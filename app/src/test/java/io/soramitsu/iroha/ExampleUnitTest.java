@@ -1,4 +1,4 @@
-package io.soramitsu.irohaapiwrapper;
+package io.soramitsu.iroha;
 
 import org.junit.Test;
 

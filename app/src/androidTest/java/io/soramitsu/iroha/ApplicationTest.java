@@ -1,4 +1,4 @@
-package io.soramitsu.irohaapiwrapper;
+package io.soramitsu.iroha;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
