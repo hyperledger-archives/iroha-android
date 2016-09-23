@@ -1,4 +1,4 @@
-package io.soramitsu.irohaapiwrapper;
+package io.soramitsu.iroha;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
