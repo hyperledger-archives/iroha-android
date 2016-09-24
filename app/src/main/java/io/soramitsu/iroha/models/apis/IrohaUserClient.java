@@ -15,9 +15,22 @@ import okhttp3.Response;
  * Wrapper class of the Iroha account API.
  */
 public class IrohaUserClient extends BaseClient {
+    private static IrohaUserClient userClient;
 
-    public IrohaUserClient(OkHttpClient okHttpClient, Gson gson) {
+    private IrohaUserClient(OkHttpClient okHttpClient, Gson gson) {
         super(okHttpClient, gson);
+    }
+
+    /**
+     * To generate new instance. (This is singleton)
+     *
+     * @return Instance of IrohaUserClient
+     */
+    public static IrohaUserClient newInstance() {
+        if (userClient == null) {
+            userClient = new IrohaUserClient(new OkHttpClient(), new Gson());
+        }
+        return userClient;
     }
 
     /**
