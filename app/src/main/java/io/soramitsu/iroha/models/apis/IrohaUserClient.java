@@ -8,6 +8,7 @@ import java.util.Map;
 
 import io.soramitsu.iroha.models.IrohaUser;
 import okhttp3.OkHttpClient;
+import okhttp3.Response;
 
 
 /**
@@ -33,8 +34,8 @@ public class IrohaUserClient extends BaseClient {
         body.put("alias", userName);
         body.put("timestamp", System.currentTimeMillis());
 
-        String result = post(ENDPOINT_URL + "/account/register", gson.toJson(body));
-        return gson.fromJson(result, IrohaUser.class);
+        Response response = post(ENDPOINT_URL + "/account/register", gson.toJson(body));
+        return gson.fromJson(responseToString(response), IrohaUser.class);
     }
 
     /**
@@ -45,7 +46,23 @@ public class IrohaUserClient extends BaseClient {
      *     If account duplicated that error response returned.
      */
     public IrohaUser findUserInfo(String uuid) throws IOException {
-        String result = get(ENDPOINT_URL + "/account?uuid=" + uuid);
-        return gson.fromJson(result, IrohaUser.class);
+        Response response = get(ENDPOINT_URL + "/account?uuid=" + uuid);
+        return gson.fromJson(responseToString(response), IrohaUser.class);
+    }
+
+    private String responseToString(Response response) throws IOException {
+        String result;
+        switch (response.code()) {
+            case STATUS_OK:
+            case STATUS_BAD:
+                result = response.body().string();
+                break;
+            case STATUS_NOT_FOUND:
+                result = "";
+                break;
+            default:
+                result = "";
+        }
+        return result;
     }
 }
