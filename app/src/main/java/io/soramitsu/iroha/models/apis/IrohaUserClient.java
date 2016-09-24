@@ -28,7 +28,6 @@ public class IrohaUserClient extends BaseClient {
      *     If account duplicated that error response returned.
      */
     public IrohaUser register(String publicKey, String userName) throws IOException {
-        // リクエストボディに含めるjsonを生成
         Map<String, Object> body = new HashMap<>();
         body.put("publicKey", publicKey);
         body.put("alias", userName);
