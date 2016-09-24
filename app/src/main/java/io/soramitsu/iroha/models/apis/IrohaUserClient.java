@@ -1,16 +1,23 @@
 package io.soramitsu.iroha.models.apis;
 
+import com.google.gson.Gson;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import io.soramitsu.iroha.models.IrohaUser;
+import okhttp3.OkHttpClient;
 
 
 /**
  * Wrapper class of the Iroha account API.
  */
 public class IrohaUserClient extends BaseClient {
+
+    public IrohaUserClient(OkHttpClient okHttpClient, Gson gson) {
+        super(okHttpClient, gson);
+    }
 
     /**
      * 【POST】To register iroha account.

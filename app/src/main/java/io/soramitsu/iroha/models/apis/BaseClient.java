@@ -30,13 +30,9 @@ public class BaseClient {
     private OkHttpClient okHttpClient;
     protected Gson gson;
 
-    public BaseClient() {
-        initialize();
-    }
-
-    private void initialize() {
-        okHttpClient = new OkHttpClient();
-        gson = new Gson();
+    public BaseClient(OkHttpClient okHttpClient, Gson gson) {
+        this.okHttpClient = okHttpClient;
+        this.gson = gson;
     }
 
     /**
