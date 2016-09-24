@@ -1,5 +1,9 @@
 package io.soramitsu.iroha.models.apis;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import io.soramitsu.iroha.models.IrohaUser;
 
 
@@ -9,25 +13,33 @@ import io.soramitsu.iroha.models.IrohaUser;
 public class IrohaUserClient extends BaseClient {
 
     /**
-     * To register iroha account.
+     * 【POST】To register iroha account.
      *
      * @param publicKey User's ed25519 public Key (Base64)
      * @param userName  User name
      * @return User info(user name, uuid, etc.)<br>
      *     If account duplicated that error response returned.
      */
-    public IrohaUser register(String publicKey, String userName) {
-        return null;
+    public IrohaUser register(String publicKey, String userName) throws IOException {
+        // リクエストボディに含めるjsonを生成
+        Map<String, Object> body = new HashMap<>();
+        body.put("publicKey", publicKey);
+        body.put("alias", userName);
+        body.put("timestamp", System.currentTimeMillis());
+
+        String result = post(ENDPOINT_URL + "/account/register", gson.toJson(body));
+        return gson.fromJson(result, IrohaUser.class);
     }
 
     /**
-     * To get the Iroha account info in accordance with uuid.
+     * 【GET】To get the Iroha account info in accordance with uuid.
      *
      * @param uuid ID for identifies the Iroha account (sha3)
      * @return User info(user name, uuid, etc.)<br>
      *     If account duplicated that error response returned.
      */
-    public IrohaUser findUserInfo(String uuid) {
-        return null;
+    public IrohaUser findUserInfo(String uuid) throws IOException {
+        String result = get(ENDPOINT_URL + "/account?uuid=" + uuid);
+        return gson.fromJson(result, IrohaUser.class);
     }
 }
