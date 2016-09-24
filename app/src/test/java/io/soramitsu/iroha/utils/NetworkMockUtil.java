@@ -13,7 +13,8 @@ public class NetworkMockUtil {
     private NetworkMockUtil() {
     }
 
-    public static void createMockWebServer(Dispatcher dispatcher) throws IOException {
+    public static void createMockWebServer(Dispatcher dispatcher)
+            throws IOException {
         mockWebServer = new MockWebServer();
         mockWebServer.setDispatcher(dispatcher);
         mockWebServer.start();
