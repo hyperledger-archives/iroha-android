@@ -1,5 +1,7 @@
 package io.soramitsu.iroha.models.apis;
 
+import com.google.gson.Gson;
+
 import java.io.IOException;
 
 import okhttp3.MediaType;
@@ -26,6 +28,7 @@ public class BaseClient {
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
     private OkHttpClient okHttpClient;
+    protected Gson gson;
 
     public BaseClient() {
         initialize();
@@ -33,6 +36,7 @@ public class BaseClient {
 
     private void initialize() {
         okHttpClient = new OkHttpClient();
+        gson = new Gson();
     }
 
     /**
