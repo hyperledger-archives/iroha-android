@@ -1,12 +1,47 @@
 package io.soramitsu.iroha.models;
 
 
+import com.google.gson.annotations.SerializedName;
+
 /**
- * Iroha domain.
+ * Iroha name.
  */
 public class Domain extends ResponseObject {
-    private String domain;
+    @SerializedName("domain")
+    private String name;
     private String creator;
     private String signature;
     private String creationDate;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getCreator() {
+        return creator;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    public String getSignature() {
+        return signature;
+    }
+
+    public void setSignature(String signature) {
+        this.signature = signature;
+    }
+
+    public String getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(String creationDate) {
+        this.creationDate = creationDate;
+    }
 }
