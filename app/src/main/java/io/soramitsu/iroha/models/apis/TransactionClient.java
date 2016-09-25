@@ -177,7 +177,7 @@ public class TransactionClient {
         return history(response);
     }
 
-    public History history(Domain domain, Asset asset) throws IOException {
+    public History history(String domain, String asset) throws IOException {
         Response response = get(ENDPOINT_URL + "/history/" + domain + "." + asset);
         return history(response);
     }
