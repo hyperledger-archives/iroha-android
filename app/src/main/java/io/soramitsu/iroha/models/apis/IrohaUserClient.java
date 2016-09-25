@@ -12,7 +12,6 @@ import okhttp3.Response;
 import static io.soramitsu.iroha.utils.NetworkUtil.ENDPOINT_URL;
 import static io.soramitsu.iroha.utils.NetworkUtil.STATUS_OK;
 import static io.soramitsu.iroha.utils.NetworkUtil.STATUS_BAD;
-import static io.soramitsu.iroha.utils.NetworkUtil.STATUS_NOT_FOUND;
 import static io.soramitsu.iroha.utils.NetworkUtil.get;
 import static io.soramitsu.iroha.utils.NetworkUtil.post;
 
@@ -109,9 +108,6 @@ public class IrohaUserClient {
             case STATUS_OK:
             case STATUS_BAD:
                 result = response.body().string();
-                break;
-            case STATUS_NOT_FOUND:
-                result = "";
                 break;
             default:
                 result = "";
