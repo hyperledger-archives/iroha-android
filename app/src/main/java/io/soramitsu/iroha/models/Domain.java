@@ -1,7 +1,7 @@
 package io.soramitsu.iroha.models;
 
-
 import com.google.gson.annotations.SerializedName;
+
 
 /**
  * Iroha name.
