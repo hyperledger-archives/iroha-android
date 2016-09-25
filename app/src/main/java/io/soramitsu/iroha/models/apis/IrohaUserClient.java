@@ -96,6 +96,13 @@ public class IrohaUserClient {
         return user;
     }
 
+    /**
+     * To convert okhttp3.Response to String.
+     *
+     * @param response Response object
+     * @return Response body after converted string.
+     * @throws IOException
+     */
     private String responseToString(Response response) throws IOException {
         String result;
         switch (response.code()) {
