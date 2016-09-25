@@ -10,7 +10,6 @@ public class Domain extends ResponseObject {
     @SerializedName("domain")
     private String name;
     private String creator;
-    private String signature;
     private String creationDate;
 
     public String getName() {
@@ -27,14 +26,6 @@ public class Domain extends ResponseObject {
 
     public void setCreator(String creator) {
         this.creator = creator;
-    }
-
-    public String getSignature() {
-        return signature;
-    }
-
-    public void setSignature(String signature) {
-        this.signature = signature;
     }
 
     public String getCreationDate() {

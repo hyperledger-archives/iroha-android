@@ -3,12 +3,15 @@ package io.soramitsu.iroha.models.apis;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.security.PublicKey;
 import java.util.HashMap;
 import java.util.Map;
 
 import io.soramitsu.iroha.models.IrohaUser;
+import io.soramitsu.iroha.utils.DigestUtil;
 import okhttp3.Response;
 
+import static io.soramitsu.iroha.utils.DigestUtil.getPublicKeyEncodedBase64;
 import static io.soramitsu.iroha.utils.NetworkUtil.ENDPOINT_URL;
 import static io.soramitsu.iroha.utils.NetworkUtil.STATUS_OK;
 import static io.soramitsu.iroha.utils.NetworkUtil.STATUS_BAD;
@@ -44,14 +47,14 @@ public class IrohaUserClient {
      * 【POST】To register iroha account.
      *
      * @param publicKey User's ed25519 public Key (Base64)
-     * @param userName  User name
+     * @param name  User name
      * @return User info(user name, uuid, etc.)<br>
      *     If account duplicated that error response returned.
      */
-    public IrohaUser register(String publicKey, String userName) throws IOException {
+    public IrohaUser register(PublicKey publicKey, String name) throws IOException {
         Map<String, Object> body = new HashMap<>();
-        body.put("publicKey", publicKey);
-        body.put("alias", userName);
+        body.put("publicKey", getPublicKeyEncodedBase64(publicKey));
+        body.put("screen_name", name);
         body.put("timestamp", System.currentTimeMillis() / 1000L);
 
         Response response = post(ENDPOINT_URL + "/account/register", gson.toJson(body));
@@ -59,7 +62,7 @@ public class IrohaUserClient {
         switch (response.code()) {
             case STATUS_OK:
                 user = gson.fromJson(responseToString(response), IrohaUser.class);
-                user.setUserName(userName);
+                user.setName(name);
                 break;
             case STATUS_BAD:
                 user = gson.fromJson(responseToString(response), IrohaUser.class);

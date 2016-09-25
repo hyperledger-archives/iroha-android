@@ -5,6 +5,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.security.KeyPair;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,11 +14,12 @@ import java.util.Map;
 import io.soramitsu.iroha.models.Asset;
 import io.soramitsu.iroha.models.Domain;
 import io.soramitsu.iroha.models.History;
-import io.soramitsu.iroha.models.Message;
 import io.soramitsu.iroha.models.Operation;
 import io.soramitsu.iroha.models.ResponseObject;
 import okhttp3.Response;
 
+import static io.soramitsu.iroha.utils.DigestUtil.getPublicKeyEncodedBase64;
+import static io.soramitsu.iroha.utils.DigestUtil.sign;
 import static io.soramitsu.iroha.utils.NetworkUtil.ENDPOINT_URL;
 import static io.soramitsu.iroha.utils.NetworkUtil.STATUS_BAD;
 import static io.soramitsu.iroha.utils.NetworkUtil.STATUS_OK;
@@ -49,12 +51,15 @@ public class TransactionClient {
         return transactionClient;
     }
 
-    public Domain registerDomain(String name, String owner, String signature) throws IOException {
+    public Domain registerDomain(String name, KeyPair keyPair) throws IOException {
+        final long timestamp = System.currentTimeMillis() / 1000L;
+        final String publicKey = getPublicKeyEncodedBase64(keyPair);
+        final String message = "timestamp:" + timestamp + ",owner:" + publicKey + ",name:" + name;
         Map<String, Object> body = new HashMap<>();
         body.put("name", name);
-        body.put("owner", owner);
-        body.put("signature", signature);
-        body.put("timestamp", System.currentTimeMillis() / 1000L);
+        body.put("owner", publicKey);
+        body.put("signature", sign(keyPair.getPrivate(), message));
+        body.put("timestamp", timestamp);
 
         Response response = post(ENDPOINT_URL + "/domain/register", gson.toJson(body));
         Domain domain;
@@ -74,13 +79,16 @@ public class TransactionClient {
         return domain;
     }
 
-    public Asset registerAsset(String name, String domain, String creator, String signature) throws IOException {
+    public Asset registerAsset(String name, String domain, KeyPair keyPair) throws IOException {
+        final long timestamp = System.currentTimeMillis() / 1000L;
+        final String publicKey = getPublicKeyEncodedBase64(keyPair);
+        final String message = "name:" + name + ",creator:" + publicKey + ",timestamp:" + timestamp;
         Map<String, Object> body = new HashMap<>();
         body.put("name", name);
         body.put("domain", domain);
-        body.put("creator", creator);
-        body.put("signature", signature);
-        body.put("timestamp", System.currentTimeMillis() / 1000L);
+        body.put("creator", publicKey);
+        body.put("signature", sign(keyPair.getPrivate(), message));
+        body.put("timestamp", timestamp);
 
         Response response = post(ENDPOINT_URL + "/asset/create", gson.toJson(body));
         Asset asset;
@@ -89,7 +97,7 @@ public class TransactionClient {
                 asset = gson.fromJson(responseToString(response), Asset.class);
                 asset.setName(name);
                 asset.setDomain(domain);
-                asset.setCreator(creator);
+                asset.setCreator(publicKey);
                 break;
             case STATUS_BAD:
                 asset = gson.fromJson(responseToString(response), Asset.class);
@@ -132,11 +140,21 @@ public class TransactionClient {
         return assets;
     }
 
-    public ResponseObject assetOperation(String assetUuid, String signature, Operation params) throws IOException {
+    public ResponseObject assetOperation(String assetUuid, String command, int amount,
+                                         String receiver, KeyPair keyPair) throws IOException {
+        final Operation operation = new Operation();
+        operation.setCommand(command);
+        operation.setAmount(amount);
+        operation.setSender(getPublicKeyEncodedBase64(keyPair));
+        operation.setReceiver(receiver);
+
+        final String message = "sender:" + operation.getSender() + ",receiver:" + receiver
+                + ",asset-uuid:" + assetUuid + ",amount:" + amount;
+
         Map<String, Object> body = new HashMap<>();
         body.put("asset-uuid", assetUuid);
-        body.put("params", gson.toJson(params));
-        body.put("signature", signature);
+        body.put("params", gson.toJson(operation));
+        body.put("signature", sign(keyPair.getPrivate(), message));
         body.put("timestamp", System.currentTimeMillis() / 1000L);
 
         Response response = post(ENDPOINT_URL + "/asset/operation", gson.toJson(body));
@@ -178,13 +196,17 @@ public class TransactionClient {
         return history;
     }
 
-    public ResponseObject sendMessage(Message message, String signature) throws IOException {
+    public ResponseObject sendMessage(String messageBody, String receiver, KeyPair keyPair) throws IOException {
+        final long timestamp = System.currentTimeMillis() / 1000L;
+        final String publicKey = getPublicKeyEncodedBase64(keyPair);
+        final String message = "message:" + messageBody + ",creator" + publicKey + ",timestamp:" + timestamp;
+
         Map<String, Object> body = new HashMap<>();
-        body.put("message", message.getBody());
-        body.put("creator", message.getCreator());
-        body.put("receiver", message.getReceiver());
-        body.put("signature", signature);
-        body.put("timestamp", System.currentTimeMillis() / 1000L);
+        body.put("message", messageBody);
+        body.put("creator", publicKey);
+        body.put("receiver", receiver);
+        body.put("signature", sign(keyPair.getPrivate(), message));
+        body.put("timestamp", timestamp);
 
         Response response = post(ENDPOINT_URL + "/message", gson.toJson(body));
         ResponseObject responseObject;

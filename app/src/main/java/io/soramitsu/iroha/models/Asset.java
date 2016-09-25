@@ -8,7 +8,6 @@ public class Asset extends ResponseObject {
     private String name;
     private String domain;
     private String creator;
-    private String signature;
     private String creationDate;
 
     public String getName() {
@@ -33,14 +32,6 @@ public class Asset extends ResponseObject {
 
     public void setCreator(String creator) {
         this.creator = creator;
-    }
-
-    public String getSignature() {
-        return signature;
-    }
-
-    public void setSignature(String signature) {
-        this.signature = signature;
     }
 
     public String getCreationDate() {

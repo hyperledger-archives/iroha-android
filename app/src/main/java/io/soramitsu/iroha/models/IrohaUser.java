@@ -8,8 +8,8 @@ import com.google.gson.annotations.SerializedName;
  */
 public class IrohaUser extends ResponseObject {
     private String uuid;
-    @SerializedName("alias")
-    private String userName;
+    @SerializedName("screen_name")
+    private String name;
 
     public String getUuid() {
         return uuid;
@@ -19,11 +19,11 @@ public class IrohaUser extends ResponseObject {
         this.uuid = uuid;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getName() {
+        return name;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setName(String name) {
+        this.name = name;
     }
 }

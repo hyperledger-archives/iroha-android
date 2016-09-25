@@ -102,7 +102,7 @@ public class IrohaUserClientTest extends TestCase {
         final IrohaUser result = userClient.register(publicKey, alias);
 
         assertThat(result.getStatus(), is(200));
-        assertThat(result.getUserName(), is(alias));
+        assertThat(result.getName(), is(alias));
         assertThat(result.getUuid(), is(TEST_EXIST_UUID));
     }
 
@@ -135,7 +135,7 @@ public class IrohaUserClientTest extends TestCase {
         final IrohaUser result = userClient.findUserInfo(TEST_EXIST_UUID);
 
         assertThat(result.getStatus(), is(200));
-        assertThat(result.getUserName(), is(alias));
+        assertThat(result.getName(), is(alias));
     }
 
     @Test(timeout = TIMEOUT)
