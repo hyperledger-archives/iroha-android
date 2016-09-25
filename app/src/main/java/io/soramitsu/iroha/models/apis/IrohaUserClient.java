@@ -53,10 +53,24 @@ public class IrohaUserClient {
         Map<String, Object> body = new HashMap<>();
         body.put("publicKey", publicKey);
         body.put("alias", userName);
-        body.put("timestamp", System.currentTimeMillis());
+        body.put("timestamp", System.currentTimeMillis() / 1000L);
 
         Response response = post(ENDPOINT_URL + "/account/register", gson.toJson(body));
-        return gson.fromJson(responseToString(response), IrohaUser.class);
+        IrohaUser user;
+        switch (response.code()) {
+            case STATUS_OK:
+                user = gson.fromJson(responseToString(response), IrohaUser.class);
+                user.setUserName(userName);
+                break;
+            case STATUS_BAD:
+                user = gson.fromJson(responseToString(response), IrohaUser.class);
+                break;
+            default:
+                user = new IrohaUser();
+                user.setStatus(response.code());
+                user.setMessage(response.message());
+        }
+        return user;
     }
 
     /**
@@ -68,7 +82,18 @@ public class IrohaUserClient {
      */
     public IrohaUser findUserInfo(String uuid) throws IOException {
         Response response = get(ENDPOINT_URL + "/account?uuid=" + uuid);
-        return gson.fromJson(responseToString(response), IrohaUser.class);
+        IrohaUser user;
+        switch (response.code()) {
+            case STATUS_OK:
+            case STATUS_BAD:
+                user = gson.fromJson(responseToString(response), IrohaUser.class);
+                break;
+            default:
+                user = new IrohaUser();
+                user.setStatus(response.code());
+                user.setMessage(response.message());
+        }
+        return user;
     }
 
     private String responseToString(Response response) throws IOException {
