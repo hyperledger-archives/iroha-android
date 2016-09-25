@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.security.PublicKey;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,6 +20,7 @@ import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.RecordedRequest;
 
+import static io.soramitsu.iroha.utils.DigestUtil.createKeyPair;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -45,7 +47,7 @@ public class IrohaUserClientTest extends TestCase {
                 switch (request.getPath()) {
                     case "//account/register":
                         if (request.getMethod().equals("POST")) {
-                            Pattern p = Pattern.compile("\"alias\":\"(.+?)\"");
+                            Pattern p = Pattern.compile("\"screen_name\":\"(.+?)\"");
                             Matcher m = p.matcher(request.getBody().toString());
                             if (m.find() && m.group(1).equals("duplicate_user")) {
                                 return new MockResponse().setBody("{\n" +
@@ -64,7 +66,7 @@ public class IrohaUserClientTest extends TestCase {
                         if (request.getMethod().equals("GET")) {
                             return new MockResponse().setBody("{\n" +
                                     "  \"status\": 200,\n" +
-                                    "  \"alias\": \"user_name\"\n" +
+                                    "  \"screen_name\": \"user_name\"\n" +
                                     "}").setResponseCode(200);
                         }
                         return new MockResponse().setResponseCode(400);
@@ -96,7 +98,7 @@ public class IrohaUserClientTest extends TestCase {
 
     @Test(timeout = TIMEOUT)
     public void testRegister_Successful() throws Exception {
-        final String publicKey = "publicKey";
+        final PublicKey publicKey = createKeyPair().getPublic();
         final String alias = "user_name";
 
         final IrohaUser result = userClient.register(publicKey, alias);
@@ -108,7 +110,7 @@ public class IrohaUserClientTest extends TestCase {
 
     @Test(timeout = TIMEOUT)
     public void testRegister_Duplicate() throws Exception {
-        final String publicKey = "publicKey";
+        final PublicKey publicKey = createKeyPair().getPublic();
         final String alias = "duplicate_user";
 
         final IrohaUser result = userClient.register(publicKey, alias);
@@ -119,7 +121,7 @@ public class IrohaUserClientTest extends TestCase {
 
     @Test(timeout = TIMEOUT)
     public void testRegister_NotFound() throws Exception {
-        final String publicKey = "publicKey";
+        final PublicKey publicKey = createKeyPair().getPublic();
         final String alias = "user_name";
 
         NetworkUtil.ENDPOINT_URL = NetworkMockUtil.call("/nothing").toString();
@@ -130,24 +132,24 @@ public class IrohaUserClientTest extends TestCase {
 
     @Test(timeout = TIMEOUT)
     public void testFindUserInfo_Successful() throws Exception {
-        final String alias = "user_name";
+        final String screenName = "user_name";
 
-        final IrohaUser result = userClient.findUserInfo(TEST_EXIST_UUID);
+        final IrohaUser result = userClient.findAccountInfo(TEST_EXIST_UUID);
 
         assertThat(result.getStatus(), is(200));
-        assertThat(result.getName(), is(alias));
+        assertThat(result.getName(), is(screenName));
     }
 
     @Test(timeout = TIMEOUT)
     public void testFindUserInfo_UserNotFound() throws Exception {
-        final IrohaUser result = userClient.findUserInfo(TEST_NO_EXIST_UUID);
+        final IrohaUser result = userClient.findAccountInfo(TEST_NO_EXIST_UUID);
         assertThat(result.getStatus(), is(400));
     }
 
     @Test(timeout = TIMEOUT)
     public void testFindUserInfo_NotFound() throws Exception {
         NetworkUtil.ENDPOINT_URL = NetworkMockUtil.call("/nothing").toString();
-        final IrohaUser result = userClient.findUserInfo(TEST_EXIST_UUID);
+        final IrohaUser result = userClient.findAccountInfo(TEST_EXIST_UUID);
         assertThat(result.getStatus(), is(404));
     }
 }
