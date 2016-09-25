@@ -7,18 +7,26 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.soramitsu.iroha.models.IrohaUser;
-import okhttp3.OkHttpClient;
 import okhttp3.Response;
+
+import static io.soramitsu.iroha.utils.NetworkUtil.ENDPOINT_URL;
+import static io.soramitsu.iroha.utils.NetworkUtil.STATUS_OK;
+import static io.soramitsu.iroha.utils.NetworkUtil.STATUS_BAD;
+import static io.soramitsu.iroha.utils.NetworkUtil.STATUS_NOT_FOUND;
+import static io.soramitsu.iroha.utils.NetworkUtil.get;
+import static io.soramitsu.iroha.utils.NetworkUtil.post;
 
 
 /**
  * Wrapper class of the Iroha account API.
  */
-public class IrohaUserClient extends BaseClient {
+public class IrohaUserClient {
     private static IrohaUserClient userClient;
 
-    private IrohaUserClient(OkHttpClient okHttpClient, Gson gson) {
-        super(okHttpClient, gson);
+    private Gson gson;
+
+    private IrohaUserClient(Gson gson) {
+        this.gson = gson;
     }
 
     /**
@@ -28,7 +36,7 @@ public class IrohaUserClient extends BaseClient {
      */
     public static IrohaUserClient newInstance() {
         if (userClient == null) {
-            userClient = new IrohaUserClient(new OkHttpClient(), new Gson());
+            userClient = new IrohaUserClient(new Gson());
         }
         return userClient;
     }

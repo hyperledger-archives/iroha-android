@@ -1,20 +1,15 @@
-package io.soramitsu.iroha.models.apis;
-
-import com.google.gson.Gson;
+package io.soramitsu.iroha.utils;
 
 import junit.framework.TestCase;
 
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import io.soramitsu.iroha.models.ResponseObject;
-import io.soramitsu.iroha.utils.NetworkMockUtil;
 import okhttp3.HttpUrl;
-import okhttp3.OkHttpClient;
 import okhttp3.Response;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
@@ -26,10 +21,8 @@ import static org.hamcrest.Matchers.is;
 
 
 @RunWith(JUnit4.class)
-public class BaseClientTest extends TestCase {
+public class NetworkUtilTest extends TestCase {
     private static final int TIMEOUT = 10000;
-
-    private BaseClient baseClient = new BaseClient(new OkHttpClient(), new Gson());
 
     @BeforeClass
     public static void setUpOnce() throws Exception {
@@ -73,60 +66,55 @@ public class BaseClientTest extends TestCase {
         NetworkMockUtil.shutdownMockWebServer();
     }
 
-    @Before
-    public void setUp() throws Exception {
-        baseClient = new BaseClient(new OkHttpClient(), new Gson());
-    }
-
     @Test(timeout = TIMEOUT)
     public void testGet_Successful() throws Exception {
         final HttpUrl url = NetworkMockUtil.call("/get");
-        final Response response = baseClient.get(url.toString());
+        final Response response = NetworkUtil.get(url.toString());
         final ResponseObject result = (ResponseObject) parse(response.body().string(), ResponseObject.class);
 
-        assertThat(result.getStatus(), is(BaseClient.STATUS_OK));
+        assertThat(result.getStatus(), is(200));
     }
 
     @Test(timeout = TIMEOUT)
     public void testGet_Failure() throws Exception {
         final HttpUrl url = NetworkMockUtil.call("/bad_request");
-        final Response response = baseClient.get(url.toString());
+        final Response response = NetworkUtil.get(url.toString());
         final ResponseObject result = (ResponseObject) parse(response.body().string(), ResponseObject.class);
 
-        assertThat(result.getStatus(), is(BaseClient.STATUS_BAD));
+        assertThat(result.getStatus(), is(400));
     }
 
     @Test(timeout = TIMEOUT)
     public void testGet_NotFound() throws Exception {
         final HttpUrl url = NetworkMockUtil.call("/nothing");
-        final Response response = baseClient.get(url.toString());
+        final Response response = NetworkUtil.get(url.toString());
 
-        assertThat(response.code(), is(BaseClient.STATUS_NOT_FOUND));
+        assertThat(response.code(), is(404));
     }
 
     @Test(timeout = TIMEOUT)
     public void testPost_Successful() throws Exception {
         final HttpUrl url = NetworkMockUtil.call("/post");
-        final Response response = baseClient.post(url.toString(), "{\"key:\"\"value\"}");
+        final Response response = NetworkUtil.post(url.toString(), "{\"key:\"\"value\"}");
         final ResponseObject result = (ResponseObject) parse(response.body().string(), ResponseObject.class);
 
-        assertThat(result.getStatus(), is(BaseClient.STATUS_OK));
+        assertThat(result.getStatus(), is(200));
     }
 
     @Test(timeout = TIMEOUT)
     public void testPost_Failure() throws Exception {
         final HttpUrl url = NetworkMockUtil.call("/bad_request");
-        final Response response = baseClient.post(url.toString(), "{\"key:\"\"value\"}");
+        final Response response = NetworkUtil.post(url.toString(), "{\"key:\"\"value\"}");
         final ResponseObject result = (ResponseObject) parse(response.body().string(), ResponseObject.class);
 
-        assertThat(result.getStatus(), is(BaseClient.STATUS_BAD));
+        assertThat(result.getStatus(), is(400));
     }
 
     @Test(timeout = TIMEOUT)
     public void testPost_NotFound() throws Exception {
         final HttpUrl url = NetworkMockUtil.call("/nothing");
-        final Response response = baseClient.post(url.toString(), "{\"key:\"\"value\"}");
+        final Response response = NetworkUtil.post(url.toString(), "{\"key:\"\"value\"}");
 
-        assertThat(response.code(), is(BaseClient.STATUS_NOT_FOUND));
+        assertThat(response.code(), is(404));
     }
 }

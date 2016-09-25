@@ -1,6 +1,4 @@
-package io.soramitsu.iroha.models.apis;
-
-import com.google.gson.Gson;
+package io.soramitsu.iroha.utils;
 
 import java.io.IOException;
 
@@ -12,9 +10,9 @@ import okhttp3.Response;
 
 
 /**
- * Base client object.
+ * Network util.
  */
-public class BaseClient {
+public class NetworkUtil {
     /** Endpoint url */
     public static final String ENDPOINT_URL = "http://io.mizuki.sonoko/";
 
@@ -30,12 +28,7 @@ public class BaseClient {
     /** Media type of JSON */
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
-    private OkHttpClient okHttpClient;
-    protected Gson gson;
-
-    public BaseClient(OkHttpClient okHttpClient, Gson gson) {
-        this.okHttpClient = okHttpClient;
-        this.gson = gson;
+    private NetworkUtil() {
     }
 
     /**
@@ -45,12 +38,12 @@ public class BaseClient {
      * @return Response
      * @throws IOException
      */
-    protected Response get(String url) throws IOException {
+    public static Response get(String url) throws IOException {
         Request request = new Request.Builder()
                 .url(url)
                 .build();
 
-        return okHttpClient.newCall(request).execute();
+        return new OkHttpClient().newCall(request).execute();
     }
 
     /**
@@ -61,12 +54,12 @@ public class BaseClient {
      * @return Response
      * @throws IOException
      */
-    protected Response post(String url, String json) throws IOException {
+    public static Response post(String url, String json) throws IOException {
         RequestBody body = RequestBody.create(JSON, json);
         Request request = new Request.Builder()
                 .url(url)
                 .post(body)
                 .build();
-        return okHttpClient.newCall(request).execute();
+        return new OkHttpClient().newCall(request).execute();
     }
 }
