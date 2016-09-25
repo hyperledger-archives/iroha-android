@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.soramitsu.iroha.models.IrohaUser;
-import io.soramitsu.iroha.utils.DigestUtil;
 import okhttp3.Response;
 
 import static io.soramitsu.iroha.utils.DigestUtil.getPublicKeyEncodedBase64;
@@ -82,7 +81,7 @@ public class IrohaUserClient {
      * @return User info(user name, uuid, etc.)<br>
      *     If account duplicated that error response returned.
      */
-    public IrohaUser findUserInfo(String uuid) throws IOException {
+    public IrohaUser findAccountInfo(String uuid) throws IOException {
         Response response = get(ENDPOINT_URL + "/account?uuid=" + uuid);
         IrohaUser user;
         switch (response.code()) {
