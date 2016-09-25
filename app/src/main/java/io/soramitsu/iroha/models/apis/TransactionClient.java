@@ -140,20 +140,20 @@ public class TransactionClient {
         return assets;
     }
 
-    public ResponseObject assetOperation(String assetUuid, String command, int amount,
-                                         String receiver, KeyPair keyPair) throws IOException {
-        final Operation operation = new Operation();
-        operation.setCommand(command);
-        operation.setAmount(amount);
-        operation.setSender(getPublicKeyEncodedBase64(keyPair));
-        operation.setReceiver(receiver);
+    public ResponseObject operation(String assetUuid, String command, int amount,
+                                    String receiver, KeyPair keyPair) throws IOException {
+        final Operation params = new Operation();
+        params.setCommand(command);
+        params.setAmount(amount);
+        params.setSender(getPublicKeyEncodedBase64(keyPair));
+        params.setReceiver(receiver);
 
-        final String message = "sender:" + operation.getSender() + ",receiver:" + receiver
+        final String message = "sender:" + params.getSender() + ",receiver:" + receiver
                 + ",asset-uuid:" + assetUuid + ",amount:" + amount;
 
         Map<String, Object> body = new HashMap<>();
         body.put("asset-uuid", assetUuid);
-        body.put("params", gson.toJson(operation));
+        body.put("params", gson.toJson(params));
         body.put("signature", sign(keyPair.getPrivate(), message));
         body.put("timestamp", System.currentTimeMillis() / 1000L);
 
