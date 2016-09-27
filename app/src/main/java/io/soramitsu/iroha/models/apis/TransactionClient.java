@@ -51,6 +51,13 @@ public class TransactionClient {
         return transactionClient;
     }
 
+    /**
+     * 【POST】To register iroha domain.
+     *
+     * @param name      Domain name
+     * @param keyPair   Public key and Private key sets in your device
+     * @return Registered domain (domain name, creator, etc.)
+     */
     public Domain registerDomain(String name, KeyPair keyPair) throws IOException {
         final long timestamp = System.currentTimeMillis() / 1000L;
         final String publicKey = getPublicKeyEncodedBase64(keyPair);
@@ -80,6 +87,14 @@ public class TransactionClient {
         return domain;
     }
 
+    /**
+     * 【POST】To register iroha asset.
+     *
+     * @param name      Asset name
+     * @param domain    Domain name
+     * @param keyPair   Public key and Private key sets in your device
+     * @return Created asset (asset name, domain, creator, etc.)
+     */
     public Asset registerAsset(String name, String domain, KeyPair keyPair) throws IOException {
         final long timestamp = System.currentTimeMillis() / 1000L;
         final String publicKey = getPublicKeyEncodedBase64(keyPair);
@@ -112,6 +127,11 @@ public class TransactionClient {
         return asset;
     }
 
+    /**
+     * 【GET】To find all domains.
+     *
+     * @return All domains
+     */
     public List<Domain> findDomains() throws IOException {
         Response response = get(ENDPOINT_URL + "/domain/list");
         List<Domain> domains = new ArrayList<>();
@@ -127,6 +147,11 @@ public class TransactionClient {
         return domains;
     }
 
+    /**
+     * 【GET】To find all assets.
+     *
+     * @return All assets
+     */
     public List<Asset> findAssets(String domain) throws IOException {
         Response response = get(ENDPOINT_URL + "/asset/list/" + domain);
         List<Asset> assets = new ArrayList<>();
@@ -142,6 +167,14 @@ public class TransactionClient {
         return assets;
     }
 
+    /**
+     * 【POST】To operate iroha asset for command.
+     *
+     * @param assetUuid target asset uuid
+     * @param command   operate command (transfer)
+     * @param keyPair   Public key and Private key sets in your device
+     * @return As a result of operation. (response code and message)
+     */
     public ResponseObject operation(String assetUuid, String command, int amount,
                                     String receiver, KeyPair keyPair) throws IOException {
         final long timestamp = System.currentTimeMillis() / 1000L;
@@ -175,11 +208,24 @@ public class TransactionClient {
         return responseObject;
     }
 
+    /**
+     * 【GET】To get history of transaction.
+     *
+     * @param uuid User's uuid
+     * @return Transaction of history made by user.
+     */
     public History history(String uuid) throws IOException {
         Response response = get(ENDPOINT_URL + "/history/transaction/" + uuid);
         return history(response);
     }
 
+    /**
+     * 【GET】To get history of transaction.
+     *
+     * @param domain Domain name
+     * @param asset  Asset name
+     * @return Transaction of history made by user.
+     */
     public History history(String domain, String asset) throws IOException {
         Response response = get(ENDPOINT_URL + "/history/" + domain + "." + asset);
         return history(response);
@@ -200,6 +246,14 @@ public class TransactionClient {
         return history;
     }
 
+    /**
+     * 【POST】To send receiver a message.
+     *
+     * @param messageBody Message body
+     * @param receiver    Receiver's public key
+     * @param keyPair     Public key and Private key sets in your device
+     * @return As a result of operation. (response code and message)
+     */
     public ResponseObject sendMessage(String messageBody, String receiver, KeyPair keyPair) throws IOException {
         final long timestamp = System.currentTimeMillis() / 1000L;
         final String publicKey = getPublicKeyEncodedBase64(keyPair);
