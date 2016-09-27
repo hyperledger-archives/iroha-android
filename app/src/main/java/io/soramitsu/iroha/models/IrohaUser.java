@@ -2,14 +2,17 @@ package io.soramitsu.iroha.models;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 
 /**
  * Iroha account.
  */
 public class IrohaUser extends ResponseObject {
     private String uuid;
-    @SerializedName("screen_name")
+    @SerializedName("alias")
     private String name;
+    private List<Asset> assets;
 
     public String getUuid() {
         return uuid;
@@ -25,5 +28,13 @@ public class IrohaUser extends ResponseObject {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public List<Asset> getAssets() {
+        return assets;
+    }
+
+    public void setAssets(List<Asset> assets) {
+        this.assets = assets;
     }
 }
