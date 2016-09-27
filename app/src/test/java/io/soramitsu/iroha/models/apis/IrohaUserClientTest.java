@@ -66,7 +66,16 @@ public class IrohaUserClientTest extends TestCase {
                         if (request.getMethod().equals("GET")) {
                             return new MockResponse().setBody("{\n" +
                                     "  \"status\": 200,\n" +
-                                    "  \"screen_name\": \"user_name\"\n" +
+                                    "  \"alias\": \"user_name\",\n" +
+                                    "  \"assets\": [{\n" +
+                                    "    \"name\" : \"moeka\",\n" +
+                                    "    \"domain\" : \"soramitsu\",\n" +
+                                    "    \"value\" : \"100\"\n" +
+                                    "  },{\n" +
+                                    "    \"name\" : \"moeka\",\n" +
+                                    "    \"domain\" : \"soramitsu\",\n" +
+                                    "    \"value\" : \"Owner\"\n" +
+                                    "  }]\n" +
                                     "}").setResponseCode(200);
                         }
                         return new MockResponse().setResponseCode(400);
@@ -138,6 +147,9 @@ public class IrohaUserClientTest extends TestCase {
 
         assertThat(result.getStatus(), is(200));
         assertThat(result.getName(), is(screenName));
+        assertThat(result.getAssets().size(), is(2));
+        assertThat(result.getAssets().get(0).getValue(), is("100"));
+        assertThat(result.getAssets().get(1).getValue(), is("Owner"));
     }
 
     @Test(timeout = TIMEOUT)

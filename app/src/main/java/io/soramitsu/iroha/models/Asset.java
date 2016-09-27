@@ -1,5 +1,7 @@
 package io.soramitsu.iroha.models;
 
+import com.google.gson.annotations.SerializedName;
+
 
 /**
  * Iroha asset.
@@ -7,8 +9,10 @@ package io.soramitsu.iroha.models;
 public class Asset extends ResponseObject {
     private String name;
     private String domain;
+    private String value;
     private String creator;
-    private String creationDate;
+    @SerializedName("creationDate")
+    private String createdAt;
 
     public String getName() {
         return name;
@@ -26,6 +30,14 @@ public class Asset extends ResponseObject {
         this.domain = domain;
     }
 
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
     public String getCreator() {
         return creator;
     }
@@ -34,11 +46,11 @@ public class Asset extends ResponseObject {
         this.creator = creator;
     }
 
-    public String getCreationDate() {
-        return creationDate;
+    public String getCreatedAt() {
+        return createdAt;
     }
 
-    public void setCreationDate(String creationDate) {
-        this.creationDate = creationDate;
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
     }
 }
