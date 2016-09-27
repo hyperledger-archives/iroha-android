@@ -3,7 +3,6 @@ package io.soramitsu.iroha.models.apis;
 import junit.framework.TestCase;
 
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,12 +16,12 @@ import io.soramitsu.iroha.models.Domain;
 import io.soramitsu.iroha.models.History;
 import io.soramitsu.iroha.models.ResponseObject;
 import io.soramitsu.iroha.utils.NetworkMockUtil;
-import io.soramitsu.iroha.utils.NetworkUtil;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.RecordedRequest;
 
 import static io.soramitsu.iroha.utils.DigestUtil.createKeyPair;
+import static io.soramitsu.iroha.utils.NetworkMockUtil.call;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -263,17 +262,12 @@ public class TransactionClientTest extends TestCase {
         NetworkMockUtil.shutdownMockWebServer();
     }
 
-    @Before
-    public void setUp() throws Exception {
-        NetworkUtil.ENDPOINT_URL = NetworkMockUtil.call("").toString();
-    }
-
     @Test(timeout = TIMEOUT)
     public void testRegisterDomain_Successful() throws Exception {
         final String name = "domain_name";
         final KeyPair keyPair = createKeyPair();
 
-        ResponseObject result = transactionClient.registerDomain(name, keyPair);
+        ResponseObject result = transactionClient.registerDomain(call(""), name, keyPair);
 
         assertThat(result.getStatus(), is(200));
         assertThat(result.getMessage(), is("Domain registered successfully."));
@@ -284,8 +278,7 @@ public class TransactionClientTest extends TestCase {
         final String name = "domain_name";
         final KeyPair keyPair = createKeyPair();
 
-        NetworkUtil.ENDPOINT_URL = NetworkMockUtil.call("/nothing").toString();
-        ResponseObject result = transactionClient.registerDomain(name, keyPair);
+        ResponseObject result = transactionClient.registerDomain(call("/nothing"), name, keyPair);
 
         assertThat(result.getStatus(), is(404));
     }
@@ -296,7 +289,7 @@ public class TransactionClientTest extends TestCase {
         final String domainName = "domain_name";
         final KeyPair keyPair = createKeyPair();
 
-        ResponseObject result = transactionClient.registerAsset(name, domainName, keyPair);
+        ResponseObject result = transactionClient.registerAsset(call(""), name, domainName, keyPair);
 
         assertThat(result.getStatus(), is(200));
         assertThat(result.getMessage(), is("Asset created successfully."));
@@ -308,16 +301,14 @@ public class TransactionClientTest extends TestCase {
         final String domainName = "domain_name";
         final KeyPair keyPair = createKeyPair();
 
-        NetworkUtil.ENDPOINT_URL = NetworkMockUtil.call("/nothing").toString();
-        ResponseObject result = transactionClient.registerAsset(name, domainName, keyPair);
+        ResponseObject result = transactionClient.registerAsset(call("/nothing"), name, domainName, keyPair);
 
         assertThat(result.getStatus(), is(404));
     }
 
     @Test(timeout = TIMEOUT)
     public void testFindDomains_Successful_OneDomain() throws Exception {
-        NetworkUtil.ENDPOINT_URL = NetworkMockUtil.call("1").toString();
-        List<Domain> domains = transactionClient.findDomains();
+        List<Domain> domains = transactionClient.findDomains(call("1"));
 
         assertThat(domains.size(), is(1));
         assertThat(domains.get(0).getName(), is("soramitsu"));
@@ -325,7 +316,7 @@ public class TransactionClientTest extends TestCase {
 
     @Test(timeout = TIMEOUT)
     public void testFindDomains_Successful_MultiDomains() throws Exception {
-        List<Domain> domains = transactionClient.findDomains();
+        List<Domain> domains = transactionClient.findDomains(call(""));
 
         assertThat(domains.size(), is(2));
         assertThat(domains.get(0).getName(), is("soramitsu"));
@@ -334,16 +325,14 @@ public class TransactionClientTest extends TestCase {
 
     @Test(timeout = TIMEOUT)
     public void testFindDomains_Successful_DomainsNotFound() throws Exception {
-        NetworkUtil.ENDPOINT_URL = NetworkMockUtil.call("0").toString();
-        List<Domain> domains = transactionClient.findDomains();
+        List<Domain> domains = transactionClient.findDomains(call("0"));
 
         assertThat(domains.size(), is(0));
     }
 
     @Test(timeout = TIMEOUT)
     public void testFindDomains_NotFound() throws Exception {
-        NetworkUtil.ENDPOINT_URL = NetworkMockUtil.call("/nothing").toString();
-        List<Domain> domains = transactionClient.findDomains();
+        List<Domain> domains = transactionClient.findDomains(call("/nothing"));
 
         assertThat(domains.size(), is(0));
     }
@@ -352,8 +341,7 @@ public class TransactionClientTest extends TestCase {
     public void testFindAssets_Successful_OneDomain() throws Exception {
         final String domain = "domain_name";
 
-        NetworkUtil.ENDPOINT_URL = NetworkMockUtil.call("1").toString();
-        List<Asset> assets = transactionClient.findAssets(domain);
+        List<Asset> assets = transactionClient.findAssets(call("1"), domain);
 
         assertThat(assets.size(), is(1));
         assertThat(assets.get(0).getName(), is("moeka"));
@@ -363,7 +351,7 @@ public class TransactionClientTest extends TestCase {
     public void testFindAssets_Successful_MultiDomains() throws Exception {
         final String domain = "domain_name";
 
-        List<Asset> assets = transactionClient.findAssets(domain);
+        List<Asset> assets = transactionClient.findAssets(call("/"), domain);
 
         assertThat(assets.size(), is(2));
         assertThat(assets.get(0).getName(), is("moeka"));
@@ -374,8 +362,7 @@ public class TransactionClientTest extends TestCase {
     public void testFindAssets_Successful_DomainsNotFound() throws Exception {
         final String domain = "domain_name";
 
-        NetworkUtil.ENDPOINT_URL = NetworkMockUtil.call("0").toString();
-        List<Asset> assets = transactionClient.findAssets(domain);
+        List<Asset> assets = transactionClient.findAssets(call("0"), domain);
 
         assertThat(assets.size(), is(0));
     }
@@ -384,8 +371,7 @@ public class TransactionClientTest extends TestCase {
     public void testFindAssets_NotFound() throws Exception {
         final String domain = "domain_name";
 
-        NetworkUtil.ENDPOINT_URL = NetworkMockUtil.call("/nothing").toString();
-        List<Asset> assets = transactionClient.findAssets(domain);
+        List<Asset> assets = transactionClient.findAssets(call("/nothing"), domain);
 
         assertThat(assets.size(), is(0));
     }
@@ -398,8 +384,8 @@ public class TransactionClientTest extends TestCase {
         final String receiver = "receiver";
         final KeyPair keyPair = createKeyPair();
 
-        ResponseObject result = transactionClient.operation(
-                assetUuid, command, amount, receiver, keyPair);
+        ResponseObject result = transactionClient.operation(call(""), assetUuid, command,
+                amount, receiver, keyPair);
 
         assertThat(result.getStatus(), is(200));
         assertThat(result.getMessage(), is("Asset transfered successfully."));
@@ -413,9 +399,8 @@ public class TransactionClientTest extends TestCase {
         final String receiver = "receiver";
         final KeyPair keyPair = createKeyPair();
 
-        NetworkUtil.ENDPOINT_URL = NetworkMockUtil.call("/nothing").toString();
-        ResponseObject result = transactionClient.operation(
-                assetUuid, command, amount, receiver, keyPair);
+        ResponseObject result = transactionClient.operation(call("/nothing"), assetUuid, command,
+                amount, receiver, keyPair);
 
         assertThat(result.getStatus(), is(404));
     }
@@ -424,8 +409,7 @@ public class TransactionClientTest extends TestCase {
     public void testHistory_Successful_OneHistory() throws Exception {
         final String uuid = "1234";
 
-        NetworkUtil.ENDPOINT_URL = NetworkMockUtil.call("1").toString();
-        History result = transactionClient.history(uuid);
+        History result = transactionClient.history(call("1"), uuid);
 
         assertThat(result.getStatus(), is(200));
         assertThat(result.getHistory().size(), is(1));
@@ -435,7 +419,7 @@ public class TransactionClientTest extends TestCase {
     public void testHistory_Successful_MultiHistory() throws Exception {
         final String uuid = "1234";
 
-        History result = transactionClient.history(uuid);
+        History result = transactionClient.history(call(""), uuid);
 
         assertThat(result.getStatus(), is(200));
         assertThat(result.getHistory().size(), is(2));
@@ -445,8 +429,7 @@ public class TransactionClientTest extends TestCase {
     public void testHistory_Successful_HistoryNotFound() throws Exception {
         final String uuid = "1234";
 
-        NetworkUtil.ENDPOINT_URL = NetworkMockUtil.call("0").toString();
-        History result = transactionClient.history(uuid);
+        History result = transactionClient.history(call("0"), uuid);
 
         assertThat(result.getStatus(), is(200));
         assertThat(result.getHistory().size(), is(0));
@@ -456,8 +439,7 @@ public class TransactionClientTest extends TestCase {
     public void testHistory_NotFound() throws Exception {
         final String uuid = "1234";
 
-        NetworkUtil.ENDPOINT_URL = NetworkMockUtil.call("/nothing").toString();
-        History result = transactionClient.history(uuid);
+        History result = transactionClient.history(call("/nothing"), uuid);
 
         assertThat(result.getStatus(), is(404));
     }
@@ -467,8 +449,7 @@ public class TransactionClientTest extends TestCase {
         final String domain = "domain_name";
         final String asset = "asset_name";
 
-        NetworkUtil.ENDPOINT_URL = NetworkMockUtil.call("1").toString();
-        History result = transactionClient.history(domain, asset);
+        History result = transactionClient.history(call("1"), domain, asset);
 
         assertThat(result.getStatus(), is(200));
         assertThat(result.getHistory().size(), is(1));
@@ -479,7 +460,7 @@ public class TransactionClientTest extends TestCase {
         final String domain = "domain_name";
         final String asset = "asset_name";
 
-        History result = transactionClient.history(domain, asset);
+        History result = transactionClient.history(call(""), domain, asset);
 
         assertThat(result.getStatus(), is(200));
         assertThat(result.getHistory().size(), is(2));
@@ -490,8 +471,7 @@ public class TransactionClientTest extends TestCase {
         final String domain = "domain_name";
         final String asset = "asset_name";
 
-        NetworkUtil.ENDPOINT_URL = NetworkMockUtil.call("0").toString();
-        History result = transactionClient.history(domain, asset);
+        History result = transactionClient.history(call("0"), domain, asset);
 
         assertThat(result.getStatus(), is(200));
         assertThat(result.getHistory().size(), is(0));
@@ -502,8 +482,7 @@ public class TransactionClientTest extends TestCase {
         final String domain = "domain_name";
         final String asset = "asset_name";
 
-        NetworkUtil.ENDPOINT_URL = NetworkMockUtil.call("/nothing").toString();
-        History result = transactionClient.history(domain, asset);
+        History result = transactionClient.history(call("/nothing"), domain, asset);
 
         assertThat(result.getStatus(), is(404));
     }
@@ -514,7 +493,7 @@ public class TransactionClientTest extends TestCase {
         final String receiver = "receiver";
         final KeyPair keyPair = createKeyPair();
 
-        ResponseObject result = transactionClient.sendMessage(message, receiver, keyPair);
+        ResponseObject result = transactionClient.sendMessage(call(""), message, receiver, keyPair);
 
         assertThat(result.getStatus(), is(200));
         assertThat(result.getMessage(), is("Message sent successfully."));
@@ -526,8 +505,7 @@ public class TransactionClientTest extends TestCase {
         final String receiver = "receiver";
         final KeyPair keyPair = createKeyPair();
 
-        NetworkUtil.ENDPOINT_URL = NetworkMockUtil.call("/nothing").toString();
-        ResponseObject result = transactionClient.sendMessage(message, receiver, keyPair);
+        ResponseObject result = transactionClient.sendMessage(call("/nothing"), message, receiver, keyPair);
 
         assertThat(result.getStatus(), is(404));
     }

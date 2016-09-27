@@ -13,10 +13,6 @@ import okhttp3.Response;
  * Network util.
  */
 public class NetworkUtil {
-    /** Endpoint url */
-    // FIXME 見られて良いもの？環境変数等から取り出すか要相談
-    public static String ENDPOINT_URL = "http://mock.mizuki.io/";
-
     /** Successful status code */
     public static final int STATUS_OK = 200;
 
