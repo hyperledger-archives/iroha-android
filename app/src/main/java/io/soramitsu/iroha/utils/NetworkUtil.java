@@ -15,7 +15,7 @@ import okhttp3.Response;
 public class NetworkUtil {
     /** Endpoint url */
     // FIXME 見られて良いもの？環境変数等から取り出すか要相談
-    public static String ENDPOINT_URL = "http://io.mizuki.sonoko/";
+    public static String ENDPOINT_URL = "http://mock.mizuki.io/";
 
     /** Successful status code */
     public static final int STATUS_OK = 200;
@@ -62,5 +62,25 @@ public class NetworkUtil {
                 .post(body)
                 .build();
         return new OkHttpClient().newCall(request).execute();
+    }
+
+    /**
+     * To convert okhttp3.Response to String.
+     *
+     * @param response Response object
+     * @return Response body after converted string.
+     * @throws IOException
+     */
+    public static String responseToString(Response response) throws IOException {
+        String result;
+        switch (response.code()) {
+            case STATUS_OK:
+            case STATUS_BAD:
+                result = response.body().string();
+                break;
+            default:
+                result = "";
+        }
+        return result;
     }
 }
