@@ -46,12 +46,12 @@ public class IrohaUserClient {
      * 【POST】To register iroha account.
      *
      * @param publicKey User's ed25519 public Key (Base64)
-     * @param name  User name
+     * @param name      User name
      * @return User info(user name, uuid, etc.)<br>
      *     If account duplicated that error response returned.
      */
     public IrohaUser register(PublicKey publicKey, String name) throws IOException {
-        Map<String, Object> body = new HashMap<>();
+        final Map<String, Object> body = new HashMap<>();
         body.put("publicKey", getPublicKeyEncodedBase64(publicKey));
         body.put("screen_name", name);
         body.put("timestamp", System.currentTimeMillis() / 1000L);

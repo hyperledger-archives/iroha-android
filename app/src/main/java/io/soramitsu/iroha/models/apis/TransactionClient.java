@@ -14,7 +14,6 @@ import java.util.Map;
 import io.soramitsu.iroha.models.Asset;
 import io.soramitsu.iroha.models.Domain;
 import io.soramitsu.iroha.models.History;
-import io.soramitsu.iroha.models.Operation;
 import io.soramitsu.iroha.models.ResponseObject;
 import okhttp3.Response;
 
@@ -55,7 +54,8 @@ public class TransactionClient {
         final long timestamp = System.currentTimeMillis() / 1000L;
         final String publicKey = getPublicKeyEncodedBase64(keyPair);
         final String message = "timestamp:" + timestamp + ",owner:" + publicKey + ",name:" + name;
-        Map<String, Object> body = new HashMap<>();
+
+        final Map<String, Object> body = new HashMap<>();
         body.put("name", name);
         body.put("owner", publicKey);
         body.put("signature", sign(keyPair.getPrivate(), message));
@@ -82,8 +82,9 @@ public class TransactionClient {
     public Asset registerAsset(String name, String domain, KeyPair keyPair) throws IOException {
         final long timestamp = System.currentTimeMillis() / 1000L;
         final String publicKey = getPublicKeyEncodedBase64(keyPair);
-        final String message = "name:" + name + ",creator:" + publicKey + ",timestamp:" + timestamp;
-        Map<String, Object> body = new HashMap<>();
+        final String message = "timestamp:" + timestamp + ",creator:" + publicKey + ",name:" + name;
+
+        final Map<String, Object> body = new HashMap<>();
         body.put("name", name);
         body.put("domain", domain);
         body.put("creator", publicKey);
@@ -142,16 +143,17 @@ public class TransactionClient {
 
     public ResponseObject operation(String assetUuid, String command, int amount,
                                     String receiver, KeyPair keyPair) throws IOException {
-        final Operation params = new Operation();
-        params.setCommand(command);
-        params.setAmount(amount);
-        params.setSender(getPublicKeyEncodedBase64(keyPair));
-        params.setReceiver(receiver);
+        final long timestamp = System.currentTimeMillis() / 1000L;
+        final Map<String, Object> params = new HashMap<>();
+        params.put("command", command);
+        params.put("amount", amount);
+        params.put("sender", getPublicKeyEncodedBase64(keyPair));
+        params.put("receiver", receiver);
+        final String message = "timestamp:" + timestamp + ",sender:" + params.get("sender")
+                + ",receiver:" + receiver + ",command:" + command
+                + ",amount:" + amount + ",asset-uuid:" + assetUuid;
 
-        final String message = "sender:" + params.getSender() + ",receiver:" + receiver
-                + ",asset-uuid:" + assetUuid + ",amount:" + amount;
-
-        Map<String, Object> body = new HashMap<>();
+        final Map<String, Object> body = new HashMap<>();
         body.put("asset-uuid", assetUuid);
         body.put("params", gson.toJson(params));
         body.put("signature", sign(keyPair.getPrivate(), message));
@@ -187,6 +189,7 @@ public class TransactionClient {
         switch (response.code()) {
             case STATUS_OK:
                 history = gson.fromJson(responseToString(response), History.class);
+                history.setStatus(response.code());
                 break;
             default:
                 history = new History();
@@ -199,9 +202,9 @@ public class TransactionClient {
     public ResponseObject sendMessage(String messageBody, String receiver, KeyPair keyPair) throws IOException {
         final long timestamp = System.currentTimeMillis() / 1000L;
         final String publicKey = getPublicKeyEncodedBase64(keyPair);
-        final String message = "message:" + messageBody + ",creator" + publicKey + ",timestamp:" + timestamp;
+        final String message = "timestamp:" + timestamp + ",message" + messageBody + ",creator:" + publicKey;
 
-        Map<String, Object> body = new HashMap<>();
+        final Map<String, Object> body = new HashMap<>();
         body.put("message", messageBody);
         body.put("creator", publicKey);
         body.put("receiver", receiver);
