@@ -47,7 +47,7 @@ public class IrohaUserClientTest extends TestCase {
                 switch (request.getPath()) {
                     case "//account/register":
                         if (request.getMethod().equals("POST")) {
-                            Pattern p = Pattern.compile("\"screen_name\":\"(.+?)\"");
+                            Pattern p = Pattern.compile("\"alias\":\"(.+?)\"");
                             Matcher m = p.matcher(request.getBody().toString());
                             if (m.find() && m.group(1).equals("duplicate_user")) {
                                 return new MockResponse().setBody("{\n" +

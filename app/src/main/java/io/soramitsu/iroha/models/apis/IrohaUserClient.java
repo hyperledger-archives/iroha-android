@@ -54,7 +54,7 @@ public class IrohaUserClient {
     public IrohaUser register(PublicKey publicKey, String name) throws IOException {
         final Map<String, Object> body = new HashMap<>();
         body.put("publicKey", getPublicKeyEncodedBase64(publicKey));
-        body.put("screen_name", name);
+        body.put("alias", name);
         body.put("timestamp", System.currentTimeMillis() / 1000L);
 
         Response response = post(ENDPOINT_URL + "/account/register", gson.toJson(body));

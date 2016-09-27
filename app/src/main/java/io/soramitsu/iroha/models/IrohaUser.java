@@ -8,7 +8,7 @@ import com.google.gson.annotations.SerializedName;
  */
 public class IrohaUser extends ResponseObject {
     private String uuid;
-    @SerializedName("screen_name")
+    @SerializedName("alias")
     private String name;
 
     public String getUuid() {
