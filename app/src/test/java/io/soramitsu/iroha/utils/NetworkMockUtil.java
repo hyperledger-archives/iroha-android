@@ -2,7 +2,6 @@ package io.soramitsu.iroha.utils;
 
 import java.io.IOException;
 
-import okhttp3.HttpUrl;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockWebServer;
 
@@ -24,7 +23,7 @@ public class NetworkMockUtil {
         mockWebServer.shutdown();
     }
 
-    public static HttpUrl call(String url) {
-        return mockWebServer.url(url);
+    public static String call(String url) {
+        return mockWebServer.url(url).toString();
     }
 }

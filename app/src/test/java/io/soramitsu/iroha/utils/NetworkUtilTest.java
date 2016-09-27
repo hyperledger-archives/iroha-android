@@ -9,13 +9,13 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import io.soramitsu.iroha.models.ResponseObject;
-import okhttp3.HttpUrl;
 import okhttp3.Response;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.RecordedRequest;
 
 import static io.soramitsu.iroha.utils.JsonParserUtil.parse;
+import static io.soramitsu.iroha.utils.NetworkMockUtil.call;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -68,8 +68,7 @@ public class NetworkUtilTest extends TestCase {
 
     @Test(timeout = TIMEOUT)
     public void testGet_Successful() throws Exception {
-        final HttpUrl url = NetworkMockUtil.call("/get");
-        final Response response = NetworkUtil.get(url.toString());
+        final Response response = NetworkUtil.get(call("/get"));
         final ResponseObject result = (ResponseObject) parse(response.body().string(), ResponseObject.class);
 
         assertThat(result.getStatus(), is(200));
@@ -77,8 +76,7 @@ public class NetworkUtilTest extends TestCase {
 
     @Test(timeout = TIMEOUT)
     public void testGet_Failure() throws Exception {
-        final HttpUrl url = NetworkMockUtil.call("/bad_request");
-        final Response response = NetworkUtil.get(url.toString());
+        final Response response = NetworkUtil.get(call("/bad_request"));
         final ResponseObject result = (ResponseObject) parse(response.body().string(), ResponseObject.class);
 
         assertThat(result.getStatus(), is(400));
@@ -86,16 +84,14 @@ public class NetworkUtilTest extends TestCase {
 
     @Test(timeout = TIMEOUT)
     public void testGet_NotFound() throws Exception {
-        final HttpUrl url = NetworkMockUtil.call("/nothing");
-        final Response response = NetworkUtil.get(url.toString());
+        final Response response = NetworkUtil.get(call("/nothing"));
 
         assertThat(response.code(), is(404));
     }
 
     @Test(timeout = TIMEOUT)
     public void testPost_Successful() throws Exception {
-        final HttpUrl url = NetworkMockUtil.call("/post");
-        final Response response = NetworkUtil.post(url.toString(), "{\"key:\"\"value\"}");
+        final Response response = NetworkUtil.post(call("/post"), "{\"key:\"\"value\"}");
         final ResponseObject result = (ResponseObject) parse(response.body().string(), ResponseObject.class);
 
         assertThat(result.getStatus(), is(200));
@@ -103,8 +99,7 @@ public class NetworkUtilTest extends TestCase {
 
     @Test(timeout = TIMEOUT)
     public void testPost_Failure() throws Exception {
-        final HttpUrl url = NetworkMockUtil.call("/bad_request");
-        final Response response = NetworkUtil.post(url.toString(), "{\"key:\"\"value\"}");
+        final Response response = NetworkUtil.post(call("/bad_request"), "{\"key:\"\"value\"}");
         final ResponseObject result = (ResponseObject) parse(response.body().string(), ResponseObject.class);
 
         assertThat(result.getStatus(), is(400));
@@ -112,8 +107,7 @@ public class NetworkUtilTest extends TestCase {
 
     @Test(timeout = TIMEOUT)
     public void testPost_NotFound() throws Exception {
-        final HttpUrl url = NetworkMockUtil.call("/nothing");
-        final Response response = NetworkUtil.post(url.toString(), "{\"key:\"\"value\"}");
+        final Response response = NetworkUtil.post(call("/nothing"), "{\"key:\"\"value\"}");
 
         assertThat(response.code(), is(404));
     }

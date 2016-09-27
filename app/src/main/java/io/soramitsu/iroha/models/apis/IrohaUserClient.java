@@ -11,7 +11,6 @@ import io.soramitsu.iroha.models.IrohaUser;
 import okhttp3.Response;
 
 import static io.soramitsu.iroha.utils.DigestUtil.getPublicKeyEncodedBase64;
-import static io.soramitsu.iroha.utils.NetworkUtil.ENDPOINT_URL;
 import static io.soramitsu.iroha.utils.NetworkUtil.STATUS_OK;
 import static io.soramitsu.iroha.utils.NetworkUtil.STATUS_BAD;
 import static io.soramitsu.iroha.utils.NetworkUtil.get;
@@ -46,18 +45,19 @@ public class IrohaUserClient {
     /**
      * 【POST】To register iroha account.
      *
+     * @param endpoint  Iroha API endpoint
      * @param publicKey User's ed25519 public Key (Base64)
      * @param name      User name
      * @return User info(user name, uuid, etc.)<br>
      *     If account duplicated that error response returned.
      */
-    public IrohaUser register(PublicKey publicKey, String name) throws IOException {
+    public IrohaUser register(String endpoint, PublicKey publicKey, String name) throws IOException {
         final Map<String, Object> body = new HashMap<>();
         body.put("publicKey", getPublicKeyEncodedBase64(publicKey));
         body.put("alias", name);
         body.put("timestamp", System.currentTimeMillis() / 1000L);
 
-        Response response = post(ENDPOINT_URL + "/account/register", gson.toJson(body));
+        Response response = post(endpoint + "/account/register", gson.toJson(body));
         IrohaUser user;
         switch (response.code()) {
             case STATUS_OK:
@@ -78,12 +78,13 @@ public class IrohaUserClient {
     /**
      * 【GET】To get the Iroha account info in accordance with uuid.
      *
-     * @param uuid ID for identifies the Iroha account (sha3)
+     * @param endpoint Iroha API endpoint
+     * @param uuid     ID for identifies the Iroha account (sha3)
      * @return User info(user name, uuid, etc.)<br>
      *     If account duplicated that error response returned.
      */
-    public IrohaUser findAccountInfo(String uuid) throws IOException {
-        Response response = get(ENDPOINT_URL + "/account?uuid=" + uuid);
+    public IrohaUser findAccountInfo(String endpoint, String uuid) throws IOException {
+        Response response = get(endpoint + "/account?uuid=" + uuid);
         IrohaUser user;
         switch (response.code()) {
             case STATUS_OK:

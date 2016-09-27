@@ -19,7 +19,6 @@ import okhttp3.Response;
 
 import static io.soramitsu.iroha.utils.DigestUtil.getPublicKeyEncodedBase64;
 import static io.soramitsu.iroha.utils.DigestUtil.sign;
-import static io.soramitsu.iroha.utils.NetworkUtil.ENDPOINT_URL;
 import static io.soramitsu.iroha.utils.NetworkUtil.STATUS_BAD;
 import static io.soramitsu.iroha.utils.NetworkUtil.STATUS_OK;
 import static io.soramitsu.iroha.utils.NetworkUtil.get;
@@ -54,11 +53,12 @@ public class TransactionClient {
     /**
      * 【POST】To register iroha domain.
      *
+     * @param endpoint  Iroha API endpoint
      * @param name      Domain name
      * @param keyPair   Public key and Private key sets in your device
      * @return Registered domain (domain name, creator, etc.)
      */
-    public Domain registerDomain(String name, KeyPair keyPair) throws IOException {
+    public Domain registerDomain(String endpoint, String name, KeyPair keyPair) throws IOException {
         final long timestamp = System.currentTimeMillis() / 1000L;
         final String publicKey = getPublicKeyEncodedBase64(keyPair);
         final String message = "timestamp:" + timestamp + ",owner:" + publicKey + ",name:" + name;
@@ -69,7 +69,7 @@ public class TransactionClient {
         body.put("signature", sign(keyPair.getPrivate(), message));
         body.put("timestamp", timestamp);
 
-        Response response = post(ENDPOINT_URL + "/domain/register", gson.toJson(body));
+        Response response = post(endpoint + "/domain/register", gson.toJson(body));
         Domain domain;
         switch (response.code()) {
             case STATUS_OK:
@@ -90,12 +90,13 @@ public class TransactionClient {
     /**
      * 【POST】To register iroha asset.
      *
+     * @param endpoint  Iroha API endpoint
      * @param name      Asset name
      * @param domain    Domain name
      * @param keyPair   Public key and Private key sets in your device
      * @return Created asset (asset name, domain, creator, etc.)
      */
-    public Asset registerAsset(String name, String domain, KeyPair keyPair) throws IOException {
+    public Asset registerAsset(String endpoint, String name, String domain, KeyPair keyPair) throws IOException {
         final long timestamp = System.currentTimeMillis() / 1000L;
         final String publicKey = getPublicKeyEncodedBase64(keyPair);
         final String message = "timestamp:" + timestamp + ",creator:" + publicKey + ",name:" + name;
@@ -107,7 +108,7 @@ public class TransactionClient {
         body.put("signature", sign(keyPair.getPrivate(), message));
         body.put("timestamp", timestamp);
 
-        Response response = post(ENDPOINT_URL + "/asset/create", gson.toJson(body));
+        Response response = post(endpoint + "/asset/create", gson.toJson(body));
         Asset asset;
         switch (response.code()) {
             case STATUS_OK:
@@ -130,10 +131,11 @@ public class TransactionClient {
     /**
      * 【GET】To find all domains.
      *
+     * @param endpoint Iroha API endpoint
      * @return All domains
      */
-    public List<Domain> findDomains() throws IOException {
-        Response response = get(ENDPOINT_URL + "/domain/list");
+    public List<Domain> findDomains(String endpoint) throws IOException {
+        Response response = get(endpoint + "/domain/list");
         List<Domain> domains = new ArrayList<>();
         switch (response.code()) {
             case STATUS_OK:
@@ -150,10 +152,11 @@ public class TransactionClient {
     /**
      * 【GET】To find all assets.
      *
+     * @param endpoint Iroha API endpoint
      * @return All assets
      */
-    public List<Asset> findAssets(String domain) throws IOException {
-        Response response = get(ENDPOINT_URL + "/asset/list/" + domain);
+    public List<Asset> findAssets(String endpoint, String domain) throws IOException {
+        Response response = get(endpoint + "/asset/list/" + domain);
         List<Asset> assets = new ArrayList<>();
         switch (response.code()) {
             case STATUS_OK:
@@ -170,13 +173,14 @@ public class TransactionClient {
     /**
      * 【POST】To operate iroha asset for command.
      *
+     * @param endpoint  Iroha API endpoint
      * @param assetUuid target asset uuid
      * @param command   operate command (transfer)
      * @param keyPair   Public key and Private key sets in your device
      * @return As a result of operation. (response code and message)
      */
-    public ResponseObject operation(String assetUuid, String command, int amount,
-                                    String receiver, KeyPair keyPair) throws IOException {
+    public ResponseObject operation(String endpoint, String assetUuid, String command,
+                                    int amount, String receiver, KeyPair keyPair) throws IOException {
         final long timestamp = System.currentTimeMillis() / 1000L;
         final Map<String, Object> params = new HashMap<>();
         params.put("command", command);
@@ -193,7 +197,7 @@ public class TransactionClient {
         body.put("signature", sign(keyPair.getPrivate(), message));
         body.put("timestamp", System.currentTimeMillis() / 1000L);
 
-        Response response = post(ENDPOINT_URL + "/asset/operation", gson.toJson(body));
+        Response response = post(endpoint + "/asset/operation", gson.toJson(body));
         ResponseObject responseObject;
         switch (response.code()) {
             case STATUS_OK:
@@ -211,23 +215,25 @@ public class TransactionClient {
     /**
      * 【GET】To get history of transaction.
      *
-     * @param uuid User's uuid
+     * @param endpoint  Iroha API endpoint
+     * @param uuid      User's uuid
      * @return Transaction of history made by user.
      */
-    public History history(String uuid) throws IOException {
-        Response response = get(ENDPOINT_URL + "/history/transaction/" + uuid);
+    public History history(String endpoint, String uuid) throws IOException {
+        Response response = get(endpoint + "/history/transaction/" + uuid);
         return history(response);
     }
 
     /**
      * 【GET】To get history of transaction.
      *
-     * @param domain Domain name
-     * @param asset  Asset name
+     * @param endpoint  Iroha API endpoint
+     * @param domain    Domain name
+     * @param asset     Asset name
      * @return Transaction of history made by user.
      */
-    public History history(String domain, String asset) throws IOException {
-        Response response = get(ENDPOINT_URL + "/history/" + domain + "." + asset);
+    public History history(String endpoint, String domain, String asset) throws IOException {
+        Response response = get(endpoint + "/history/" + domain + "." + asset);
         return history(response);
     }
 
@@ -249,12 +255,14 @@ public class TransactionClient {
     /**
      * 【POST】To send receiver a message.
      *
+     * @param endpoint    Iroha API endpoint
      * @param messageBody Message body
      * @param receiver    Receiver's public key
      * @param keyPair     Public key and Private key sets in your device
      * @return As a result of operation. (response code and message)
      */
-    public ResponseObject sendMessage(String messageBody, String receiver, KeyPair keyPair) throws IOException {
+    public ResponseObject sendMessage(String endpoint, String messageBody,
+                                      String receiver, KeyPair keyPair) throws IOException {
         final long timestamp = System.currentTimeMillis() / 1000L;
         final String publicKey = getPublicKeyEncodedBase64(keyPair);
         final String message = "timestamp:" + timestamp + ",message" + messageBody + ",creator:" + publicKey;
@@ -266,7 +274,7 @@ public class TransactionClient {
         body.put("signature", sign(keyPair.getPrivate(), message));
         body.put("timestamp", timestamp);
 
-        Response response = post(ENDPOINT_URL + "/message", gson.toJson(body));
+        Response response = post(endpoint + "/message", gson.toJson(body));
         ResponseObject responseObject;
         switch (response.code()) {
             case STATUS_OK:

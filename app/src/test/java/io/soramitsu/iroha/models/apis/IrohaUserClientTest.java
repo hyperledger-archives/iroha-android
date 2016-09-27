@@ -3,7 +3,6 @@ package io.soramitsu.iroha.models.apis;
 import junit.framework.TestCase;
 
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,12 +14,12 @@ import java.util.regex.Pattern;
 
 import io.soramitsu.iroha.models.IrohaUser;
 import io.soramitsu.iroha.utils.NetworkMockUtil;
-import io.soramitsu.iroha.utils.NetworkUtil;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.RecordedRequest;
 
 import static io.soramitsu.iroha.utils.DigestUtil.createKeyPair;
+import static io.soramitsu.iroha.utils.NetworkMockUtil.call;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -100,17 +99,12 @@ public class IrohaUserClientTest extends TestCase {
         NetworkMockUtil.shutdownMockWebServer();
     }
 
-    @Before
-    public void setUp() throws Exception {
-        NetworkUtil.ENDPOINT_URL = NetworkMockUtil.call("").toString();
-    }
-
     @Test(timeout = TIMEOUT)
     public void testRegister_Successful() throws Exception {
         final PublicKey publicKey = createKeyPair().getPublic();
         final String alias = "user_name";
 
-        final IrohaUser result = userClient.register(publicKey, alias);
+        final IrohaUser result = userClient.register(call(""), publicKey, alias);
 
         assertThat(result.getStatus(), is(200));
         assertThat(result.getName(), is(alias));
@@ -122,7 +116,7 @@ public class IrohaUserClientTest extends TestCase {
         final PublicKey publicKey = createKeyPair().getPublic();
         final String alias = "duplicate_user";
 
-        final IrohaUser result = userClient.register(publicKey, alias);
+        final IrohaUser result = userClient.register(call(""), publicKey, alias);
 
         assertThat(result.getStatus(), is(400));
         assertThat(result.getMessage(), is("duplicate user"));
@@ -133,8 +127,7 @@ public class IrohaUserClientTest extends TestCase {
         final PublicKey publicKey = createKeyPair().getPublic();
         final String alias = "user_name";
 
-        NetworkUtil.ENDPOINT_URL = NetworkMockUtil.call("/nothing").toString();
-        final IrohaUser result = userClient.register(publicKey, alias);
+        final IrohaUser result = userClient.register(call("/nothing"), publicKey, alias);
 
         assertThat(result.getStatus(), is(404));
     }
@@ -143,7 +136,7 @@ public class IrohaUserClientTest extends TestCase {
     public void testFindUserInfo_Successful() throws Exception {
         final String screenName = "user_name";
 
-        final IrohaUser result = userClient.findAccountInfo(TEST_EXIST_UUID);
+        final IrohaUser result = userClient.findAccountInfo(call(""), TEST_EXIST_UUID);
 
         assertThat(result.getStatus(), is(200));
         assertThat(result.getName(), is(screenName));
@@ -154,14 +147,13 @@ public class IrohaUserClientTest extends TestCase {
 
     @Test(timeout = TIMEOUT)
     public void testFindUserInfo_UserNotFound() throws Exception {
-        final IrohaUser result = userClient.findAccountInfo(TEST_NO_EXIST_UUID);
+        final IrohaUser result = userClient.findAccountInfo(call(""), TEST_NO_EXIST_UUID);
         assertThat(result.getStatus(), is(400));
     }
 
     @Test(timeout = TIMEOUT)
     public void testFindUserInfo_NotFound() throws Exception {
-        NetworkUtil.ENDPOINT_URL = NetworkMockUtil.call("/nothing").toString();
-        final IrohaUser result = userClient.findAccountInfo(TEST_EXIST_UUID);
+        final IrohaUser result = userClient.findAccountInfo(call("/nothing"), TEST_EXIST_UUID);
         assertThat(result.getStatus(), is(404));
     }
 }
