@@ -63,4 +63,24 @@ public class NetworkUtil {
                 .build();
         return new OkHttpClient().newCall(request).execute();
     }
+
+    /**
+     * To convert okhttp3.Response to String.
+     *
+     * @param response Response object
+     * @return Response body after converted string.
+     * @throws IOException
+     */
+    public static String responseToString(Response response) throws IOException {
+        String result;
+        switch (response.code()) {
+            case STATUS_OK:
+            case STATUS_BAD:
+                result = response.body().string();
+                break;
+            default:
+                result = "";
+        }
+        return result;
+    }
 }

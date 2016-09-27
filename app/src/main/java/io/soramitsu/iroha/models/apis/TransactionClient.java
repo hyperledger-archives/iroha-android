@@ -24,6 +24,7 @@ import static io.soramitsu.iroha.utils.NetworkUtil.STATUS_BAD;
 import static io.soramitsu.iroha.utils.NetworkUtil.STATUS_OK;
 import static io.soramitsu.iroha.utils.NetworkUtil.get;
 import static io.soramitsu.iroha.utils.NetworkUtil.post;
+import static io.soramitsu.iroha.utils.NetworkUtil.responseToString;
 
 
 /**
@@ -224,25 +225,5 @@ public class TransactionClient {
                 responseObject.setMessage(response.message());
         }
         return responseObject;
-    }
-
-    /**
-     * To convert okhttp3.Response to String.
-     *
-     * @param response Response object
-     * @return Response body after converted string.
-     * @throws IOException
-     */
-    private String responseToString(Response response) throws IOException {
-        String result;
-        switch (response.code()) {
-            case STATUS_OK:
-            case STATUS_BAD:
-                result = response.body().string();
-                break;
-            default:
-                result = "";
-        }
-        return result;
     }
 }
