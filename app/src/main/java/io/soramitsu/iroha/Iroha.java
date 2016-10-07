@@ -38,9 +38,7 @@ public class Iroha {
             if (endpoint == null) {
                 throw new NullPointerException();
             }
-            if (iroha == null) {
-                iroha.endpoint = this.endpoint;
-            }
+            iroha.endpoint = this.endpoint;
             return iroha;
         }
     }
