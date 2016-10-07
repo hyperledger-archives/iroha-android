@@ -123,6 +123,7 @@ gen-external-apklibs
 
 
 ### CMake ###
+.externalNativeBuild
 CMakeCache.txt
 CMakeFiles
 CMakeScripts
