@@ -1,0 +1,102 @@
+
+{
+	"buildFiles" : 
+	[
+		"/Users/koba/Documents/android_studio_workspace/IrohaAndroid/ed25519/src/main/cpp/CMakeLists.txt"
+	],
+	"cFileExtensions" : [ "c" ],
+	"cleanCommands" : 
+	[
+		"/Users/koba/sdk/cmake/3.6.3155560/bin/cmake --build /Users/koba/Documents/android_studio_workspace/IrohaAndroid/ed25519/.externalNativeBuild/cmake/debug/arm64-v8a --target clean"
+	],
+	"cppFileExtensions" : [ "cpp" ],
+	"libraries" : 
+	{
+		"ed25519-android-Debug-arm64-v8a" : 
+		{
+			"abi" : "arm64-v8a",
+			"artifactName" : "ed25519-android",
+			"buildCommand" : "/Users/koba/sdk/cmake/3.6.3155560/bin/cmake --build /Users/koba/Documents/android_studio_workspace/IrohaAndroid/ed25519/.externalNativeBuild/cmake/debug/arm64-v8a --target ed25519-android",
+			"buildType" : "debug",
+			"files" : 
+			[
+				
+				{
+					"flags" : "  -target aarch64-none-linux-android -gcc-toolchain /Users/koba/sdk/ndk-bundle/toolchains/aarch64-linux-android-4.9/prebuilt/darwin-x86_64 --sysroot=/Users/koba/sdk/ndk-bundle/platforms/android-21/arch-arm64 -Ded25519_android_EXPORTS  -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security  -O0 -fno-limit-debug-info  -fPIC      -c ",
+					"src" : "/Users/koba/Documents/android_studio_workspace/IrohaAndroid/ed25519/src/main/cpp/add_scalar.c",
+					"workingDirectory" : "/Users/koba/Documents/android_studio_workspace/IrohaAndroid/ed25519/.externalNativeBuild/cmake/debug/arm64-v8a"
+				},
+				
+				{
+					"flags" : "  -target aarch64-none-linux-android -gcc-toolchain /Users/koba/sdk/ndk-bundle/toolchains/aarch64-linux-android-4.9/prebuilt/darwin-x86_64 --sysroot=/Users/koba/sdk/ndk-bundle/platforms/android-21/arch-arm64 -Ded25519_android_EXPORTS  -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security  -O0 -fno-limit-debug-info  -fPIC      -c ",
+					"src" : "/Users/koba/Documents/android_studio_workspace/IrohaAndroid/ed25519/src/main/cpp/fe.c",
+					"workingDirectory" : "/Users/koba/Documents/android_studio_workspace/IrohaAndroid/ed25519/.externalNativeBuild/cmake/debug/arm64-v8a"
+				},
+				
+				{
+					"flags" : "  -target aarch64-none-linux-android -gcc-toolchain /Users/koba/sdk/ndk-bundle/toolchains/aarch64-linux-android-4.9/prebuilt/darwin-x86_64 --sysroot=/Users/koba/sdk/ndk-bundle/platforms/android-21/arch-arm64 -Ded25519_android_EXPORTS  -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security  -O0 -fno-limit-debug-info  -fPIC      -c ",
+					"src" : "/Users/koba/Documents/android_studio_workspace/IrohaAndroid/ed25519/src/main/cpp/ge.c",
+					"workingDirectory" : "/Users/koba/Documents/android_studio_workspace/IrohaAndroid/ed25519/.externalNativeBuild/cmake/debug/arm64-v8a"
+				},
+				
+				{
+					"flags" : "  -target aarch64-none-linux-android -gcc-toolchain /Users/koba/sdk/ndk-bundle/toolchains/aarch64-linux-android-4.9/prebuilt/darwin-x86_64 --sysroot=/Users/koba/sdk/ndk-bundle/platforms/android-21/arch-arm64 -Ded25519_android_EXPORTS  -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security  -O0 -fno-limit-debug-info  -fPIC      -c ",
+					"src" : "/Users/koba/Documents/android_studio_workspace/IrohaAndroid/ed25519/src/main/cpp/key_exchange.c",
+					"workingDirectory" : "/Users/koba/Documents/android_studio_workspace/IrohaAndroid/ed25519/.externalNativeBuild/cmake/debug/arm64-v8a"
+				},
+				
+				{
+					"flags" : "  -target aarch64-none-linux-android -gcc-toolchain /Users/koba/sdk/ndk-bundle/toolchains/aarch64-linux-android-4.9/prebuilt/darwin-x86_64 --sysroot=/Users/koba/sdk/ndk-bundle/platforms/android-21/arch-arm64 -Ded25519_android_EXPORTS  -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security  -O0 -fno-limit-debug-info  -fPIC      -c ",
+					"src" : "/Users/koba/Documents/android_studio_workspace/IrohaAndroid/ed25519/src/main/cpp/keypair.c",
+					"workingDirectory" : "/Users/koba/Documents/android_studio_workspace/IrohaAndroid/ed25519/.externalNativeBuild/cmake/debug/arm64-v8a"
+				},
+				
+				{
+					"flags" : "  -target aarch64-none-linux-android -gcc-toolchain /Users/koba/sdk/ndk-bundle/toolchains/aarch64-linux-android-4.9/prebuilt/darwin-x86_64 --sysroot=/Users/koba/sdk/ndk-bundle/platforms/android-21/arch-arm64 -Ded25519_android_EXPORTS  -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security  -O0 -fno-limit-debug-info  -fPIC      -c ",
+					"src" : "/Users/koba/Documents/android_studio_workspace/IrohaAndroid/ed25519/src/main/cpp/sc.c",
+					"workingDirectory" : "/Users/koba/Documents/android_studio_workspace/IrohaAndroid/ed25519/.externalNativeBuild/cmake/debug/arm64-v8a"
+				},
+				
+				{
+					"flags" : "  -target aarch64-none-linux-android -gcc-toolchain /Users/koba/sdk/ndk-bundle/toolchains/aarch64-linux-android-4.9/prebuilt/darwin-x86_64 --sysroot=/Users/koba/sdk/ndk-bundle/platforms/android-21/arch-arm64 -Ded25519_android_EXPORTS  -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security  -O0 -fno-limit-debug-info  -fPIC      -c ",
+					"src" : "/Users/koba/Documents/android_studio_workspace/IrohaAndroid/ed25519/src/main/cpp/seed.c",
+					"workingDirectory" : "/Users/koba/Documents/android_studio_workspace/IrohaAndroid/ed25519/.externalNativeBuild/cmake/debug/arm64-v8a"
+				},
+				
+				{
+					"flags" : "  -target aarch64-none-linux-android -gcc-toolchain /Users/koba/sdk/ndk-bundle/toolchains/aarch64-linux-android-4.9/prebuilt/darwin-x86_64 --sysroot=/Users/koba/sdk/ndk-bundle/platforms/android-21/arch-arm64 -Ded25519_android_EXPORTS  -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security  -O0 -fno-limit-debug-info  -fPIC      -c ",
+					"src" : "/Users/koba/Documents/android_studio_workspace/IrohaAndroid/ed25519/src/main/cpp/sha3.c",
+					"workingDirectory" : "/Users/koba/Documents/android_studio_workspace/IrohaAndroid/ed25519/.externalNativeBuild/cmake/debug/arm64-v8a"
+				},
+				
+				{
+					"flags" : "  -target aarch64-none-linux-android -gcc-toolchain /Users/koba/sdk/ndk-bundle/toolchains/aarch64-linux-android-4.9/prebuilt/darwin-x86_64 --sysroot=/Users/koba/sdk/ndk-bundle/platforms/android-21/arch-arm64 -Ded25519_android_EXPORTS  -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security  -O0 -fno-limit-debug-info  -fPIC      -c ",
+					"src" : "/Users/koba/Documents/android_studio_workspace/IrohaAndroid/ed25519/src/main/cpp/sign.c",
+					"workingDirectory" : "/Users/koba/Documents/android_studio_workspace/IrohaAndroid/ed25519/.externalNativeBuild/cmake/debug/arm64-v8a"
+				},
+				
+				{
+					"flags" : "  -target aarch64-none-linux-android -gcc-toolchain /Users/koba/sdk/ndk-bundle/toolchains/aarch64-linux-android-4.9/prebuilt/darwin-x86_64 --sysroot=/Users/koba/sdk/ndk-bundle/platforms/android-21/arch-arm64 -Ded25519_android_EXPORTS  -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security  -O0 -fno-limit-debug-info  -fPIC      -c ",
+					"src" : "/Users/koba/Documents/android_studio_workspace/IrohaAndroid/ed25519/src/main/cpp/verify.c",
+					"workingDirectory" : "/Users/koba/Documents/android_studio_workspace/IrohaAndroid/ed25519/.externalNativeBuild/cmake/debug/arm64-v8a"
+				},
+				
+				{
+					"flags" : "  -target aarch64-none-linux-android -gcc-toolchain /Users/koba/sdk/ndk-bundle/toolchains/aarch64-linux-android-4.9/prebuilt/darwin-x86_64 --sysroot=/Users/koba/sdk/ndk-bundle/platforms/android-21/arch-arm64  -Ded25519_android_EXPORTS -isystem /Users/koba/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.9/include -isystem /Users/koba/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.9/libs/arm64-v8a/include -isystem /Users/koba/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.9/include/backward  -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security -fno-exceptions -fno-rtti  -O0 -fno-limit-debug-info  -fPIC    -c ",
+					"src" : "/Users/koba/Documents/android_studio_workspace/IrohaAndroid/ed25519/src/main/cpp/wrapper.cpp",
+					"workingDirectory" : "/Users/koba/Documents/android_studio_workspace/IrohaAndroid/ed25519/.externalNativeBuild/cmake/debug/arm64-v8a"
+				}
+			],
+			"output" : "/Users/koba/Documents/android_studio_workspace/IrohaAndroid/ed25519/.externalNativeBuild/cmake/debug/obj/arm64-v8a/libed25519-android.so",
+			"toolchain" : "11210790902543855485"
+		}
+	},
+	"toolchains" : 
+	{
+		"11210790902543855485" : 
+		{
+			"cCompilerExecutable" : "/Users/koba/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang",
+			"cppCompilerExecutable" : "/Users/koba/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++"
+		}
+	}
+}

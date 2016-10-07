@@ -12,6 +12,9 @@ android {
         versionName "1.0"
     }
     buildTypes {
+        debug {
+            testCoverageEnabled true
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -34,4 +37,5 @@ dependencies {
     compile 'net.i2p.crypto:eddsa:0.1.0'
     compile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.55'
     compile group: 'commons-codec', name: 'commons-codec', version: '1.4'
+    compile project(path: ':ed25519')
 }
