@@ -24,7 +24,7 @@ jbyteArray Java_com_kobaken0029_ed25519_Ed25519_CreateSeed(
 jobject Java_com_kobaken0029_ed25519_Ed25519_Ed25519CreateKeyPair(
         JNIEnv *env, jobject thiz, unsigned char *public_key, unsigned char *private_key, const unsigned char *seed) {
 
-    jclass paramClass = env->FindClass("com/kobaken0029/ed25519/Ed25519$ParamObject");
+    jclass paramClass = env->FindClass("com/kobaken0029/ed25519/Ed25519$KeyPair");
     jmethodID paramConstructor = env->GetMethodID(paramClass, "<init>", "([B[B)V");
 
     ed25519_create_keypair(public_key, private_key, seed);

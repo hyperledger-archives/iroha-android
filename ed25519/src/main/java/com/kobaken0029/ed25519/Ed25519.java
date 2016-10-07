@@ -7,7 +7,7 @@ import org.bouncycastle.util.encoders.Base64;
 
 public class Ed25519 {
     public native static byte[] CreateSeed(byte[] seed);
-    public native static ParamObject Ed25519CreateKeyPair(byte[] publicKey, byte[] privateKey, byte[] seed);
+    public native static KeyPair Ed25519CreateKeyPair(byte[] publicKey, byte[] privateKey, byte[] seed);
     public native static byte[] Ed25519Sign(byte[] signature, byte[] message, byte[] public_key, byte[] private_key);
     public native static int Ed25519Verify(byte[] signature, byte[] message, byte[] public_key);
     public native static byte[] sha3(byte[] message, int length);
@@ -25,15 +25,13 @@ public class Ed25519 {
         byte[] privateKey = new byte[64];
         byte[] seed = createSeed();
         Log.d("test", "seed created!");
-        ParamObject params = Ed25519CreateKeyPair(publicKey, privateKey, seed);
+        KeyPair params = Ed25519CreateKeyPair(publicKey, privateKey, seed);
         if (params.getPublicKey() == null || params.getPrivateKey() == null) {
             Log.e("ed25519", "public key or private key are null.");
             return null;
         }
         byte[] encodedPublicKey = Base64.encode(params.getPublicKey());
         byte[] encodedPrivateKey = Base64.encode(params.getPrivateKey());
-//        String base64PublicKey = Base64.toBase64String(encodedPublicKey);
-//        String base64PrivateKey = Base64.toBase64String(encodedPrivateKey);
         Log.d("test", "[encode] pubkey: " + new String(encodedPublicKey) + "\nprikey: " + new String(encodedPrivateKey));
         return new KeyPair(encodedPublicKey, encodedPrivateKey);
     }
@@ -100,76 +98,6 @@ public class Ed25519 {
 
         public void setPrivateKey(byte[] privateKey) {
             this.privateKey = privateKey;
-        }
-    }
-
-    public static class ParamObject {
-        private byte[] publicKey;
-        private byte[] privateKey;
-        private byte[] seed;
-        private byte[] signature;
-        private byte[] message;
-
-        public ParamObject(byte[] seed) {
-            this.seed = seed;
-        }
-
-        public ParamObject(byte[] publicKey, byte[] privateKey) {
-            this.publicKey = publicKey;
-            this.privateKey = privateKey;
-        }
-
-        public ParamObject(byte[] publicKey, byte[] privateKey, byte[] seed) {
-            this.publicKey = publicKey;
-            this.privateKey = privateKey;
-            this.seed = seed;
-        }
-
-        public ParamObject(byte[] signature, byte[] message, byte[] publicKey, byte[] privateKey) {
-            this.signature = signature;
-            this.message = message;
-            this.publicKey = publicKey;
-            this.privateKey = privateKey;
-        }
-
-        public byte[] getPublicKey() {
-            return publicKey;
-        }
-
-        public void setPublicKey(byte[] publicKey) {
-            this.publicKey = publicKey;
-        }
-
-        public byte[] getPrivateKey() {
-            return privateKey;
-        }
-
-        public void setPrivateKey(byte[] privateKey) {
-            this.privateKey = privateKey;
-        }
-
-        public byte[] getSeed() {
-            return seed;
-        }
-
-        public void setSeed(byte[] seed) {
-            this.seed = seed;
-        }
-
-        public byte[] getSignature() {
-            return signature;
-        }
-
-        public void setSignature(byte[] signature) {
-            this.signature = signature;
-        }
-
-        public byte[] getMessage() {
-            return message;
-        }
-
-        public void setMessage(byte[] message) {
-            this.message = message;
         }
     }
 }
