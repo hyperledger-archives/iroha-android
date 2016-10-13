@@ -2,101 +2,185 @@ package com.kobaken0029.ed25519;
 
 import android.util.Log;
 
-import org.bouncycastle.util.encoders.Base64;
-
 
 public class Ed25519 {
-    public native static byte[] CreateSeed(byte[] seed);
-    public native static KeyPair Ed25519CreateKeyPair(byte[] publicKey, byte[] privateKey, byte[] seed);
-    public native static byte[] Ed25519Sign(byte[] signature, byte[] message, byte[] public_key, byte[] private_key);
-    public native static int Ed25519Verify(byte[] signature, byte[] message, byte[] public_key);
-    public native static byte[] sha3(byte[] message, int length);
+    public native static void CreateSeed(int[] seed);
+    public native static KeyPair Ed25519CreateKeyPair(int[] publicKey, int[] privateKey, int[] seed);
+    public native static void Ed25519Sign(int[] signature, int[] message, int[] public_key, int[] private_key);
+    public native static int Ed25519Verify(int[] signature, int[] message, int message_len, int[] public_key);
+    public native static void Sha3(int[] message, int length, int[] out);
+    public native static int[] Base64Encode(int[] bytes_to_encode, int in_len);
+    public native static int[] Base64Decode(int[] encoded_string);
+
+    private static int[] Seed;
+    private static KeyPair KeyPair;
+    private static int[] Signature;
+    private static int[] Sha3Result;
 
     static {
         System.loadLibrary("ed25519-android");
     }
 
-    private static byte[] createSeed() {
-        return CreateSeed(new byte[32]);
+    private static int[] createSeed() {
+        Seed = InitUInt8(32);
+        CreateSeed(Seed);
+        return Seed;
     }
 
     public static KeyPair createKeyPair() {
-        byte[] publicKey = new byte[32];
-        byte[] privateKey = new byte[64];
-        byte[] seed = createSeed();
-        Log.d("test", "seed created!");
-        KeyPair params = Ed25519CreateKeyPair(publicKey, privateKey, seed);
-        if (params.getPublicKey() == null || params.getPrivateKey() == null) {
+        int[] publicKey = InitUInt8(32);
+        int[] privateKey = InitUInt8(64);
+        int[] seed = createSeed();
+        KeyPair = Ed25519CreateKeyPair(publicKey, privateKey, seed);
+        if (KeyPair.getPublicKey() == null || KeyPair.getPrivateKey() == null) {
             Log.e("ed25519", "public key or private key are null.");
             return null;
         }
-        byte[] encodedPublicKey = Base64.encode(params.getPublicKey());
-        byte[] encodedPrivateKey = Base64.encode(params.getPrivateKey());
-        Log.d("test", "[encode] pubkey: " + new String(encodedPublicKey) + "\nprikey: " + new String(encodedPrivateKey));
-        return new KeyPair(encodedPublicKey, encodedPrivateKey);
+        Log.d("test", "[encode] pubkey: " + KeyPair.getPublicKey() + "\nprikey: " + KeyPair.getPrivateKey());
+        int[] encodedPublicKey = Base64Encode(toInteger(KeyPair.publicKey), toInteger(KeyPair.publicKey).length);
+        int[] encodedPrivateKey = Base64Encode(toInteger(KeyPair.privateKey), toInteger(KeyPair.privateKey).length);
+        KeyPair = new KeyPair(toString(encodedPublicKey), toString(encodedPrivateKey));
+        return KeyPair;
     }
 
-    public static byte[] sign(byte[] publicKey, byte[] privateKey, byte[] message) {
-        byte[] signature = new byte[64];
-        Log.d("test", "message: " + new String(message));
-        byte[] signatureMessage = sha3(message, message.length);
-        Log.d("test", "signature message: " + new String(signatureMessage));
+    public static String sign(String publicKey, String privateKey, String message) {
+        int[] signature = InitUInt8(64);
+        Sha3(toInteger(message), toInteger(message).length, InitUInt8(32));
+        int[] signatureMessage = Sha3Result;
+        Log.d("test", "message: " + message);
+        Log.d("test", "signature message: " + toString(signatureMessage));
         if (publicKey == null || privateKey == null) {
             Log.e("ed25519", "public key or private key are null.");
             return null;
         }
-        byte[] decodedPublicKey = Base64.decode(publicKey);
-        byte[] decodedPrivateKey = Base64.decode(privateKey);
-        Log.d("test", "[decode] pubkey: " + new String(decodedPublicKey) + "\nprikey: " + new String(decodedPrivateKey));
-        Log.d("test", "[encode] pubkey: " + new String(Base64.encode(decodedPublicKey)) + "\nprikey: " + new String(Base64.encode(decodedPrivateKey)));
-        byte[] sign = Ed25519Sign(signature, signatureMessage, decodedPublicKey, decodedPrivateKey);
-        if (sign == null) {
+        int[] decodedPublicKey = Base64Decode(toInteger(publicKey));
+        int[] decodedPrivateKey = Base64Decode(toInteger(privateKey));
+        Log.d("test", "[decode] pubkey: " + toString(decodedPublicKey) + "\nprikey: " + toString(decodedPrivateKey));
+        Ed25519Sign(signature, signatureMessage, decodedPublicKey, decodedPrivateKey);
+        if (Signature == null) {
             Log.e("ed25519", "sign is null.");
             return null;
         }
-        byte[] encodedSignature = Base64.encode(sign);
-        Log.d("test", "[encode] signature: " + new String(encodedSignature));
-        return encodedSignature;
+        int[] encodedSignature = Base64Encode(Signature, Signature.length);
+        Log.d("test", "[encode] signature: " + toString(encodedSignature));
+        return toString(encodedSignature);
     }
 
-    public static int verify(byte[] publicKey, byte[] signature, byte[] message) throws Exception {
-        Log.d("test", "message: " + new String(message));
-        byte[] signatureMessage = sha3(message, message.length);
-        Log.d("test", "signature message: " + new String(signatureMessage));
+    public static int verify(String publicKey, String signature, String message) {
+        Log.d("test", "[verify] message: " + message);
+        Sha3(toInteger(message), toInteger(message).length, InitUInt8(32));
+        int[] signatureMessage = Sha3Result;
+        Log.d("test", "[verify] signature message: " + toString(signatureMessage));
         if (publicKey == null || signature == null) {
             Log.e("ed25519", "public key or signature are null.");
             return 0;
         }
-        byte[] decodedPublicKey = Base64.decode(publicKey);
-        byte[] decodedSignature = Base64.decode(signature);
-        Log.d("test", "[decode] pubkey: " + new String(decodedPublicKey));
-        Log.d("test", "[decode] signature: " + new String(decodedSignature));
-        Log.d("test", "[encode] signature: " + new String(Base64.encode(decodedSignature)));
-        return Ed25519Verify(decodedSignature, signatureMessage, decodedPublicKey);
+        int[] decodedPublicKey = Base64Decode(toInteger(publicKey));
+        int[] decodedSignature = Base64Decode(toInteger(signature));
+        Log.d("test", "[decode] pubkey: " + toString(decodedPublicKey));
+        Log.d("test", "[decode] signature: " + toString(decodedSignature));
+        return Ed25519Verify(decodedSignature, signatureMessage, signatureMessage.length, decodedPublicKey);
+    }
+
+    private static int[] InitUInt8(int length) {
+        int[] result = new int[length];
+        for (int i = 0; i < length; i++) {
+            byte buff = (byte) 0x00;
+            result[i] = buff & 0xFF;
+        }
+        return result;
+    }
+
+   public static String toString(int[] text) {
+        StringBuilder out = new StringBuilder();
+        for (int i = 0, j = text.length; i < j; i++) {
+            out.append(Character.toChars(text[i]));
+        }
+        return (out.toString());
+    }
+
+    public static int[] toInteger(String text) {
+        int textLength = text.length();
+        for (int i = 0, j = text.length(); i < j; i++) {
+            if (Character.isHighSurrogate(text.charAt(i))) {
+                textLength--;
+                i++;
+            }
+        }
+        int[] out = new int[textLength];
+        for (int i = 0, j = text.length(), p = 0; i < j; i++, p++) {
+            int c = text.charAt(i);
+            if (!Character.isHighSurrogate(text.charAt(i))) {
+                out[p] = c;
+            } else {
+                out[p] = toCodePoint(c, text.charAt(i + 1));
+                i++;
+            }
+        }
+        return (out);
+    }
+
+    private static int toCodePoint(int high, int low) {
+        high -= 0xD800;
+        high <<= 10;
+        low -= 0xDC00;
+        low |= high;
+        low += 0x10000;
+        return (low);
+    }
+
+    @SuppressWarnings("unused")
+    private static void setSeed(int[] seed_) {
+        Seed = seed_;
+    }
+
+    @SuppressWarnings("unused")
+    private static void initKeyPair() {
+        KeyPair = new KeyPair("", "");
+    }
+
+    @SuppressWarnings("unused")
+    private static void setPublicKey(String publicKey) {
+        KeyPair.publicKey = publicKey;
+    }
+
+    @SuppressWarnings("unused")
+    private static void setPrivateKey(String privateKey) {
+        KeyPair.privateKey = privateKey;
+    }
+
+    @SuppressWarnings("unused")
+    private static void setSignature(int[] signature_) {
+        Signature = signature_;
+    }
+
+    @SuppressWarnings("unused")
+    private static void setSha3Result(int[] result) {
+        Sha3Result = result;
     }
 
     public static class KeyPair {
-        private byte[] publicKey;
-        private byte[] privateKey;
+        public String publicKey;
+        public String privateKey;
 
-        public KeyPair(byte[] publicKey, byte[] privateKey) {
+        public KeyPair(String publicKey, String privateKey) {
             this.publicKey = publicKey;
             this.privateKey = privateKey;
         }
 
-        public byte[] getPublicKey() {
+        public String getPublicKey() {
             return publicKey;
         }
 
-        public void setPublicKey(byte[] publicKey) {
+        public void setPublicKey(String publicKey) {
             this.publicKey = publicKey;
         }
 
-        public byte[] getPrivateKey() {
+        public String getPrivateKey() {
             return privateKey;
         }
 
-        public void setPrivateKey(byte[] privateKey) {
+        public void setPrivateKey(String privateKey) {
             this.privateKey = privateKey;
         }
     }

@@ -167,13 +167,9 @@ int ge_frombytes_negate_vartime(ge_p3 *h, const unsigned char *s) {
     fe_mul(vxx, vxx, v);
     fe_sub(check, vxx, u);  /* vx^2-u */
 
-    LOGD("%d", check);
     if (fe_isnonzero(check)) {
         fe_add(check, vxx, u); /* vx^2+u */
 
-        LOGD("%d", vxx);
-        LOGD("%d", u);
-        LOGD("%d", check);
         if (fe_isnonzero(check)) {
             return -1;
         }

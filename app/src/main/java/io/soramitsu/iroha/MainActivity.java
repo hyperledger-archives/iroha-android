@@ -13,6 +13,7 @@ import net.i2p.crypto.eddsa.KeyPairGenerator;
 
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
+import java.nio.ByteBuffer;
 import java.security.KeyPair;
 
 
@@ -41,21 +42,17 @@ public class MainActivity extends AppCompatActivity {
                 editor.apply();
             }
 
-            byte[] privateKeyBytes = sp.getString("privateKey", "").getBytes();
-            byte[] publicKeyBytes = sp.getString("publicKey", "").getBytes();
-
-
             Ed25519.KeyPair result = Ed25519.createKeyPair();
-            if (result.getPublicKey() != null && result.getPrivateKey() != null) {
-                Log.d("privateKey", new String(result.getPublicKey()));
-                Log.d("publicKey", new String(result.getPrivateKey()));
-            }
+            if (result != null && result.getPublicKey() != null && result.getPrivateKey() != null) {
+                Log.d("publicKey", result.getPublicKey());
+                Log.d("privateKey", result.getPrivateKey());
 
-            String mimorin = "みもりん";
-            byte[] signature = Ed25519.sign(result.getPublicKey(), result.getPrivateKey(), mimorin.getBytes());
-            if (signature != null) {
-                Log.d("signature", new String(signature));
-                Log.d("verify", String.valueOf(Ed25519.verify(result.getPublicKey(), signature, mimorin.getBytes())));
+                String mimorin = "みもりん";
+                String signature = Ed25519.sign(result.getPublicKey(), result.getPrivateKey(), mimorin);
+                if (signature != null) {
+                    Log.d("signature", String.valueOf(signature));
+                    Log.d("verify", String.valueOf(Ed25519.verify(result.getPublicKey(), signature, mimorin)));
+                }
             }
 
             TextView t = (TextView) findViewById(R.id.text);
@@ -64,8 +61,6 @@ public class MainActivity extends AppCompatActivity {
             t1.setText("");
             TextView t2 = (TextView) findViewById(R.id.text2);
             t2.setText("");
-//            TextView t3 = (TextView) findViewById(R.id.text3);
-//            t3.setText(String.valueOf(new String(privateKeyBytes)));
         } catch (Exception e) {
             e.printStackTrace();
         }
