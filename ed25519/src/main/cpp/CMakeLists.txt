@@ -4,6 +4,7 @@ add_library(
     ed25519-android
     SHARED
     add_scalar.c
+    base64.c
     fe.c
     ge.c
     key_exchange.c
