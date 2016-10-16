@@ -9,13 +9,6 @@ import android.widget.TextView;
 
 import com.kobaken0029.ed25519.Ed25519;
 
-import net.i2p.crypto.eddsa.KeyPairGenerator;
-
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectOutputStream;
-import java.nio.ByteBuffer;
-import java.security.KeyPair;
-
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,53 +18,40 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         try {
-            SharedPreferences sp = getSharedPreferences("iroha", Context.MODE_PRIVATE);
+            SharedPreferences sp = getSharedPreferences("iroha-android", Context.MODE_PRIVATE);
 
+            Ed25519.KeyPair keyPair;
             if (!sp.getBoolean("first", false)) {
+                Log.d("test", "First!!!!!");
+                 keyPair = Ed25519.createKeyPair();
+
                 SharedPreferences.Editor editor = sp.edit();
                 editor.putBoolean("first", true);
-
-                KeyPairGenerator kpg = new KeyPairGenerator();
-                KeyPair keyPair = kpg.generateKeyPair();
-
-                byte[] privateKey = keyPair.getPrivate().getEncoded();
-                byte[] publicKey = keyPair.getPublic().getEncoded();
-
-                editor.putString("privateKey", new String(privateKey));
-                editor.putString("publicKey", new String(publicKey));
+                editor.putString("publicKey", keyPair.getPublicKey());
+                editor.putString("privateKey", keyPair.getPrivateKey());
                 editor.apply();
+            } else {
+                Log.d("test", "Created KeyPair!!!!!");
+                keyPair = new Ed25519.KeyPair(
+                        sp.getString("publicKey", ""),
+                        sp.getString("privateKey", "")
+                );
             }
 
-            Ed25519.KeyPair result = Ed25519.createKeyPair();
-            if (result != null && result.getPublicKey() != null && result.getPrivateKey() != null) {
-                Log.d("publicKey", result.getPublicKey());
-                Log.d("privateKey", result.getPrivateKey());
-
-                String mimorin = "みもりん";
-                String signature = Ed25519.sign(result.getPublicKey(), result.getPrivateKey(), mimorin);
-                if (signature != null) {
-                    Log.d("signature", String.valueOf(signature));
-                    Log.d("verify", String.valueOf(Ed25519.verify(result.getPublicKey(), signature, mimorin)));
-                }
-            }
+            String message = "Hello IrohaAndroid!";
+            String signature = Ed25519.sign(message, keyPair);
+            boolean verify = Ed25519.verify(signature, message, keyPair.getPrivateKey());
 
             TextView t = (TextView) findViewById(R.id.text);
-            t.setText("");
+            t.setText(keyPair.getPublicKey());
             TextView t1 = (TextView) findViewById(R.id.text1);
-            t1.setText("");
+            t1.setText(keyPair.getPrivateKey());
             TextView t2 = (TextView) findViewById(R.id.text2);
-            t2.setText("");
+            t2.setText(signature);
+            TextView t3 = (TextView) findViewById(R.id.text3);
+            t3.setText(String.valueOf(verify));
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private byte[] convertObjToBytes(Object obj) throws Exception {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(baos);
-        oos.writeObject(obj);
-        oos.close();
-        baos.close();
-        return baos.toByteArray();
     }
 }

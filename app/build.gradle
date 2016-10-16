@@ -1,8 +1,17 @@
 apply plugin: 'com.android.application'
+apply plugin: 'git-repo'
+
+repositories {
+    github("kobaken0029", "ed25519-android", "gh-pages", "repository")
+}
+
+dependencies {
+    compile 'click.kobaken:ed25519-android:1.0.0'
+}
 
 android {
     compileSdkVersion 24
-    buildToolsVersion "24.0.1"
+    buildToolsVersion "24.0.3"
 
     defaultConfig {
         applicationId "io.soramitsu.iroha"
@@ -31,11 +40,10 @@ dependencies {
     testCompile 'org.powermock:powermock-api-mockito:1.6.5'
     testCompile 'com.squareup.okhttp3:mockwebserver:3.4.1'
     testCompile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.55'
-    compile 'com.android.support:appcompat-v7:24.2.0'
+    compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.squareup.okhttp3:okhttp:3.4.1'
     compile 'com.google.code.gson:gson:2.4'
     compile 'net.i2p.crypto:eddsa:0.1.0'
     compile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.55'
     compile group: 'commons-codec', name: 'commons-codec', version: '1.4'
-    compile project(path: ':ed25519')
 }
