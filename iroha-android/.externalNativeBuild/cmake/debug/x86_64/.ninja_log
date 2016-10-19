@@ -1,0 +1,16 @@
+# ninja log v5
+1	124	0	libs/ed25519/CMakeFiles/ed25519.dir/src/add_scalar.c.o	ea444ea0a8bc0d2
+4	128	0	libs/ed25519/CMakeFiles/ed25519.dir/src/keypair.c.o	110f063e421292d7
+2	133	0	libs/ed25519/CMakeFiles/ed25519.dir/src/key_exchange.c.o	e4c65a41dcee093f
+2	181	0	libs/ed25519/CMakeFiles/ed25519.dir/src/ge.c.o	ecaeae6ec737abf7
+2	197	0	libs/ed25519/CMakeFiles/ed25519.dir/src/fe.c.o	9f203c3d0b3529fd
+181	244	0	libs/ed25519/CMakeFiles/ed25519.dir/src/sign.c.o	95ce9f39c77ce17d
+124	247	0	libs/ed25519/CMakeFiles/ed25519.dir/src/sc.c.o	74ac2c4deb32b3fc
+197	258	0	libs/ed25519/CMakeFiles/ed25519.dir/src/verify.c.o	fdaafa499d534f77
+128	357	0	libs/ed25519/CMakeFiles/ed25519.dir/src/seed.c.o	95f6320bccb0f15c
+133	405	0	libs/ed25519/CMakeFiles/ed25519.dir/src/sha3.c.o	2b75bcb3af794f6e
+405	656	0	../../../../build/intermediates/cmake/debug/obj/x86_64/libed25519.so	7e0c3b89be2f0bfb
+1	1085	0	libs/base64/CMakeFiles/base64.dir/base64.cpp.o	58d2cce32b624b4
+1085	1197	0	libs/base64/libbase64.a	508bb7a653597c96
+1197	1676	0	CMakeFiles/native-lib.dir/src/main/cpp/native-lib.cpp.o	286e211ddf879946
+1676	2128	0	../../../../build/intermediates/cmake/debug/obj/x86_64/libnative-lib.so	7ad292a0d6c1350d

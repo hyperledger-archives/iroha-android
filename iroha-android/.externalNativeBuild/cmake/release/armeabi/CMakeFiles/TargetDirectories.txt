@@ -1,0 +1,9 @@
+/Users/koba/Documents/android_studio_workspace/IrohaAndroid/iroha-android/.externalNativeBuild/cmake/release/armeabi/CMakeFiles/edit_cache.dir
+/Users/koba/Documents/android_studio_workspace/IrohaAndroid/iroha-android/.externalNativeBuild/cmake/release/armeabi/CMakeFiles/rebuild_cache.dir
+/Users/koba/Documents/android_studio_workspace/IrohaAndroid/iroha-android/.externalNativeBuild/cmake/release/armeabi/CMakeFiles/native-lib.dir
+/Users/koba/Documents/android_studio_workspace/IrohaAndroid/iroha-android/.externalNativeBuild/cmake/release/armeabi/libs/base64/CMakeFiles/edit_cache.dir
+/Users/koba/Documents/android_studio_workspace/IrohaAndroid/iroha-android/.externalNativeBuild/cmake/release/armeabi/libs/base64/CMakeFiles/rebuild_cache.dir
+/Users/koba/Documents/android_studio_workspace/IrohaAndroid/iroha-android/.externalNativeBuild/cmake/release/armeabi/libs/base64/CMakeFiles/base64.dir
+/Users/koba/Documents/android_studio_workspace/IrohaAndroid/iroha-android/.externalNativeBuild/cmake/release/armeabi/libs/ed25519/CMakeFiles/edit_cache.dir
+/Users/koba/Documents/android_studio_workspace/IrohaAndroid/iroha-android/.externalNativeBuild/cmake/release/armeabi/libs/ed25519/CMakeFiles/rebuild_cache.dir
+/Users/koba/Documents/android_studio_workspace/IrohaAndroid/iroha-android/.externalNativeBuild/cmake/release/armeabi/libs/ed25519/CMakeFiles/ed25519.dir

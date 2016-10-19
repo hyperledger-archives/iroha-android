@@ -1,13 +1,4 @@
 apply plugin: 'com.android.library'
-apply plugin: 'git-repo'
-
-repositories {
-    github("kobaken0029", "ed25519-android", "gh-pages", "repository")
-}
-
-dependencies {
-    compile 'click.kobaken:ed25519-android:1.0.0'
-}
 
 android {
     compileSdkVersion 24
@@ -18,9 +9,12 @@ android {
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
-
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
+        externalNativeBuild {
+            cmake {
+                cppFlags "-std=c++11"
+            }
+        }
     }
     buildTypes {
         release {
@@ -28,19 +22,18 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    externalNativeBuild {
+        cmake {
+            path "CMakeLists.txt"
+        }
+    }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.hamcrest:hamcrest-library:1.3'
-    testCompile 'org.mockito:mockito-all:1.10.9'
-    testCompile 'org.powermock:powermock-module-junit4:1.6.5'
-    testCompile 'org.powermock:powermock-api-mockito:1.6.5'
-    testCompile 'com.squareup.okhttp3:mockwebserver:3.4.1'
-    testCompile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.55'
-    compile 'com.android.support:appcompat-v7:24.2.1'
-    compile 'com.squareup.okhttp3:okhttp:3.4.1'
-    compile 'com.google.code.gson:gson:2.4'
+    androidTestCompile 'com.android.support.test:runner:0.5'
+    androidTestCompile 'com.android.support.test:rules:0.5'
+    androidTestCompile 'org.hamcrest:hamcrest-library:1.3'
+    androidTestCompile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.55'
     compile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.55'
 }
