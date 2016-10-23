@@ -1,5 +1,7 @@
 # iroha-android
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/122f8fc23361423e99b941b547ad95eb)](https://www.codacy.com/app/soramitsu/iroha-android?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=soramitsu/iroha-android&amp;utm_campaign=Badge_Grade)
+
 ## License
 
 Copyright 2016 Soramitsu Co., Ltd.
