@@ -14,3 +14,5 @@
 1271	1314	0	libs/base64/libbase64.a	b9798a55ee71876e
 1314	2041	0	CMakeFiles/native-lib.dir/src/main/cpp/native-lib.cpp.o	e071d8418cc20a64
 2041	2414	0	../../../../build/intermediates/cmake/debug/obj/armeabi/libnative-lib.so	a03be72de40e3aa1
+17	814	0	CMakeFiles/native-lib.dir/src/main/cpp/native-lib.cpp.o	e071d8418cc20a64
+814	1278	0	../../../../build/intermediates/cmake/debug/obj/armeabi/libnative-lib.so	a03be72de40e3aa1

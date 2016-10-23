@@ -14,3 +14,5 @@
 1085	1197	0	libs/base64/libbase64.a	508bb7a653597c96
 1197	1676	0	CMakeFiles/native-lib.dir/src/main/cpp/native-lib.cpp.o	286e211ddf879946
 1676	2128	0	../../../../build/intermediates/cmake/debug/obj/x86_64/libnative-lib.so	7ad292a0d6c1350d
+3	999	0	CMakeFiles/native-lib.dir/src/main/cpp/native-lib.cpp.o	286e211ddf879946
+999	1697	0	../../../../build/intermediates/cmake/debug/obj/x86_64/libnative-lib.so	7ad292a0d6c1350d

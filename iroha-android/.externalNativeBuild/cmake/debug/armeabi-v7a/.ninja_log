@@ -14,3 +14,5 @@
 814	5274	0	../../../../build/intermediates/cmake/debug/obj/armeabi-v7a/libed25519.so	901ba1f18e7f1915
 5274	6558	0	CMakeFiles/native-lib.dir/src/main/cpp/native-lib.cpp.o	4311f43c1d9f7b4b
 6559	6915	0	../../../../build/intermediates/cmake/debug/obj/armeabi-v7a/libnative-lib.so	99621c884a1d9246
+3	1436	0	CMakeFiles/native-lib.dir/src/main/cpp/native-lib.cpp.o	4311f43c1d9f7b4b
+1436	2183	0	../../../../build/intermediates/cmake/debug/obj/armeabi-v7a/libnative-lib.so	99621c884a1d9246
