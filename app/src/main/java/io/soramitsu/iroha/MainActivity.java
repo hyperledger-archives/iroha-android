@@ -7,7 +7,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 
-import com.kobaken0029.ed25519.Ed25519;
+import io.soramitsu.irohaandroid.KeyPair;
+
+import static io.soramitsu.irohaandroid.Iroha.createKeyPair;
+import static io.soramitsu.irohaandroid.Iroha.sha3_256;
+import static io.soramitsu.irohaandroid.Iroha.sign;
+import static io.soramitsu.irohaandroid.Iroha.verify;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -20,10 +25,10 @@ public class MainActivity extends AppCompatActivity {
         try {
             SharedPreferences sp = getSharedPreferences("iroha-android", Context.MODE_PRIVATE);
 
-            Ed25519.KeyPair keyPair;
+            KeyPair keyPair;
             if (!sp.getBoolean("first", false)) {
                 Log.d("test", "First!!!!!");
-                 keyPair = Ed25519.createKeyPair();
+                 keyPair = createKeyPair();
 
                 SharedPreferences.Editor editor = sp.edit();
                 editor.putBoolean("first", true);
@@ -32,15 +37,15 @@ public class MainActivity extends AppCompatActivity {
                 editor.apply();
             } else {
                 Log.d("test", "Created KeyPair!!!!!");
-                keyPair = new Ed25519.KeyPair(
+                keyPair = new KeyPair(
                         sp.getString("publicKey", ""),
                         sp.getString("privateKey", "")
                 );
             }
 
-            String message = "Hello IrohaAndroid!";
-            String signature = Ed25519.sign(message, keyPair);
-            boolean verify = Ed25519.verify(signature, message, keyPair.getPrivateKey());
+            String message = sha3_256("Hello IrohaAndroid!");
+            String signature = sign(keyPair, message);
+            boolean verify = verify(keyPair.getPublicKey(), signature, message);
 
             TextView t = (TextView) findViewById(R.id.text);
             t.setText(keyPair.getPublicKey());

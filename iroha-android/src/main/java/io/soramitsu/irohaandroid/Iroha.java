@@ -1,155 +1,54 @@
 package io.soramitsu.irohaandroid;
 
-import com.kobaken0029.ed25519.Ed25519;
+import org.bouncycastle.jcajce.provider.digest.SHA3;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import io.soramitsu.irohaandroid.models.Asset;
-import io.soramitsu.irohaandroid.models.Domain;
-import io.soramitsu.irohaandroid.models.History;
-import io.soramitsu.irohaandroid.models.IrohaUser;
-import io.soramitsu.irohaandroid.models.ResponseObject;
-import io.soramitsu.irohaandroid.models.apis.IrohaUserClient;
-import io.soramitsu.irohaandroid.models.apis.TransactionClient;
+import java.security.MessageDigest;
 
 
-/**
- * Wrapper class of the Iroha API.<br>
- * This class is Singleton and Builder pattern.
- */
 public class Iroha {
-    private static Iroha iroha = new Iroha(IrohaUserClient.newInstance(), TransactionClient.newInstance());
-
-    private String endpoint;
-    private IrohaUserClient userClient;
-    private TransactionClient transactionClient;
-
-    static class Builder {
-        String endpoint;
-
-        public Builder baseUrl(String endpoint) {
-            this.endpoint = endpoint;
-            return this;
-        }
-
-        public Iroha build() {
-            if (endpoint == null) {
-                throw new NullPointerException();
-            }
-            iroha.endpoint = this.endpoint;
-            return iroha;
-        }
+    private Iroha() {
     }
 
-    private Iroha(IrohaUserClient userClient, TransactionClient transactionClient) {
-        this.userClient = userClient;
-        this.transactionClient = transactionClient;
+    public static KeyPair createKeyPair() {
+        return Ed25519.createKeyPair();
     }
 
-    public static Iroha getInstance() {
-        return iroha;
+    public static String sign(KeyPair keyPair, String message) {
+        return Ed25519.sign(message, keyPair);
     }
 
-    public IrohaUser register(String publicKey, String name) {
-        IrohaUser user = null;
-        try {
-            user = userClient.register(endpoint, publicKey, name);
-        } catch (IOException e) {
-            e.printStackTrace();
+    public static boolean verify(String publicKey, String signature, String message) {
+        return Ed25519.verify(signature, message, publicKey);
+    }
+
+    public static String sha3_256(final String message) {
+        return sha3_x(new SHA3.Digest256(), message);
+    }
+
+    public static String sha3_384(final String message) {
+        return sha3_x(new SHA3.Digest384(), message);
+    }
+
+    public static String sha3_512(final String message) {
+        return sha3_x(new SHA3.Digest512(), message);
+    }
+
+    private static String sha3_x(SHA3.DigestSHA3 sha3, String message) {
+        sha3.update(message.getBytes());
+        return hashToString(sha3);
+    }
+
+    private static String hashToString(MessageDigest hash) {
+        return hashToString(hash.digest());
+    }
+
+    private static String hashToString(byte[] hash) {
+        StringBuilder buff = new StringBuilder();
+
+        for (byte b : hash) {
+            buff.append(String.format("%02x", b & 0xFF));
         }
-        return user;
-    }
 
-    public IrohaUser getAccountInfo(String uuid) {
-        IrohaUser user = null;
-        try {
-            user = userClient.findAccountInfo(endpoint, uuid);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return user;
-    }
-
-    public Domain registerDomain(String name, Ed25519.KeyPair keyPair) {
-        Domain domain = null;
-        try {
-            domain = transactionClient.registerDomain(endpoint, name, keyPair);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return domain;
-    }
-
-    public Asset createAsset(String name, String domain, Ed25519.KeyPair keyPair) {
-        Asset asset = null;
-        try {
-            asset = transactionClient.registerAsset(endpoint, name, domain, keyPair);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return asset;
-    }
-
-    public List<Domain> getDomains() {
-        List<Domain> domains = new ArrayList<>();
-        try {
-            domains = transactionClient.findDomains(endpoint);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return domains;
-    }
-
-    public List<Asset> getAssets(String domain) {
-        List<Asset> assets = new ArrayList<>();
-        try {
-            assets = transactionClient.findAssets(endpoint, domain);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return assets;
-    }
-
-    public ResponseObject operationAsset(String assetUuid, String command,
-                                                int amount, String receiver, Ed25519.KeyPair keyPair) {
-        ResponseObject response = null;
-        try {
-            response = transactionClient.operation(endpoint, assetUuid, command, amount, receiver, keyPair);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return response;
-    }
-
-    public History getHistory(String uuid) {
-        History history = null;
-        try {
-            history = transactionClient.history(endpoint, uuid);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return history;
-    }
-
-    public History getHistory(String domain, String asset) {
-        History history = null;
-        try {
-            history = transactionClient.history(endpoint, domain, asset);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return history;
-    }
-
-    public ResponseObject sendMessage(String messageBody, String receiver, Ed25519.KeyPair keyPair) {
-        ResponseObject response = null;
-        try {
-            response = transactionClient.sendMessage(endpoint, messageBody, receiver, keyPair);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return response;
+        return buff.toString();
     }
 }
