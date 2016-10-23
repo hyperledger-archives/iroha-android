@@ -1,5 +1,6 @@
 package io.soramitsu.irohaandroid;
 
+
 /**
  * KeyPair for ed25519.
  */
