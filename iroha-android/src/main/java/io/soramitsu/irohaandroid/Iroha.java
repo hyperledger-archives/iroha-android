@@ -21,21 +21,20 @@ public class Iroha {
         return Ed25519.verify(signature, message, publicKey);
     }
 
-    public static String sha3_256(final String input) {
-        final SHA3.DigestSHA3 sha3 = new SHA3.Digest256();
-        sha3.update(input.getBytes());
-        return hashToString(sha3);
+    public static String sha3_256(final String message) {
+        return sha3_x(new SHA3.Digest256(), message);
     }
 
-    public static String sha3_384(final String input) {
-        final SHA3.DigestSHA3 sha3 = new SHA3.Digest384();
-        sha3.update(input.getBytes());
-        return hashToString(sha3);
+    public static String sha3_384(final String message) {
+        return sha3_x(new SHA3.Digest384(), message);
     }
 
-    public static String sha3_512(final String input) {
-        final SHA3.DigestSHA3 sha3 = new SHA3.Digest512();
-        sha3.update(input.getBytes());
+    public static String sha3_512(final String message) {
+        return sha3_x(new SHA3.Digest512(), message);
+    }
+
+    private static String sha3_x(SHA3.DigestSHA3 sha3, String message) {
+        sha3.update(message.getBytes());
         return hashToString(sha3);
     }
 
