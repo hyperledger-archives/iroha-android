@@ -10,6 +10,7 @@ import android.widget.TextView;
 import io.soramitsu.irohaandroid.KeyPair;
 
 import static io.soramitsu.irohaandroid.Iroha.createKeyPair;
+import static io.soramitsu.irohaandroid.Iroha.sha3_256;
 import static io.soramitsu.irohaandroid.Iroha.sign;
 import static io.soramitsu.irohaandroid.Iroha.verify;
 
@@ -42,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
                 );
             }
 
-            String message = "Hello IrohaAndroid!";
+            String message = sha3_256("Hello IrohaAndroid!");
             String signature = sign(keyPair, message);
             boolean verify = verify(keyPair.getPublicKey(), signature, message);
 
