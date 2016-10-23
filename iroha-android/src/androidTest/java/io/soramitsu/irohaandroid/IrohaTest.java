@@ -8,16 +8,17 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static io.soramitsu.irohaandroid.Ed25519.createKeyPair;
-import static io.soramitsu.irohaandroid.Ed25519.sign;
-import static io.soramitsu.irohaandroid.Ed25519.verify;
+import static io.soramitsu.irohaandroid.Iroha.createKeyPair;
+import static io.soramitsu.irohaandroid.Iroha.sign;
+import static io.soramitsu.irohaandroid.Iroha.verify;
 import static io.soramitsu.irohaandroid.Iroha.sha3_256;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 
 /**
- * native method is only test.
+ * This is Iroha unit test.<br>
+ * Run the Instrumented Unit Test because native method(call C++ function) is not call the Unit Test.
  */
 @RunWith(AndroidJUnit4.class)
 @SmallTest
@@ -40,9 +41,9 @@ public class IrohaTest {
         final String privateKey = "aFJfbcedA7p6X0b6EdQNovfFtmq4YSGK/+Bw+XBrsnAEBpXRu+Qfw0559lgLwF2QusChGiDEkLAxPqodQH1kbA==";
         final KeyPair keyPair = new KeyPair(privateKey, publicKey);
         final String message = sha3_256("test");
-        final String signature = "Y6sgwsm2GEr//KI7uDUe+IFoiOQt7WNsLxn15A40pUsvYAeVMxb7koxGA1Uixxfzwm7hbX5ke/MYboTdMfOzBA==";
+        final String signature = "bl7EyGwrdDIcHpizHUcDd4Ui34pQRv5VoM69WEPGNveZVOIXJbX3nWhvBvyGXaCxZIuu0THCo5g8PSr2NZJKBg==";
 
-        String result = Iroha.sign(keyPair, message);
+        String result = sign(keyPair, message);
 
         assertThat(result, is(signature));
     }
@@ -51,9 +52,9 @@ public class IrohaTest {
     public void test_verify_Successful() throws Exception {
         final String publicKey = "N1X+Fv7soLknpZNtkdW5cRphgzFjqHmOJl9GvVahWxk=";
         final String message = sha3_256("test");
-        final String signature = "Y6sgwsm2GEr//KI7uDUe+IFoiOQt7WNsLxn15A40pUsvYAeVMxb7koxGA1Uixxfzwm7hbX5ke/MYboTdMfOzBA==";
+        final String signature = "bl7EyGwrdDIcHpizHUcDd4Ui34pQRv5VoM69WEPGNveZVOIXJbX3nWhvBvyGXaCxZIuu0THCo5g8PSr2NZJKBg==";
 
-        boolean result = Iroha.verify(publicKey, signature, message);
+        boolean result = verify(publicKey, signature, message);
 
         assertThat(result, is(Boolean.TRUE));
     }
@@ -61,9 +62,9 @@ public class IrohaTest {
     @Test
     public void test_verify_with_createKeyPair_Successful() throws Exception {
         final String message = "Iroha Android";
-        final String signature = sign(message, keyPair);
+        final String signature = sign(keyPair, message);
 
-        boolean result = verify(signature, message, keyPair.getPublicKey());
+        boolean result = verify(keyPair.getPublicKey(), signature, message);
 
         assertThat(result, is(Boolean.TRUE));
     }
@@ -71,9 +72,9 @@ public class IrohaTest {
     @Test
     public void test_verify_with_sha3_Successful() throws Exception {
         final String message = sha3_256("Iroha Android");
-        final String signature = sign(message, keyPair);
+        final String signature = sign(keyPair, message);
 
-        boolean result = verify(signature, message, keyPair.getPublicKey());
+        boolean result = verify(keyPair.getPublicKey(), signature, message);
 
         assertThat(result, is(Boolean.TRUE));
     }
@@ -81,10 +82,10 @@ public class IrohaTest {
     @Test
     public void test_verify_another_public_key_Failure() throws Exception {
         final String message = "Iroha Android";
-        final String signature = sign(message, keyPair);
+        final String signature = sign(keyPair, message);
 
         final KeyPair anotherKeyPair = createKeyPair();
-        boolean result = verify(signature, message, anotherKeyPair.getPublicKey());
+        boolean result = verify(anotherKeyPair.getPublicKey(), signature, message);
 
         assertThat(result, is(Boolean.FALSE));
     }
@@ -92,10 +93,10 @@ public class IrohaTest {
     @Test
     public void test_verify_with_sha3_another_public_key_Failure() throws Exception {
         final String message = sha3_256("Iroha Android");
-        final String signature = sign(message, keyPair);
+        final String signature = sign(keyPair, message);
 
         final KeyPair anotherKeyPair = createKeyPair();
-        boolean result = verify(signature, message, anotherKeyPair.getPublicKey());
+        boolean result = verify(anotherKeyPair.getPublicKey(), signature, message);
 
         assertThat(result, is(Boolean.FALSE));
     }
