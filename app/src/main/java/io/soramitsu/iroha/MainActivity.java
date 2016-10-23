@@ -9,9 +9,9 @@ import android.widget.TextView;
 
 import io.soramitsu.irohaandroid.KeyPair;
 
-import static io.soramitsu.irohaandroid.Ed25519.createKeyPair;
-import static io.soramitsu.irohaandroid.Ed25519.sign;
-import static io.soramitsu.irohaandroid.Ed25519.verify;
+import static io.soramitsu.irohaandroid.Iroha.createKeyPair;
+import static io.soramitsu.irohaandroid.Iroha.sign;
+import static io.soramitsu.irohaandroid.Iroha.verify;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -43,8 +43,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
             String message = "Hello IrohaAndroid!";
-            String signature = sign(message, keyPair);
-            boolean verify = verify(signature, message, keyPair.getPublicKey());
+            String signature = sign(keyPair, message);
+            boolean verify = verify(keyPair.getPublicKey(), signature, message);
 
             TextView t = (TextView) findViewById(R.id.text);
             t.setText(keyPair.getPublicKey());
