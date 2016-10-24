@@ -1,1 +1,1 @@
-include ':app', ':iroha-android'
+include ':iroha-android-sample', ':iroha-android'
