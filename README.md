@@ -1,5 +1,6 @@
-# いろはAndroid(IrohaAndroid)
+# iroha-android
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/122f8fc23361423e99b941b547ad95eb)](https://www.codacy.com/app/soramitsu/iroha-android?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=soramitsu/iroha-android&amp;utm_campaign=Badge_Grade)
 
 ## What's is いろは(iroha)?
 いろは(iroha) is [this](https://github.com/soramitsu/iroha).
@@ -75,7 +76,6 @@ String hash = Iroha.sha3_512("")
 
 ## Author
 [kobaken0029](https://github.com/kobaken0029)
-
 
 ## License
 
