@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.novoda.bintray-release'
 
 android {
     compileSdkVersion 24
@@ -35,4 +36,13 @@ dependencies {
     androidTestCompile 'com.android.support.test:rules:0.5'
     androidTestCompile 'org.hamcrest:hamcrest-library:1.3'
     compile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.55'
+}
+
+publish {
+    userOrg = 'hyperledger'
+    groupId = 'org.hyperledger'
+    artifactId = 'iroha-android'
+    publishVersion = '1.0'
+    desc = 'Android library for Iroha, a simple distributed ledger.'
+    website = 'https://github.com/hyperledger/iroha-android'
 }
