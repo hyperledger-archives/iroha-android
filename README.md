@@ -25,8 +25,9 @@ Android Build Tools >v24
 In your ```app/build.gradle```
 
 ```gradle
+
 repositories {
-    github("soramitsu", "iroha-android", "gh-pages", "repository")
+    maven { url 'http://hyperledger.github.com/iroha-android/repository' }
 }
 
 dependencies {
