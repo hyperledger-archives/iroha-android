@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 
-import io.soramitsu.irohaandroid.KeyPair;
+import io.soramitsu.irohaandroid.domain.entity.KeyPair;
 
 import static io.soramitsu.irohaandroid.Iroha.createKeyPair;
 import static io.soramitsu.irohaandroid.Iroha.sha3_256;

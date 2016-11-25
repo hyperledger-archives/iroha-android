@@ -4,6 +4,8 @@ import org.bouncycastle.jcajce.provider.digest.SHA3;
 
 import java.security.MessageDigest;
 
+import io.soramitsu.irohaandroid.domain.entity.KeyPair;
+
 
 public class Iroha {
     private Iroha() {

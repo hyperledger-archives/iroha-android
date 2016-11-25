@@ -1,5 +1,4 @@
-package io.soramitsu.irohaandroid;
-
+package io.soramitsu.irohaandroid.domain.entity;
 
 /**
  * KeyPair for ed25519.

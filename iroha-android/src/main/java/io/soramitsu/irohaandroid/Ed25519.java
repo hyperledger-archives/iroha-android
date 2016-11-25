@@ -3,6 +3,8 @@ package io.soramitsu.irohaandroid;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.soramitsu.irohaandroid.domain.entity.KeyPair;
+
 
 /**
  * This class can be generate keypair or create signature or verify the message.
