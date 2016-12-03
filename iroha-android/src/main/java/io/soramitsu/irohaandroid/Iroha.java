@@ -88,7 +88,6 @@ public class Iroha {
                     new JobExecutor(),
                     new UiThread()
             );
-
         }
 
         registerAccountUseCase.execute(callback);

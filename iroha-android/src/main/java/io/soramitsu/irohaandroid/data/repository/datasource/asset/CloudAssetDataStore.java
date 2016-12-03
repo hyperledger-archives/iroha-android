@@ -16,7 +16,7 @@ public class CloudAssetDataStore implements AssetDataStore {
     }
 
     @Override
-    public Observable<AssetEntity> register(AssetRegisterRequest body) {
+    public Observable<AssetEntity> create(AssetRegisterRequest body) {
         return restApi.assetService().create(body);
     }
 
