@@ -1,6 +1,8 @@
 package io.soramitsu.irohaandroid.domain.entity;
 
-public class OperationParameter {
+import java.io.Serializable;
+
+public class OperationParameter implements Serializable {
     public String command;
     public String value;
     public String sender;

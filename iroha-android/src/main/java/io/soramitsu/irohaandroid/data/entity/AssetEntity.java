@@ -1,10 +1,8 @@
-package io.soramitsu.irohaandroid.domain.entity;
+package io.soramitsu.irohaandroid.data.entity;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.io.Serializable;
-
-public class Asset implements Serializable {
+public class AssetEntity {
     @SerializedName(value = "asset-uuid")
     public String uuid;
     public String name;

@@ -2,12 +2,16 @@ package io.soramitsu.iroha;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
 
+import io.soramitsu.irohaandroid.Iroha;
+import io.soramitsu.irohaandroid.domain.entity.Account;
 import io.soramitsu.irohaandroid.domain.entity.KeyPair;
+import io.soramitsu.irohaandroid.domain.entity.reqest.AccountRegisterRequest;
+import rx.Subscriber;
 
 import static io.soramitsu.irohaandroid.Iroha.createKeyPair;
 import static io.soramitsu.irohaandroid.Iroha.sha3_256;
@@ -21,6 +25,24 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Iroha iroha = new Iroha.Builder().baseUrl("https://example.com").build();
+        iroha.registerAccount(getApplicationContext(), new AccountRegisterRequest(), new Subscriber<Account>() {
+            @Override
+            public void onNext(Account account) {
+                Log.d("MainActivity", account.name);
+            }
+
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+        });
 
         try {
             SharedPreferences sp = getSharedPreferences("iroha-android", Context.MODE_PRIVATE);
@@ -58,5 +80,11 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Iroha.getInstance().unsubscribeRegisterAccount();
     }
 }

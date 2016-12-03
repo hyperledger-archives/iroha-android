@@ -1,5 +1,6 @@
 package io.soramitsu.irohaandroid.domain.executor;
 
-public interface ThreadExecutor {
-    void execute(final Runnable runnable);
+import java.util.concurrent.Executor;
+
+public interface ThreadExecutor extends Executor {
 }
