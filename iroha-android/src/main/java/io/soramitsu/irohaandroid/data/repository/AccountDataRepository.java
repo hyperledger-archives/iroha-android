@@ -17,6 +17,8 @@ import io.soramitsu.irohaandroid.domain.repository.AccountRepository;
 import rx.Observable;
 import rx.functions.Func1;
 
+import static io.soramitsu.irohaandroid.data.repository.datasource.account.AccountDataFactory.FetchType;
+
 public class AccountDataRepository implements AccountRepository {
 
     private final Context context;
@@ -45,12 +47,18 @@ public class AccountDataRepository implements AccountRepository {
 
     @Override
     public Observable<Account> register(AccountRegisterRequest body) {
-        AccountDataStore accountDataStore = accountDataFactory.create();
+        AccountDataStore accountDataStore = accountDataFactory.create(FetchType.CLOUD);
         return accountDataStore.register(body).map(transformFunction);
     }
 
     @Override
-    public Observable<Account> userInfo(String uuid) {
+    public Observable<String> findUuid() {
+        AccountDataStore accountDataStore = accountDataFactory.create(FetchType.LOCAL);
+        return accountDataStore.uuid();
+    }
+
+    @Override
+    public Observable<Account> findByUuid(String uuid) {
         AccountDataStore accountDataStore = accountDataFactory.create(uuid);
         return accountDataStore.userInfo(uuid).map(transformFunction);
     }

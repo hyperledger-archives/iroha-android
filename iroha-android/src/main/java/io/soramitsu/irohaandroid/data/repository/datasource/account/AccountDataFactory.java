@@ -8,19 +8,27 @@ public class AccountDataFactory {
 
     private final AccountCache userCache;
 
+    public enum FetchType {
+        CLOUD, LOCAL
+    }
+
     public AccountDataFactory(AccountCache userCache) {
         this.userCache = userCache;
     }
 
-    public AccountDataStore create() {
-        return createCloudDataStore();
+    public AccountDataStore create(FetchType fetchType) {
+        if (fetchType == FetchType.LOCAL) {
+            return new DiskAccountDataStore(userCache);
+        } else {
+            return createCloudDataStore();
+        }
     }
 
     public AccountDataStore create(String uuid) {
         AccountDataStore userDataStore;
 
-        if (!this.userCache.isExpired() && this.userCache.isCached(uuid)) {
-            userDataStore = new DiskAccountDataStore(this.userCache);
+        if (!userCache.isExpired() && userCache.isCached(uuid)) {
+            userDataStore = new DiskAccountDataStore(userCache);
         } else {
             userDataStore = createCloudDataStore();
         }

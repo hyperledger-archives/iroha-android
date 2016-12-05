@@ -129,7 +129,7 @@ public class TransactionListCacheImpl implements TransactionListCache {
         fileNameBuilder.append(File.separator);
         fileNameBuilder.append(DEFAULT_FILE_NAME);
         fileNameBuilder.append(uuid);
-        if (other != null && other[0] != null && other[1] != null) {
+        if (other != null && other.length == 2 && other[0] != null && other[1] != null) {
             fileNameBuilder.append(other[0]);
             fileNameBuilder.append(other[1]);
         }

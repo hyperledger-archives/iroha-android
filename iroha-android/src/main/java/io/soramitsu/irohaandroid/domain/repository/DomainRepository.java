@@ -9,5 +9,5 @@ import rx.Observable;
 public interface DomainRepository {
     Observable<Domain> register(DomainRegisterRequest body);
 
-    Observable<List<Domain>> domains();
+    Observable<List<Domain>> findDomains();
 }

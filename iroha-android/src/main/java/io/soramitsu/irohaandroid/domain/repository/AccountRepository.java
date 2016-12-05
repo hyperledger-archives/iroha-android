@@ -7,5 +7,7 @@ import rx.Observable;
 public interface AccountRepository {
     Observable<Account> register(AccountRegisterRequest body);
 
-    Observable<Account> userInfo(String uuid);
+    Observable<String> findUuid();
+
+    Observable<Account> findByUuid(String uuid);
 }

@@ -20,6 +20,11 @@ class DiskAccountDataStore implements AccountDataStore {
     }
 
     @Override
+    public Observable<String> uuid() {
+        return userCache.get();
+    }
+
+    @Override
     public Observable<AccountEntity> userInfo(String uuid) {
         return userCache.get(uuid);
     }

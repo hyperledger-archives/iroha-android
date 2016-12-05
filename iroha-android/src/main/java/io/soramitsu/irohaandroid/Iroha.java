@@ -18,6 +18,7 @@ import io.soramitsu.irohaandroid.domain.entity.Asset;
 import io.soramitsu.irohaandroid.domain.entity.Domain;
 import io.soramitsu.irohaandroid.domain.entity.KeyPair;
 import io.soramitsu.irohaandroid.domain.entity.Transaction;
+import io.soramitsu.irohaandroid.domain.entity.TransactionHistory;
 import io.soramitsu.irohaandroid.domain.entity.reqest.AccountRegisterRequest;
 import io.soramitsu.irohaandroid.domain.entity.reqest.AssetOperationRequest;
 import io.soramitsu.irohaandroid.domain.entity.reqest.AssetRegisterRequest;
@@ -29,14 +30,19 @@ import io.soramitsu.irohaandroid.domain.interactor.FetchAssetUseCase;
 import io.soramitsu.irohaandroid.domain.interactor.FetchDomainUseCase;
 import io.soramitsu.irohaandroid.domain.interactor.FetchKeyPairUseCase;
 import io.soramitsu.irohaandroid.domain.interactor.FetchMultiAssetsTransactionUseCase;
+import io.soramitsu.irohaandroid.domain.interactor.FetchTransactionHistoryUseCase;
 import io.soramitsu.irohaandroid.domain.interactor.FetchTransactionUseCase;
+import io.soramitsu.irohaandroid.domain.interactor.FetchUuidUseCase;
 import io.soramitsu.irohaandroid.domain.interactor.OperationAssetUseCase;
 import io.soramitsu.irohaandroid.domain.interactor.RegisterAccountUseCase;
 import io.soramitsu.irohaandroid.domain.interactor.RegisterAssetUseCase;
 import io.soramitsu.irohaandroid.domain.interactor.RegisterDomainUseCase;
 import io.soramitsu.irohaandroid.domain.interactor.RegisterKeyPairUseCase;
-import io.soramitsu.irohaandroid.presentation.UiThread;
 import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+
+import static android.R.attr.key;
 
 public class Iroha {
     private static Iroha iroha;
@@ -44,6 +50,7 @@ public class Iroha {
     private RegisterKeyPairUseCase registerKeyPairUseCase;
     private DeleteKeyPairUseCase deleteKeyPairUseCase;
     private FetchKeyPairUseCase fetchKeyPairUseCase;
+    private FetchUuidUseCase fetchUuidUseCase;
     private RegisterAccountUseCase registerAccountUseCase;
     private FetchAccountUseCase fetchAccountUseCase;
     private RegisterDomainUseCase registerDomainUseCase;
@@ -53,6 +60,7 @@ public class Iroha {
     private OperationAssetUseCase operationAssetUseCase;
     private FetchTransactionUseCase fetchTransactionUseCase;
     private FetchMultiAssetsTransactionUseCase fetchMultiAssetsTransactionUseCase;
+    private FetchTransactionHistoryUseCase fetchTransactionHistoryUseCase;
 
     private String baseUrl;
 
@@ -91,9 +99,9 @@ public class Iroha {
     public void generateKeyPair(Context context, Subscriber<Boolean> callback) {
         if (registerKeyPairUseCase == null) {
             registerKeyPairUseCase = new RegisterKeyPairUseCase(
-                    KeyPairDataRepository.getInstance(context),
-                    new JobExecutor(),
-                    new UiThread()
+                    AndroidSchedulers.mainThread(),
+                    AndroidSchedulers.mainThread(),
+                    KeyPairDataRepository.getInstance(context)
             );
         }
 
@@ -109,9 +117,9 @@ public class Iroha {
     public void removeKeyPair(Context context) {
         if (deleteKeyPairUseCase == null) {
             deleteKeyPairUseCase = new DeleteKeyPairUseCase(
-                    KeyPairDataRepository.getInstance(context),
-                    new JobExecutor(),
-                    new UiThread()
+                    AndroidSchedulers.mainThread(),
+                    AndroidSchedulers.mainThread(),
+                    KeyPairDataRepository.getInstance(context)
             );
         }
 
@@ -127,9 +135,9 @@ public class Iroha {
     public void findKeyPair(Context context, Subscriber<KeyPair> callback) {
         if (fetchKeyPairUseCase == null) {
             fetchKeyPairUseCase = new FetchKeyPairUseCase(
-                    KeyPairDataRepository.getInstance(context),
-                    new JobExecutor(),
-                    new UiThread()
+                    Schedulers.from(new JobExecutor()),
+                    AndroidSchedulers.mainThread(),
+                    KeyPairDataRepository.getInstance(context)
             );
         }
 
@@ -142,13 +150,31 @@ public class Iroha {
         }
     }
 
+    public String findUuid(Context context) {
+        if (fetchUuidUseCase == null) {
+            fetchUuidUseCase = new FetchUuidUseCase(
+                    AndroidSchedulers.mainThread(),
+                    AndroidSchedulers.mainThread(),
+                    new AccountDataRepository(context)
+            );
+        }
+
+        return fetchUuidUseCase.findUuid().toBlocking().first();
+    }
+
+    public void unsbscribeFindUuid() {
+        if (fetchUuidUseCase != null) {
+            fetchUuidUseCase.unsubscribe();
+        }
+    }
+
     public void registerAccount(Context context, AccountRegisterRequest body, Subscriber<Account> callback) {
         if (registerAccountUseCase == null) {
             registerAccountUseCase = new RegisterAccountUseCase(
+                    Schedulers.from(new JobExecutor()),
+                    AndroidSchedulers.mainThread(),
                     body,
-                    new AccountDataRepository(context.getApplicationContext()),
-                    new JobExecutor(),
-                    new UiThread()
+                    new AccountDataRepository(context.getApplicationContext())
             );
         }
 
@@ -164,10 +190,10 @@ public class Iroha {
     public void findAccountInfo(Context context, String uuid, Subscriber<Account> callback) {
         if (fetchAccountUseCase == null) {
             fetchAccountUseCase = new FetchAccountUseCase(
+                    Schedulers.from(new JobExecutor()),
+                    AndroidSchedulers.mainThread(),
                     uuid,
-                    new AccountDataRepository(context.getApplicationContext()),
-                    new JobExecutor(),
-                    new UiThread()
+                    new AccountDataRepository(context.getApplicationContext())
             );
         }
 
@@ -183,10 +209,10 @@ public class Iroha {
     public void registerDomain(DomainRegisterRequest body, Subscriber<Domain> callback) {
         if (registerDomainUseCase == null) {
             registerDomainUseCase = new RegisterDomainUseCase(
+                    Schedulers.from(new JobExecutor()),
+                    AndroidSchedulers.mainThread(),
                     body,
-                    new DomainDataRepository(),
-                    new JobExecutor(),
-                    new UiThread()
+                    new DomainDataRepository()
             );
         }
 
@@ -202,9 +228,9 @@ public class Iroha {
     public void findDomains(Subscriber<List<Domain>> callback) {
         if (fetchDomainUseCase == null) {
             fetchDomainUseCase = new FetchDomainUseCase(
-                    new DomainDataRepository(),
-                    new JobExecutor(),
-                    new UiThread()
+                    Schedulers.from(new JobExecutor()),
+                    AndroidSchedulers.mainThread(),
+                    new DomainDataRepository()
             );
         }
 
@@ -220,10 +246,10 @@ public class Iroha {
     public void createAsset(AssetRegisterRequest body, Subscriber<Asset> callback) {
         if (registerAssetUseCase == null) {
             registerAssetUseCase = new RegisterAssetUseCase(
+                    Schedulers.from(new JobExecutor()),
+                    AndroidSchedulers.mainThread(),
                     body,
-                    new AssetDataRepository(),
-                    new JobExecutor(),
-                    new UiThread()
+                    new AssetDataRepository()
             );
         }
 
@@ -239,10 +265,10 @@ public class Iroha {
     public void findAssets(String domain, Subscriber<List<Asset>> callback) {
         if (fetchAssetUseCase == null) {
             fetchAssetUseCase = new FetchAssetUseCase(
+                    Schedulers.from(new JobExecutor()),
+                    AndroidSchedulers.mainThread(),
                     domain,
-                    new AssetDataRepository(),
-                    new JobExecutor(),
-                    new UiThread()
+                    new AssetDataRepository()
             );
         }
 
@@ -258,10 +284,10 @@ public class Iroha {
     public void operationAsset(AssetOperationRequest body, Subscriber<Asset> callback) {
         if (operationAssetUseCase == null) {
             operationAssetUseCase = new OperationAssetUseCase(
+                    Schedulers.from(new JobExecutor()),
+                    AndroidSchedulers.mainThread(),
                     body,
-                    new AssetDataRepository(),
-                    new JobExecutor(),
-                    new UiThread()
+                    new AssetDataRepository()
             );
         }
 
@@ -274,41 +300,41 @@ public class Iroha {
         }
     }
 
-    public void findTransaction(Context context, String uuid, Subscriber<List<Transaction>> callback) {
-        if (fetchTransactionUseCase == null) {
-            fetchTransactionUseCase = new FetchTransactionUseCase(
-                    uuid,
-                    new TransactionDataRepository(context),
-                    new JobExecutor(),
-                    new UiThread()
+    public void findTransactionHistory(Context context, Subscriber<TransactionHistory> callback) {
+        if (fetchTransactionHistoryUseCase == null) {
+            fetchTransactionHistoryUseCase = new FetchTransactionHistoryUseCase(
+                    Schedulers.from(new JobExecutor()),
+                    AndroidSchedulers.mainThread(),
+                    new AccountDataRepository(context),
+                    new TransactionDataRepository(context)
             );
         }
 
-        fetchTransactionUseCase.execute(callback);
+        fetchTransactionHistoryUseCase.execute(callback);
     }
 
-    public void unsubscribeFindTransaction() {
-        if (fetchTransactionUseCase != null) {
-            fetchTransactionUseCase.unsubscribe();
+    public void unsubscribeFindTransactionHistory() {
+        if (fetchTransactionHistoryUseCase != null) {
+            fetchTransactionHistoryUseCase.unsubscribe();
         }
     }
 
-    public void findTransaction(Context context, String uuid, String domain, String asset, Subscriber<List<Transaction>> callback) {
+    public void findTransactionHistory(Context context, String uuid, String domain, String asset, Subscriber<TransactionHistory> callback) {
         if (fetchMultiAssetsTransactionUseCase == null) {
             fetchMultiAssetsTransactionUseCase = new FetchMultiAssetsTransactionUseCase(
+                    Schedulers.from(new JobExecutor()),
+                    AndroidSchedulers.mainThread(),
                     uuid,
                     domain,
                     asset,
-                    new TransactionDataRepository(context),
-                    new JobExecutor(),
-                    new UiThread()
+                    new TransactionDataRepository(context)
             );
         }
 
         fetchMultiAssetsTransactionUseCase.execute(callback);
     }
 
-    public void unsubscribeFindMultAssetsTransaction() {
+    public void unsubscribeFindMultAssetsTransactionHistory() {
         if (fetchMultiAssetsTransactionUseCase != null) {
             fetchMultiAssetsTransactionUseCase.unsubscribe();
         }

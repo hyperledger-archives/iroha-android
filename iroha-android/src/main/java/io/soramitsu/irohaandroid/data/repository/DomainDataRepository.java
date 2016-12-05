@@ -35,7 +35,7 @@ public class DomainDataRepository implements DomainRepository {
     }
 
     @Override
-    public Observable<List<Domain>> domains() {
+    public Observable<List<Domain>> findDomains() {
         DomainDataStore domainDataStore = domainDataFactory.create();
         return domainDataStore.domains().map(new Func1<DomainListEntity, List<Domain>>() {
             @Override

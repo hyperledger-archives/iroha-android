@@ -36,7 +36,7 @@ public class AssetDataRepository implements AssetRepository {
     }
 
     @Override
-    public Observable<List<Asset>> assets(String domain) {
+    public Observable<List<Asset>> findAssets(String domain) {
         AssetDataStore assetDataStore = assetDataFactory.create();
         return assetDataStore.assets(domain).map(new Func1<AssetListEntity, List<Asset>>() {
             @Override

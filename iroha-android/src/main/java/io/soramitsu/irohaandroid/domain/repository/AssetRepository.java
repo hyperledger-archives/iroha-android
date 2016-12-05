@@ -10,7 +10,7 @@ import rx.Observable;
 public interface AssetRepository {
     Observable<Asset> create(AssetRegisterRequest body);
 
-    Observable<List<Asset>> assets(String domain);
+    Observable<List<Asset>> findAssets(String domain);
 
     Observable<Asset> operation(AssetOperationRequest body);
 }

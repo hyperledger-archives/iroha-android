@@ -38,7 +38,7 @@ public class TransactionDataRepository implements TransactionRepository {
     }
 
     @Override
-    public Observable<List<Transaction>> history(String uuid) {
+    public Observable<List<Transaction>> findHistory(String uuid) {
         TransactionDataStore transactionDataStore = transactionDataFactory.create(uuid);
         return transactionDataStore.history(uuid).map(new Func1<TransactionListEntity, List<Transaction>>() {
             @Override
@@ -49,7 +49,7 @@ public class TransactionDataRepository implements TransactionRepository {
     }
 
     @Override
-    public Observable<List<Transaction>> history(String uuid, String domain, String asset) {
+    public Observable<List<Transaction>> findHistory(String uuid, String domain, String asset) {
         TransactionDataStore transactionDataStore = transactionDataFactory.create(uuid, domain, asset);
         return transactionDataStore.history(uuid, domain, asset).map(new Func1<TransactionListEntity, List<Transaction>>() {
             @Override

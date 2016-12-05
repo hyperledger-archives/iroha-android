@@ -4,20 +4,22 @@ import io.soramitsu.irohaandroid.domain.repository.AccountRepository;
 import rx.Observable;
 import rx.Scheduler;
 
-public class FetchAccountUseCase extends UseCase {
+public class FetchUuidUseCase extends UseCase {
 
-    private String uuid;
     private AccountRepository accountRepository;
 
-    public FetchAccountUseCase(Scheduler onSubscribeThread, Scheduler onObserveThread,
-                               String uuid, AccountRepository accountRepository) {
+    public FetchUuidUseCase(Scheduler onSubscribeThread, Scheduler onObserveThread,
+                            AccountRepository accountRepository) {
         super(onSubscribeThread, onObserveThread);
-        this.uuid = uuid;
         this.accountRepository = accountRepository;
     }
 
     @Override
     protected Observable buildUseCaseObservable() {
-        return accountRepository.findByUuid(uuid);
+        return accountRepository.findUuid();
+    }
+
+    public Observable<String> findUuid() {
+        return buildUseCaseObservable();
     }
 }

@@ -1,24 +1,21 @@
 package io.soramitsu.irohaandroid.domain.interactor;
 
-import io.soramitsu.irohaandroid.domain.executor.PostExecutionThread;
-import io.soramitsu.irohaandroid.domain.executor.ThreadExecutor;
 import rx.Observable;
+import rx.Scheduler;
 import rx.Subscriber;
 import rx.Subscription;
-import rx.schedulers.Schedulers;
 import rx.subscriptions.Subscriptions;
 
 public abstract class UseCase {
 
-    private final ThreadExecutor threadExecutor;
-    private final PostExecutionThread postExecutionThread;
+    private final Scheduler onObserveThread;
+    private final Scheduler onSubscribeThread;
 
     private Subscription subscription = Subscriptions.empty();
 
-    protected UseCase(ThreadExecutor threadExecutor,
-                      PostExecutionThread postExecutionThread) {
-        this.threadExecutor = threadExecutor;
-        this.postExecutionThread = postExecutionThread;
+    protected UseCase(Scheduler onSubscribeThread, Scheduler onObserveThread) {
+        this.onSubscribeThread = onSubscribeThread;
+        this.onObserveThread = onObserveThread;
     }
 
     protected abstract Observable buildUseCaseObservable();
@@ -26,8 +23,8 @@ public abstract class UseCase {
     @SuppressWarnings("unchecked")
     public void execute(Subscriber useCaseSubscriber) {
         this.subscription = this.buildUseCaseObservable()
-                .subscribeOn(Schedulers.from(threadExecutor))
-                .observeOn(postExecutionThread.getScheduler())
+                .subscribeOn(onSubscribeThread)
+                .observeOn(onObserveThread)
                 .subscribe(useCaseSubscriber);
     }
 

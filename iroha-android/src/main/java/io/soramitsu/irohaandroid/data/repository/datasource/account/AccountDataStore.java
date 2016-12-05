@@ -6,5 +6,6 @@ import rx.Observable;
 
 public interface AccountDataStore {
     Observable<AccountEntity> register(AccountRegisterRequest body);
+    Observable<String> uuid();
     Observable<AccountEntity> userInfo(String uuid);
 }

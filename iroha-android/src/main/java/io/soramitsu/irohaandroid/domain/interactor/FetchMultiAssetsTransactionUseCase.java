@@ -1,9 +1,8 @@
 package io.soramitsu.irohaandroid.domain.interactor;
 
-import io.soramitsu.irohaandroid.domain.executor.PostExecutionThread;
-import io.soramitsu.irohaandroid.domain.executor.ThreadExecutor;
 import io.soramitsu.irohaandroid.domain.repository.TransactionRepository;
 import rx.Observable;
+import rx.Scheduler;
 
 public class FetchMultiAssetsTransactionUseCase extends UseCase {
 
@@ -12,9 +11,10 @@ public class FetchMultiAssetsTransactionUseCase extends UseCase {
     private String asset;
     private TransactionRepository transactionRepository;
 
-    public FetchMultiAssetsTransactionUseCase(String uuid, String domain, String asset, TransactionRepository transactionRepository,
-                                              ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
-        super(threadExecutor, postExecutionThread);
+    public FetchMultiAssetsTransactionUseCase(Scheduler onSubscribeThread, Scheduler onObserveThread,
+                                              String uuid, String domain, String asset,
+                                              TransactionRepository transactionRepository) {
+        super(onSubscribeThread, onObserveThread);
         this.uuid = uuid;
         this.domain = domain;
         this.asset = asset;
@@ -23,6 +23,6 @@ public class FetchMultiAssetsTransactionUseCase extends UseCase {
 
     @Override
     protected Observable buildUseCaseObservable() {
-        return transactionRepository.history(uuid, domain, asset);
+        return transactionRepository.findHistory(uuid, domain, asset);
     }
 }

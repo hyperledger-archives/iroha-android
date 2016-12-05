@@ -1,17 +1,16 @@
 package io.soramitsu.irohaandroid.domain.interactor;
 
-import io.soramitsu.irohaandroid.domain.executor.PostExecutionThread;
-import io.soramitsu.irohaandroid.domain.executor.ThreadExecutor;
 import io.soramitsu.irohaandroid.domain.repository.KeyPairRepository;
 import rx.Observable;
+import rx.Scheduler;
 
 public class RegisterKeyPairUseCase extends UseCase {
 
     private KeyPairRepository keyPairRepository;
 
-    public RegisterKeyPairUseCase(KeyPairRepository keyPairRepository,
-                                  ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
-        super(threadExecutor, postExecutionThread);
+    public RegisterKeyPairUseCase(Scheduler onSubscribeThread, Scheduler onObserveThread,
+                                  KeyPairRepository keyPairRepository) {
+        super(onSubscribeThread, onObserveThread);
         this.keyPairRepository = keyPairRepository;
     }
 
