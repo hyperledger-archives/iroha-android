@@ -2,7 +2,7 @@ package io.soramitsu.irohaandroid.domain.entity.reqest;
 
 import com.google.gson.annotations.SerializedName;
 
-import io.soramitsu.irohaandroid.domain.entity.OperationParameter;
+import static io.soramitsu.irohaandroid.domain.entity.Transaction.OperationParameter;
 
 public class AssetOperationRequest {
     @SerializedName(value = "asset-uuid")

@@ -1,7 +1,5 @@
 package io.soramitsu.irohaandroid.data.executor;
 
-import android.support.annotation.NonNull;
-
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;

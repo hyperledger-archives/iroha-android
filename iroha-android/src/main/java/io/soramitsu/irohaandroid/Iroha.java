@@ -11,6 +11,7 @@ import io.soramitsu.irohaandroid.data.executor.JobExecutor;
 import io.soramitsu.irohaandroid.data.repository.AccountDataRepository;
 import io.soramitsu.irohaandroid.data.repository.AssetDataRepository;
 import io.soramitsu.irohaandroid.data.repository.DomainDataRepository;
+import io.soramitsu.irohaandroid.data.repository.KeyPairDataRepository;
 import io.soramitsu.irohaandroid.data.repository.TransactionDataRepository;
 import io.soramitsu.irohaandroid.domain.entity.Account;
 import io.soramitsu.irohaandroid.domain.entity.Asset;
@@ -21,21 +22,28 @@ import io.soramitsu.irohaandroid.domain.entity.reqest.AccountRegisterRequest;
 import io.soramitsu.irohaandroid.domain.entity.reqest.AssetOperationRequest;
 import io.soramitsu.irohaandroid.domain.entity.reqest.AssetRegisterRequest;
 import io.soramitsu.irohaandroid.domain.entity.reqest.DomainRegisterRequest;
+import io.soramitsu.irohaandroid.domain.interactor.DefaultSubscriber;
+import io.soramitsu.irohaandroid.domain.interactor.DeleteKeyPairUseCase;
 import io.soramitsu.irohaandroid.domain.interactor.FetchAccountUseCase;
 import io.soramitsu.irohaandroid.domain.interactor.FetchAssetUseCase;
 import io.soramitsu.irohaandroid.domain.interactor.FetchDomainUseCase;
+import io.soramitsu.irohaandroid.domain.interactor.FetchKeyPairUseCase;
 import io.soramitsu.irohaandroid.domain.interactor.FetchMultiAssetsTransactionUseCase;
 import io.soramitsu.irohaandroid.domain.interactor.FetchTransactionUseCase;
 import io.soramitsu.irohaandroid.domain.interactor.OperationAssetUseCase;
 import io.soramitsu.irohaandroid.domain.interactor.RegisterAccountUseCase;
 import io.soramitsu.irohaandroid.domain.interactor.RegisterAssetUseCase;
 import io.soramitsu.irohaandroid.domain.interactor.RegisterDomainUseCase;
+import io.soramitsu.irohaandroid.domain.interactor.RegisterKeyPairUseCase;
 import io.soramitsu.irohaandroid.presentation.UiThread;
 import rx.Subscriber;
 
 public class Iroha {
     private static Iroha iroha;
 
+    private RegisterKeyPairUseCase registerKeyPairUseCase;
+    private DeleteKeyPairUseCase deleteKeyPairUseCase;
+    private FetchKeyPairUseCase fetchKeyPairUseCase;
     private RegisterAccountUseCase registerAccountUseCase;
     private FetchAccountUseCase fetchAccountUseCase;
     private RegisterDomainUseCase registerDomainUseCase;
@@ -78,6 +86,60 @@ public class Iroha {
 
     public String getBaseUrl() {
         return baseUrl;
+    }
+
+    public void generateKeyPair(Context context, Subscriber<Boolean> callback) {
+        if (registerKeyPairUseCase == null) {
+            registerKeyPairUseCase = new RegisterKeyPairUseCase(
+                    KeyPairDataRepository.getInstance(context),
+                    new JobExecutor(),
+                    new UiThread()
+            );
+        }
+
+        registerKeyPairUseCase.execute(callback);
+    }
+
+    public void unsubscribeRegisterKeyPair() {
+        if (registerKeyPairUseCase != null) {
+            registerKeyPairUseCase.unsubscribe();
+        }
+    }
+
+    public void removeKeyPair(Context context) {
+        if (deleteKeyPairUseCase == null) {
+            deleteKeyPairUseCase = new DeleteKeyPairUseCase(
+                    KeyPairDataRepository.getInstance(context),
+                    new JobExecutor(),
+                    new UiThread()
+            );
+        }
+
+        deleteKeyPairUseCase.execute(new DefaultSubscriber());
+    }
+
+    public void unsubscribeDeleteKeyPair() {
+        if (deleteKeyPairUseCase != null) {
+            deleteKeyPairUseCase.unsubscribe();
+        }
+    }
+
+    public void findKeyPair(Context context, Subscriber<KeyPair> callback) {
+        if (fetchKeyPairUseCase == null) {
+            fetchKeyPairUseCase = new FetchKeyPairUseCase(
+                    KeyPairDataRepository.getInstance(context),
+                    new JobExecutor(),
+                    new UiThread()
+            );
+        }
+
+        fetchKeyPairUseCase.execute(callback);
+    }
+
+    public void unsubscribeFetchKeyPair() {
+        if (fetchKeyPairUseCase != null) {
+            fetchKeyPairUseCase.unsubscribe();
+        }
     }
 
     public void registerAccount(Context context, AccountRegisterRequest body, Subscriber<Account> callback) {

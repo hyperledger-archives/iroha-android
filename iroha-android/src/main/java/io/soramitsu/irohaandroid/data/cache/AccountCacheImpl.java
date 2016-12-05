@@ -11,6 +11,8 @@ import io.soramitsu.irohaandroid.domain.executor.ThreadExecutor;
 import rx.Observable;
 import rx.Subscriber;
 
+import static io.soramitsu.irohaandroid.data.cache.FileManager.PREFERENCES_FILE_NAME;
+
 public class AccountCacheImpl implements AccountCache {
     private static final String SETTINGS_FILE_NAME = "io.soramitsu.irohaandroid.SETTINGS";
     private static final String SETTINGS_KEY_LAST_CACHE_UPDATE = "last_cache_update";

@@ -4,10 +4,11 @@ import java.util.List;
 
 import io.soramitsu.irohaandroid.data.entity.TransactionEntity;
 import io.soramitsu.irohaandroid.data.entity.TransactionListEntity;
-import io.soramitsu.irohaandroid.domain.entity.OperationParameter;
 import io.soramitsu.irohaandroid.domain.entity.Transaction;
 import rx.Observable;
 import rx.functions.Func1;
+
+import static io.soramitsu.irohaandroid.domain.entity.Transaction.OperationParameter;
 
 public class TransactionEntityDataMapper {
 

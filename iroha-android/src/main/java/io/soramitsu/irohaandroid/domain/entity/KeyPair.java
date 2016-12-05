@@ -19,4 +19,8 @@ public class KeyPair {
     public String getPublicKey() {
         return publicKey;
     }
+
+    public boolean isEmpty() {
+        return privateKey == null || publicKey == null || privateKey.isEmpty() || publicKey.isEmpty();
+    }
 }

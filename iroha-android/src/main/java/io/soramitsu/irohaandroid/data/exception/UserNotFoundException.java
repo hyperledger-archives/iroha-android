@@ -2,7 +2,7 @@ package io.soramitsu.irohaandroid.data.exception;
 
 public class UserNotFoundException extends Exception {
     public UserNotFoundException() {
-        super();
+        super("アカウントが存在しません");
     }
 
     public UserNotFoundException(final String message) {

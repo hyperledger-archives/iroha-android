@@ -18,7 +18,7 @@ public class Account implements Serializable {
             FileManager fileManager = new FileManager();
             uuid = fileManager.getStringFromPreferences(
                     context,
-                    AccountCache.PREFERENCES_FILE_NAME,
+                    FileManager.PREFERENCES_FILE_NAME,
                     AccountCache.PREFERENCES_KEY_UUID
             );
         }

@@ -12,4 +12,11 @@ public class Transaction implements Serializable {
     public OperationParameter params;
     public String signature;
     public long timestamp;
+
+    public static class OperationParameter implements Serializable {
+        public String command;
+        public String value;
+        public String sender;
+        public String receiver;
+    }
 }

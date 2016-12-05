@@ -10,6 +10,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class FileManager {
+    public static final String PREFERENCES_FILE_NAME = "io.soramitsu.irohaandroid.PREFERENCES";
 
     public void writeToFile(File file, String fileContent) {
         if (!file.exists()) {
