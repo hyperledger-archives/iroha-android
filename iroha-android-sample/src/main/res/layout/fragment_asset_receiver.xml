@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="8dp">
+
+        <ImageView
+            android:id="@+id/image_view_qr_code"
+            android:layout_width="144dp"
+            android:layout_height="144dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:paddingTop="8dp" />
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/receiver_amount_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/image_view_qr_code"
+            android:hint="@string/hint_receiver_amount"
+            android:paddingTop="8dp"
+            android:textColorHint="@color/colorPrimary">
+
+            <EditText
+                android:id="@+id/receiver_amount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:focusable="false"
+                android:inputType="none"
+                android:maxLines="1" />
+        </android.support.design.widget.TextInputLayout>
+
+        <io.soramitsu.iroha.view.customview.SimpleCalculatorKeyboardView
+            android:id="@+id/calculator_keyboard"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/receiver_amount_container" />
+    </RelativeLayout>
+</layout>

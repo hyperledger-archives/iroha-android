@@ -1,3 +1,26 @@
 <resources>
     <string name="app_name">IrohaAndroid</string>
+
+    <string name="register">登録</string>
+    <string name="title_register">新規登録</string>
+    <string name="validation_message_required">%1$sを入力してください</string>
+    <string name="name">名前</string>
+    <string name="error">エラー</string>
+    <string name="during_registration">登録中…</string>
+    <string name="message_account_register_successful">アカウントを登録しました</string>
+    <string name="placeholder_account_name">ユーザー名</string>
+    <string name="transaction_history">取引履歴</string>
+    <string name="sender">送金</string>
+    <string name="receive">受取</string>
+    <string name="during_fetch_account_info">口座情報を取得中…</string>
+    <string name="error_message_retry_again">再度試してください</string>
+    <string name="error_message_check_network_state">ネットワーク状況を\n確認してください</string>
+    <string name="load_receiver_qr">送信先を読み込む</string>
+    <string name="sending">送金中…</string>
+    <string name="error_message_illegal_qr">不正なQRコードです</string>
+    <string name="error_message_request_amount_is_incorrect">要求額が正しくありません</string>
+    <string name="error_message_cannot_send_to_myself">自分に送信することはできません</string>
+    <string name="successful_title_sent">送金完了</string>
+    <string name="hint_receiver_amount">要求額</string>
+    <string name="error_message_cannot_generate_qr">QRコードが生成できませんでした…</string>
 </resources>
