@@ -2,7 +2,7 @@ package io.soramitsu.irohaandroid.data.entity;
 
 import com.google.gson.annotations.SerializedName;
 
-public class AssetEntity {
+public class AssetEntity extends BaseEntity {
     @SerializedName(value = "asset-uuid")
     public String uuid;
     public String name;

@@ -42,8 +42,6 @@ import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-import static android.R.attr.key;
-
 public class Iroha {
     private static Iroha iroha;
 
@@ -132,7 +130,7 @@ public class Iroha {
         }
     }
 
-    public void findKeyPair(Context context, Subscriber<KeyPair> callback) {
+    public KeyPair findKeyPair(Context context) {
         if (fetchKeyPairUseCase == null) {
             fetchKeyPairUseCase = new FetchKeyPairUseCase(
                     Schedulers.from(new JobExecutor()),
@@ -141,7 +139,7 @@ public class Iroha {
             );
         }
 
-        fetchKeyPairUseCase.execute(callback);
+        return fetchKeyPairUseCase.findKeyPair().toBlocking().first();
     }
 
     public void unsubscribeFetchKeyPair() {
@@ -281,8 +279,22 @@ public class Iroha {
         }
     }
 
-    public void operationAsset(AssetOperationRequest body, Subscriber<Asset> callback) {
+    public void operationAsset(Context context, String command, String receiver, String value, Subscriber<Asset> callback) {
         if (operationAssetUseCase == null) {
+            final String sender = Iroha.getInstance().findUuid(context);
+            final long timestamp = System.currentTimeMillis() / 1000;
+            final String message = sha3_256("timestamp:" + timestamp + ",sender:" + sender + ",receiver:" + receiver + ",command:" + command + ",amount:" + value);
+            final String signature = sign(Iroha.getInstance().findKeyPair(context), message);
+            Transaction.OperationParameter params = new Transaction.OperationParameter();
+            params.command = command;
+            params.value = value;
+            params.sender = sender;
+            params.receiver = receiver;
+            AssetOperationRequest body = new AssetOperationRequest();
+            body.params = params;
+            body.signature = signature;
+            body.timestamp = timestamp;
+
             operationAssetUseCase = new OperationAssetUseCase(
                     Schedulers.from(new JobExecutor()),
                     AndroidSchedulers.mainThread(),

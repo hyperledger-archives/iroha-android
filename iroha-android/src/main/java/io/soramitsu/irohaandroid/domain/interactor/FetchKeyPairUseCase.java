@@ -1,5 +1,6 @@
 package io.soramitsu.irohaandroid.domain.interactor;
 
+import io.soramitsu.irohaandroid.domain.entity.KeyPair;
 import io.soramitsu.irohaandroid.domain.repository.KeyPairRepository;
 import rx.Observable;
 import rx.Scheduler;
@@ -17,5 +18,9 @@ public class FetchKeyPairUseCase extends UseCase {
     @Override
     protected Observable buildUseCaseObservable() {
         return keyPairRepository.find();
+    }
+
+    public Observable<KeyPair> findKeyPair() {
+        return buildUseCaseObservable();
     }
 }
