@@ -8,7 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.navigator.Navigator;
 import io.soramitsu.iroha.view.fragment.AccountRegisterFragment;
-import io.soramitsu.irohaandroid.Iroha;
+import io.soramitsu.irohaandroid.model.Account;
 
 public class AccountRegisterActivity extends AppCompatActivity
         implements AccountRegisterFragment.AccountRegisterListener {
@@ -29,7 +29,9 @@ public class AccountRegisterActivity extends AppCompatActivity
 
     @Override
     public void onAccountRegisterSuccessful() {
-        String uuid = Iroha.getInstance().findUuid(getApplicationContext());
-        navigator.navigateToMainActivity(getApplicationContext(), uuid);
+        final Context context = getApplicationContext();
+//        navigator.navigateToMainActivity(context, Account.getUuid(context));
+        navigator.navigateToMainActivity(context, "test"); // TODO mock用
+        finish();
     }
 }

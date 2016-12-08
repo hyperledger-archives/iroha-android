@@ -25,6 +25,15 @@
                 android:textSize="32sp"
                 tools:text="4500 iroha" />
 
+            <android.support.v4.widget.ContentLoadingProgressBar
+                android:id="@+id/progress_bar"
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_gravity="center"
+                android:layout_weight="6"
+                android:visibility="gone" />
+
             <ListView
                 android:id="@+id/transaction_list"
                 android:layout_width="match_parent"
@@ -35,8 +44,8 @@
                 android:id="@+id/empty_view"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:gravity="center"
                 android:layout_weight="6"
+                android:gravity="center"
                 android:orientation="vertical"
                 tools:visibility="visible">
 

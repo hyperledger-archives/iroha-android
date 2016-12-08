@@ -1,5 +1,6 @@
 package io.soramitsu.iroha.presenter;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.View;
 
@@ -8,8 +9,9 @@ import io.soramitsu.iroha.model.QRType;
 import io.soramitsu.iroha.util.NetworkUtil;
 import io.soramitsu.iroha.view.AssetSenderView;
 import io.soramitsu.irohaandroid.Iroha;
-import io.soramitsu.irohaandroid.domain.entity.Asset;
-import rx.Subscriber;
+import io.soramitsu.irohaandroid.MessageDigest;
+import io.soramitsu.irohaandroid.callback.Callback;
+import io.soramitsu.irohaandroid.model.KeyPair;
 
 public class AssetSenderPresenter implements Presenter<AssetSenderView> {
 
@@ -42,8 +44,7 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
 
     @Override
     public void onStop() {
-        Iroha.getInstance().unsbscribeFindUuid();
-        Iroha.getInstance().unsubscribeOperationAsset();
+        // nothing
     }
 
     @Override
@@ -63,23 +64,25 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
     private void send() {
         assetSenderView.showProgressDialog();
 
-        Iroha.getInstance().operationAsset(
-                assetSenderView.getContext(),
-                QRType.TRANSFER.getType(),
-                assetSenderView.getReceiver(),
-                assetSenderView.getAmount(),
-                new Subscriber<Asset>() {
+        final String assetUuid = ""; // TODO asset-uuidなるものをセットする
+        final String command = QRType.TRANSFER.getType();
+        final String value = assetSenderView.getAmount();
+        final String sender = KeyPair.getKeyPair(assetSenderView.getContext()).publicKey;
+        final String receiver = assetSenderView.getReceiver();
+        final String message = ""; // TODO signatureのフォーマットが決まり次第
+        final String signature = MessageDigest.digest(message, MessageDigest.Algorithm.SHA3_256);
+
+        final Context context = assetSenderView.getContext();
+        Iroha.getInstance().operationAsset(assetUuid, command, value, sender, receiver, signature,
+                new Callback<Boolean>() {
                     @Override
-                    public void onCompleted() {
-                        String successfulMessage = "";
-                        successfulMessage += assetSenderView.getReceiver();
-                        successfulMessage += "に";
-                        successfulMessage += assetSenderView.getAmount();
-                        successfulMessage += "の送金をしました";
+                    public void onSuccessful(Boolean result) {
+                        assetSenderView.hideProgressDialog();
 
                         assetSenderView.showSuccess(
-                                assetSenderView.getContext().getString(R.string.successful_title_sent),
-                                successfulMessage,
+                                context.getString(R.string.successful_title_sent),
+                                context.getString(R.string.message_send_asset_successful,
+                                        assetSenderView.getReceiver(), assetSenderView.getAmount()),
                                 new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
@@ -90,21 +93,17 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
                     }
 
                     @Override
-                    public void onError(Throwable e) {
+                    public void onFailure(Throwable throwable) {
                         assetSenderView.hideProgressDialog();
 
                         if (NetworkUtil.isOnline(assetSenderView.getContext())) {
-                            assetSenderView.showError(assetSenderView.getContext().getString(R.string.error_message_retry_again));
+                            assetSenderView.showError(context.getString(R.string.error_message_retry_again));
                         } else {
-                            assetSenderView.showError(assetSenderView.getContext().getString(R.string.error_message_check_network_state));
+                            assetSenderView.showError(context.getString(R.string.error_message_check_network_state));
                         }
                     }
-
-                    @Override
-                    public void onNext(Asset asset) {
-                        assetSenderView.hideProgressDialog();
-                    }
-                });
+                }
+        );
     }
 
     public View.OnClickListener onQRShowClicked() {
@@ -124,9 +123,5 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
                 assetSenderView.beforeQRReadViewState();
             }
         };
-    }
-
-    public String getUuid() {
-        return Iroha.getInstance().findUuid(assetSenderView.getContext());
     }
 }

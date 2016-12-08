@@ -2,7 +2,7 @@ package io.soramitsu.iroha.exception;
 
 import android.content.Context;
 
-import io.soramitsu.irohaandroid.data.exception.UserNotFoundException;
+import io.soramitsu.irohaandroid.exception.UserNotFoundException;
 
 public class ErrorMessageFactory {
 

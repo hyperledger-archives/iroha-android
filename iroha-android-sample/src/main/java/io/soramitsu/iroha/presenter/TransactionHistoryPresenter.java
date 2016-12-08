@@ -7,13 +7,17 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AbsListView;
 
+import java.util.List;
+
 import io.soramitsu.iroha.R;
+import io.soramitsu.iroha.model.TransactionHistory;
 import io.soramitsu.iroha.util.NetworkUtil;
 import io.soramitsu.iroha.view.TransactionHistoryView;
 import io.soramitsu.iroha.view.fragment.TransactionHistoryFragment;
 import io.soramitsu.irohaandroid.Iroha;
-import io.soramitsu.irohaandroid.domain.entity.TransactionHistory;
-import rx.Subscriber;
+import io.soramitsu.irohaandroid.callback.Callback;
+import io.soramitsu.irohaandroid.model.Account;
+import io.soramitsu.irohaandroid.model.Transaction;
 
 public class TransactionHistoryPresenter implements Presenter<TransactionHistoryView> {
     public static final String TAG = TransactionHistoryPresenter.class.getSimpleName();
@@ -65,7 +69,7 @@ public class TransactionHistoryPresenter implements Presenter<TransactionHistory
 
     @Override
     public void onDestroy() {
-        Iroha.getInstance().unsubscribeFindTransactionHistory();
+        // nothing
     }
 
     public void transactionHistory(TransactionHistory transactionHistory, final TransactionHistoryFragment.RefreshState state) {
@@ -75,44 +79,52 @@ public class TransactionHistoryPresenter implements Presenter<TransactionHistory
                 transactionHistoryView.showProgressDialog();
             }
 
-            Iroha.getInstance().findTransactionHistory(
-                    transactionHistoryView.getContext(),
-                    new Subscriber<TransactionHistory>() {
+            Iroha.getInstance().findAccount(Account.getUuid(transactionHistoryView.getContext()), new Callback<Account>() {
+                @Override
+                public void onSuccessful(final Account account) {
+                    Iroha.getInstance().findTransactionHistory(account.uuid, new Callback<List<Transaction>>() {
                         @Override
-                        public void onCompleted() {
-                            transactionHistoryView.hideProgressDialog();
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-                            if (transactionHistoryView.isRefreshing()) {
-                                transactionHistoryView.setRefreshing(false);
-                            }
-
+                        public void onSuccessful(List<Transaction> transactions) {
                             transactionHistoryView.hideProgressDialog();
 
-                            if (state == TransactionHistoryFragment.RefreshState.SWIPE_UP
-                                    || state == TransactionHistoryFragment.RefreshState.EMPTY_REFRESH) {
-                                if (NetworkUtil.isOnline(transactionHistoryView.getContext())) {
-                                    transactionHistoryView.showError(transactionHistoryView.getContext().getString(R.string.error_message_retry_again));
-                                } else {
-                                    transactionHistoryView.showError(transactionHistoryView.getContext().getString(R.string.error_message_check_network_state));
-                                }
-                            }
-                        }
-
-                        @Override
-                        public void onNext(TransactionHistory transactionHistory) {
-                            if (transactionHistoryView.isRefreshing()) {
-                                transactionHistoryView.setRefreshing(false);
-                            }
+                            TransactionHistory transactionHistory = new TransactionHistory();
+                            transactionHistory.value = account.assets.get(0).value; // TODO マルチアセット対応
+                            transactionHistory.histories = transactions;
                             transactionHistoryView.renderTransactionHistory(transactionHistory);
                         }
-                    }
-            );
+
+                        @Override
+                        public void onFailure(Throwable throwable) {
+                            fail(state);
+                        }
+                    });
+                }
+
+                @Override
+                public void onFailure(Throwable throwable) {
+                    fail(state);
+                }
+            });
         } else {
             Log.d(TAG, "transactionHistory: cache in memory");
             transactionHistoryView.renderTransactionHistory(transactionHistory);
+        }
+    }
+
+    private void fail(TransactionHistoryFragment.RefreshState state) {
+        if (transactionHistoryView.isRefreshing()) {
+            transactionHistoryView.setRefreshing(false);
+        }
+
+        transactionHistoryView.hideProgressDialog();
+
+        if (state == TransactionHistoryFragment.RefreshState.SWIPE_UP
+                || state == TransactionHistoryFragment.RefreshState.EMPTY_REFRESH) {
+            if (NetworkUtil.isOnline(transactionHistoryView.getContext())) {
+                transactionHistoryView.showError(transactionHistoryView.getContext().getString(R.string.error_message_retry_again));
+            } else {
+                transactionHistoryView.showError(transactionHistoryView.getContext().getString(R.string.error_message_check_network_state));
+            }
         }
     }
 

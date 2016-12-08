@@ -23,4 +23,5 @@
     <string name="successful_title_sent">送金完了</string>
     <string name="hint_receiver_amount">要求額</string>
     <string name="error_message_cannot_generate_qr">QRコードが生成できませんでした…</string>
+    <string name="message_send_asset_successful">%1$sに%2$s送金しました</string>
 </resources>

@@ -13,9 +13,10 @@ import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.databinding.FragmentAssetReceiverBinding;
 import io.soramitsu.iroha.presenter.AssetReceiverPresenter;
 import io.soramitsu.iroha.view.AssetReceiverView;
+import io.soramitsu.iroha.view.activity.MainActivity;
 import io.soramitsu.iroha.view.dialog.ErrorDialog;
 
-public class AssetReceiverFragment extends Fragment implements AssetReceiverView {
+public class AssetReceiverFragment extends Fragment implements AssetReceiverView, MainActivity.MainActivityListener {
     public static final String TAG = AssetReceiverFragment.class.getSimpleName();
 
     private AssetReceiverPresenter assetReceiverPresenter = new AssetReceiverPresenter();
@@ -74,5 +75,10 @@ public class AssetReceiverFragment extends Fragment implements AssetReceiverView
     @Override
     public void setQR(Bitmap qr) {
         binding.imageViewQrCode.setImageBitmap(qr);
+    }
+
+    @Override
+    public void onNavigationItemClicked() {
+        // nothing
     }
 }

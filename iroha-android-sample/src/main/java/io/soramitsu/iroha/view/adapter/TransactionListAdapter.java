@@ -11,7 +11,7 @@ import java.util.List;
 
 import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.databinding.RowTransactionListBinding;
-import io.soramitsu.irohaandroid.domain.entity.Transaction;
+import io.soramitsu.irohaandroid.model.Transaction;
 
 public class TransactionListAdapter extends BaseAdapter {
     private Context context;

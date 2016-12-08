@@ -1,6 +1,5 @@
 package io.soramitsu.iroha.presenter;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -15,9 +14,8 @@ import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.model.TransferQRParameter;
 import io.soramitsu.iroha.util.QRCodeGenerator;
 import io.soramitsu.iroha.view.AssetReceiverView;
-import io.soramitsu.irohaandroid.Iroha;
-import io.soramitsu.irohaandroid.domain.entity.Account;
-import rx.Subscriber;
+import io.soramitsu.irohaandroid.model.Account;
+import io.soramitsu.irohaandroid.model.KeyPair;
 
 public class AssetReceiverPresenter implements Presenter<AssetReceiverView> {
     private static final String QR_TEXT_DEFAULT = "{\"type\":\"trans\",\"account\":\"\",\"value\":0}";
@@ -53,9 +51,7 @@ public class AssetReceiverPresenter implements Presenter<AssetReceiverView> {
 
     @Override
     public void onStop() {
-        Iroha.getInstance().unsbscribeFindUuid();
-        Iroha.getInstance().unsubscribeFetchKeyPair();
-        Iroha.getInstance().unsubscribeFindAccount();
+        // nothing
     }
 
     @Override
@@ -102,43 +98,24 @@ public class AssetReceiverPresenter implements Presenter<AssetReceiverView> {
                     return;
                 }
 
-                Iroha iroha = Iroha.getInstance();
-                final Context context = assetReceiverView.getContext();
                 final TransferQRParameter qrParams = new TransferQRParameter();
                 qrParams.type = "trans";
-                qrParams.account = iroha.findKeyPair(context).getPublicKey();
+                qrParams.account = KeyPair.getKeyPair(assetReceiverView.getContext()).publicKey;
                 qrParams.value = value;
 
-                iroha.findAccountInfo(context, iroha.findUuid(context), new Subscriber<Account>() {
-                    private String qrParamsText;
-
-                    @Override
-                    public void onCompleted() {
-                        generateQR(qrParamsText);
-                        assetReceiverView.invalidate();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e(TAG, "onError: " + e.getMessage());
-                        assetReceiverView.showError(context.getString(R.string.error_message_retry_again));
-                    }
-
-                    @Override
-                    public void onNext(Account account) {
-                        try {
-                            qrParams.alias = new String(account.name.getBytes("UTF-8"), "UTF-8");
-                            qrParamsText = new GsonBuilder()
-                                    .disableHtmlEscaping()
-                                    .create()
-                                    .toJson(qrParams, TransferQRParameter.class);
-                            Log.d(TAG, "onTextChanged: " + qrParamsText);
-                        } catch (UnsupportedEncodingException e) {
-                            Log.e(TAG, "onNext: " + e.getMessage());
-                            e.printStackTrace();
-                        }
-                    }
-                });
+                try {
+                    qrParams.alias = new String(Account.getAlias(assetReceiverView.getContext()).getBytes("UTF-8"), "UTF-8");
+                    String qrParamsText = new GsonBuilder()
+                            .disableHtmlEscaping()
+                            .create()
+                            .toJson(qrParams, TransferQRParameter.class);
+                    Log.d(TAG, "onTextChanged: " + qrParamsText);
+                    generateQR(qrParamsText);
+                    assetReceiverView.invalidate();
+                } catch (UnsupportedEncodingException e) {
+                    Log.e(TAG, "onSuccessful: " + e.getMessage());
+                    e.printStackTrace();
+                }
             }
 
             @Override

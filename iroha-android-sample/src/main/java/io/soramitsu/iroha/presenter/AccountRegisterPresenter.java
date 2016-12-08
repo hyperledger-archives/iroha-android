@@ -2,7 +2,6 @@ package io.soramitsu.iroha.presenter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -10,9 +9,10 @@ import android.view.inputmethod.InputMethodManager;
 import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.view.AccountRegisterView;
 import io.soramitsu.irohaandroid.Iroha;
-import io.soramitsu.irohaandroid.domain.entity.Account;
-import io.soramitsu.irohaandroid.domain.entity.reqest.AccountRegisterRequest;
-import rx.Subscriber;
+import io.soramitsu.irohaandroid.KeyGenerator;
+import io.soramitsu.irohaandroid.callback.Callback;
+import io.soramitsu.irohaandroid.model.Account;
+import io.soramitsu.irohaandroid.model.KeyPair;
 
 public class AccountRegisterPresenter implements Presenter<AccountRegisterView> {
     public static final String TAG = AccountRegisterPresenter.class.getSimpleName();
@@ -46,10 +46,7 @@ public class AccountRegisterPresenter implements Presenter<AccountRegisterView> 
 
     @Override
     public void onStop() {
-        Iroha.getInstance().unsubscribeRegisterKeyPair();
-        Iroha.getInstance().unsubscribeDeleteKeyPair();
-        Iroha.getInstance().unsubscribeFetchKeyPair();
-        Iroha.getInstance().unsubscribeRegisterAccount();
+        // nothing
     }
 
     @Override
@@ -86,68 +83,38 @@ public class AccountRegisterPresenter implements Presenter<AccountRegisterView> 
                     return;
                 }
 
-                final Iroha iroha = Iroha.getInstance();
-                iroha.generateKeyPair(context, new Subscriber<Boolean>() {
-                    AccountRegisterRequest body;
-                    @Override
-                    public void onCompleted() {
-                        if (body == null) {
-                            Log.d(TAG, "onCompleted: Cannot create keypair…");
-                            accountRegisterView.showError(accountRegisterView.getContext().getString(R.string.error_message_retry_again));
-                        } else {
-                            registerAccount(body);
-                        }
-                    }
+                accountRegisterView.showProgressDialog();
 
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.d(TAG, e.getMessage());
-                    }
-
-                    @Override
-                    public void onNext(Boolean succeeded) {
-                        if (succeeded) {
-                            body = new AccountRegisterRequest();
-                            body.alias = alias;
-                            body.publicKey = iroha.findKeyPair(context).getPublicKey();
-                        }
-                    }
-                });
+                KeyPair keyPair = KeyGenerator.createKeyPair();
+                keyPair.save(context);
+                register(keyPair, alias);
             }
         };
     }
 
-    private void registerAccount(AccountRegisterRequest body) {
-        accountRegisterView.showProgressDialog();
-
-        body.timestamp = System.currentTimeMillis() / 1000L;
-
-        Iroha.getInstance().registerAccount(accountRegisterView.getContext(), body, new Subscriber<Account>() {
-            String uuid;
-
+    private void register(final KeyPair keyPair, final String alias) {
+        Iroha.getInstance().registerAccount(keyPair.publicKey, alias, new Callback<Account>() {
             @Override
-            public void onCompleted() {
+            public void onSuccessful(Account result) {
+                result.save(accountRegisterView.getContext());
+
                 accountRegisterView.hideProgressDialog();
                 accountRegisterView.registerSuccessful();
             }
 
             @Override
-            public void onError(Throwable e) {
+            public void onFailure(Throwable throwable) {
                 accountRegisterView.hideProgressDialog();
-//                Iroha.getInstance().removeKeyPair(accountRegisterView.getContext());
 
-//                if (NetworkUtil.isOnline(accountRegisterView.getContext())) {
-//                    accountRegisterView.showError(accountRegisterView.getContext().getString(R.string.error_message_retry_again));
-//                } else {
-//                    accountRegisterView.showError(accountRegisterView.getContext().getString(R.string.error_message_check_network_state));
-//                }
+//                        keyPair.delete(accountRegisterView.getContext());
+
+//                        if (NetworkUtil.isOnline(accountRegisterView.getContext())) {
+//                            accountRegisterView.showError(accountRegisterView.getContext().getString(R.string.error_message_retry_again));
+//                        } else {
+//                            accountRegisterView.showError(accountRegisterView.getContext().getString(R.string.error_message_check_network_state));
+//                        }
 
                 accountRegisterView.registerSuccessful();
-            }
-
-            @Override
-            public void onNext(Account account) {
-                uuid = account.uuid;
             }
         });
     }

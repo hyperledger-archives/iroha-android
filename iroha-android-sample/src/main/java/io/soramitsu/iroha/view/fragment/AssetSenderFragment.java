@@ -23,6 +23,7 @@ import io.soramitsu.iroha.view.dialog.ErrorDialog;
 import io.soramitsu.iroha.view.dialog.OnQRReaderListener;
 import io.soramitsu.iroha.view.dialog.ProgressDialog;
 import io.soramitsu.iroha.view.dialog.SuccessDialog;
+import io.soramitsu.irohaandroid.model.Account;
 
 public class AssetSenderFragment extends Fragment
         implements AssetSenderView, MainActivity.MainActivityListener, OnQRReaderListener {
@@ -185,7 +186,7 @@ public class AssetSenderFragment extends Fragment
             return;
         }
 
-        if (params.account.equals(assetSenderPresenter.getUuid())) {
+        if (params.account.equals(Account.getUuid(getContext()))) {
             Log.e(TAG, "setOnResult: This QR is mine!");
             errorDialog.show(getActivity(), getString(R.string.error_message_cannot_send_to_myself));
             return;

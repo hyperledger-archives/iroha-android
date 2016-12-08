@@ -1,6 +1,6 @@
 package io.soramitsu.iroha.view;
 
-import io.soramitsu.irohaandroid.domain.entity.TransactionHistory;
+import io.soramitsu.iroha.model.TransactionHistory;
 
 public interface TransactionHistoryView extends LoadingView {
     boolean isRefreshing();

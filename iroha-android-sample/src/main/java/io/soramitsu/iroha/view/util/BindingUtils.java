@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.util.AndroidSupportUtil;
-import io.soramitsu.irohaandroid.domain.entity.Transaction;
+import io.soramitsu.irohaandroid.model.Transaction;
 
 @BindingMethods({
         @BindingMethod(type = View.class, attribute = "android:drawable", method = "setBackground"),
@@ -22,7 +22,7 @@ public final class BindingUtils {
     public static void setTransactionTypeBackgroundDrawable(View view, Transaction transaction, String publicKey, Context c) {
         Drawable target;
 
-        if (transaction.isRemittance(publicKey)) {
+        if (transaction.isSender(publicKey)) {
             target = AndroidSupportUtil.getDrawable(c, R.drawable.shape_rounded_corners_send);
         } else {
             target = AndroidSupportUtil.getDrawable(c, R.drawable.shape_rounded_corners_receiver);
@@ -35,7 +35,7 @@ public final class BindingUtils {
     public static void setTransactionOpponentText(TextView textView, Transaction transaction, String publicKey) {
         String type;
 
-        if (transaction.isRemittance(publicKey)) {
+        if (transaction.isSender(publicKey)) {
             type = "to ";
         } else {
             type = "from ";
