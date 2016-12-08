@@ -3,8 +3,7 @@ package io.soramitsu.irohaandroid;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.soramitsu.irohaandroid.domain.entity.KeyPair;
-
+import io.soramitsu.irohaandroid.model.KeyPair;
 
 /**
  * This class can be generate keypair or create signature or verify the message.
@@ -36,7 +35,7 @@ class Ed25519 {
      * @return signature
      */
     static String sign(String message, KeyPair keyPair) {
-        return Signature(message, keyPair.getPrivateKey(), keyPair.getPublicKey());
+        return Signature(message, keyPair.privateKey, keyPair.publicKey);
     }
 
     /**
