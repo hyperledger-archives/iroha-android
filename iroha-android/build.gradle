@@ -32,10 +32,9 @@ android {
 
 def ESPRESSO_PACKAGE_VERSION = "2.2.2"
 def JUNIT_PACKAGE_VERSION = "4.12"
-def SUPPORT_PACKAGE_VERSION = "25.0.1"
-def RETROFIT_PACKAGE_VERSION = "2.1.0"
-def OKHTTP_PACKAGE_VERSION = "3.3.1";
-def RX_ANDROID_PACKAGE_VERSION = "1.2.1"
+def OKHTTP_PACKAGE_VERSION = "3.5.0";
+def GSON_PACKAGE_VERSION = "2.4";
+def BOUNCY_CASTLE_PACKAGE_VERSION = "1.55";
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -44,16 +43,10 @@ dependencies {
     })
     testCompile "junit:junit:${JUNIT_PACKAGE_VERSION}"
 
-    compile "com.android.support:support-v13:${SUPPORT_PACKAGE_VERSION}"
-    compile "com.android.support:appcompat-v7:${SUPPORT_PACKAGE_VERSION}"
-    compile "com.android.support:support-v4:${SUPPORT_PACKAGE_VERSION}"
-    compile "com.squareup.retrofit2:retrofit:${RETROFIT_PACKAGE_VERSION}"
-    compile "com.squareup.retrofit2:adapter-rxjava:${RETROFIT_PACKAGE_VERSION}"
-    compile "com.squareup.retrofit2:converter-gson:${RETROFIT_PACKAGE_VERSION}"
+    compile "com.squareup.okhttp3:okhttp:${OKHTTP_PACKAGE_VERSION}"
     compile "com.squareup.okhttp3:logging-interceptor:${OKHTTP_PACKAGE_VERSION}"
-    compile "io.reactivex:rxandroid:${RX_ANDROID_PACKAGE_VERSION}"
-
-    compile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.55'
+    compile "com.google.code.gson:gson:${GSON_PACKAGE_VERSION}"
+    compile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: "${BOUNCY_CASTLE_PACKAGE_VERSION}"
 }
 
 publish {

@@ -1,66 +1,27 @@
 package io.soramitsu.irohaandroid;
 
-import android.content.Context;
-
-import org.bouncycastle.jcajce.provider.digest.SHA3;
-
-import java.security.MessageDigest;
 import java.util.List;
 
-import io.soramitsu.irohaandroid.data.executor.JobExecutor;
-import io.soramitsu.irohaandroid.data.repository.AccountDataRepository;
-import io.soramitsu.irohaandroid.data.repository.AssetDataRepository;
-import io.soramitsu.irohaandroid.data.repository.DomainDataRepository;
-import io.soramitsu.irohaandroid.data.repository.KeyPairDataRepository;
-import io.soramitsu.irohaandroid.data.repository.TransactionDataRepository;
-import io.soramitsu.irohaandroid.domain.entity.Account;
-import io.soramitsu.irohaandroid.domain.entity.Asset;
-import io.soramitsu.irohaandroid.domain.entity.Domain;
-import io.soramitsu.irohaandroid.domain.entity.KeyPair;
-import io.soramitsu.irohaandroid.domain.entity.Transaction;
-import io.soramitsu.irohaandroid.domain.entity.TransactionHistory;
-import io.soramitsu.irohaandroid.domain.entity.reqest.AccountRegisterRequest;
-import io.soramitsu.irohaandroid.domain.entity.reqest.AssetOperationRequest;
-import io.soramitsu.irohaandroid.domain.entity.reqest.AssetRegisterRequest;
-import io.soramitsu.irohaandroid.domain.entity.reqest.DomainRegisterRequest;
-import io.soramitsu.irohaandroid.domain.interactor.DefaultSubscriber;
-import io.soramitsu.irohaandroid.domain.interactor.DeleteKeyPairUseCase;
-import io.soramitsu.irohaandroid.domain.interactor.FetchAccountUseCase;
-import io.soramitsu.irohaandroid.domain.interactor.FetchAssetUseCase;
-import io.soramitsu.irohaandroid.domain.interactor.FetchDomainUseCase;
-import io.soramitsu.irohaandroid.domain.interactor.FetchKeyPairUseCase;
-import io.soramitsu.irohaandroid.domain.interactor.FetchMultiAssetsTransactionUseCase;
-import io.soramitsu.irohaandroid.domain.interactor.FetchTransactionHistoryUseCase;
-import io.soramitsu.irohaandroid.domain.interactor.FetchTransactionUseCase;
-import io.soramitsu.irohaandroid.domain.interactor.FetchUuidUseCase;
-import io.soramitsu.irohaandroid.domain.interactor.OperationAssetUseCase;
-import io.soramitsu.irohaandroid.domain.interactor.RegisterAccountUseCase;
-import io.soramitsu.irohaandroid.domain.interactor.RegisterAssetUseCase;
-import io.soramitsu.irohaandroid.domain.interactor.RegisterDomainUseCase;
-import io.soramitsu.irohaandroid.domain.interactor.RegisterKeyPairUseCase;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import io.soramitsu.irohaandroid.async.IrohaAsyncTask;
+import io.soramitsu.irohaandroid.callback.Callback;
+import io.soramitsu.irohaandroid.model.Account;
+import io.soramitsu.irohaandroid.model.Asset;
+import io.soramitsu.irohaandroid.model.Domain;
+import io.soramitsu.irohaandroid.model.Transaction;
+import io.soramitsu.irohaandroid.service.AccountService;
+import io.soramitsu.irohaandroid.service.AssetService;
+import io.soramitsu.irohaandroid.service.DomainService;
+import io.soramitsu.irohaandroid.service.TransactionService;
 
 public class Iroha {
     private static Iroha iroha;
 
-    private RegisterKeyPairUseCase registerKeyPairUseCase;
-    private DeleteKeyPairUseCase deleteKeyPairUseCase;
-    private FetchKeyPairUseCase fetchKeyPairUseCase;
-    private FetchUuidUseCase fetchUuidUseCase;
-    private RegisterAccountUseCase registerAccountUseCase;
-    private FetchAccountUseCase fetchAccountUseCase;
-    private RegisterDomainUseCase registerDomainUseCase;
-    private FetchDomainUseCase fetchDomainUseCase;
-    private RegisterAssetUseCase registerAssetUseCase;
-    private FetchAssetUseCase fetchAssetUseCase;
-    private OperationAssetUseCase operationAssetUseCase;
-    private FetchTransactionUseCase fetchTransactionUseCase;
-    private FetchMultiAssetsTransactionUseCase fetchMultiAssetsTransactionUseCase;
-    private FetchTransactionHistoryUseCase fetchTransactionHistoryUseCase;
+    private final AccountService accountService = new AccountService();
+    private final DomainService domainService = new DomainService();
+    private final AssetService assetService = new AssetService();
+    private final TransactionService transactionService = new TransactionService();
 
-    private String baseUrl;
+    public String baseUrl;
 
     private Iroha(Builder builder) {
         this.baseUrl = builder.baseUrl;
@@ -90,308 +51,87 @@ public class Iroha {
         return iroha;
     }
 
-    public String getBaseUrl() {
-        return baseUrl;
+    public void registerAccount(final String publicKey, final String alias, Callback<Account> callback) {
+        new IrohaAsyncTask<Account>(callback) {
+            @Override
+            protected Account onBackground() throws Exception {
+                    return accountService.register(publicKey, alias);
+            }
+        }.execute();
     }
 
-    public void generateKeyPair(Context context, Subscriber<Boolean> callback) {
-        if (registerKeyPairUseCase == null) {
-            registerKeyPairUseCase = new RegisterKeyPairUseCase(
-                    AndroidSchedulers.mainThread(),
-                    AndroidSchedulers.mainThread(),
-                    KeyPairDataRepository.getInstance(context)
-            );
-        }
-
-        registerKeyPairUseCase.execute(callback);
+    public void findAccount(final String uuid, final Callback<Account> callback) {
+        new IrohaAsyncTask<Account>(callback) {
+            @Override
+            protected Account onBackground() throws Exception {
+                    return accountService.findAccount(uuid);
+            }
+        }.execute();
     }
 
-    public void unsubscribeRegisterKeyPair() {
-        if (registerKeyPairUseCase != null) {
-            registerKeyPairUseCase.unsubscribe();
-        }
+    public void registerDomain(final String name, final String owner,
+                               final String signature, Callback<Domain> callback) {
+        new IrohaAsyncTask<Domain>(callback) {
+            @Override
+            protected Domain onBackground() throws Exception {
+                return domainService.register(name, owner, signature);
+            }
+        }.execute();
     }
 
-    public void removeKeyPair(Context context) {
-        if (deleteKeyPairUseCase == null) {
-            deleteKeyPairUseCase = new DeleteKeyPairUseCase(
-                    AndroidSchedulers.mainThread(),
-                    AndroidSchedulers.mainThread(),
-                    KeyPairDataRepository.getInstance(context)
-            );
-        }
-
-        deleteKeyPairUseCase.execute(new DefaultSubscriber());
+    public void findDomains(Callback<List<Domain>> callback) {
+        new IrohaAsyncTask<List<Domain>>(callback) {
+            @Override
+            protected List<Domain> onBackground() throws Exception {
+                return domainService.findDomains();
+            }
+        }.execute();
     }
 
-    public void unsubscribeDeleteKeyPair() {
-        if (deleteKeyPairUseCase != null) {
-            deleteKeyPairUseCase.unsubscribe();
-        }
+    public void createAsset(final String name, final String domain,
+                            final String creator, final String signature, Callback<Asset> callback) {
+        new IrohaAsyncTask<Asset>(callback) {
+            @Override
+            protected Asset onBackground() throws Exception {
+                return assetService.create(name, domain, creator, signature);
+            }
+        }.execute();
     }
 
-    public KeyPair findKeyPair(Context context) {
-        if (fetchKeyPairUseCase == null) {
-            fetchKeyPairUseCase = new FetchKeyPairUseCase(
-                    Schedulers.from(new JobExecutor()),
-                    AndroidSchedulers.mainThread(),
-                    KeyPairDataRepository.getInstance(context)
-            );
-        }
-
-        return fetchKeyPairUseCase.findKeyPair().toBlocking().first();
+    public void findAssets(final String domain, Callback<List<Asset>> callback) {
+        new IrohaAsyncTask<List<Asset>>(callback) {
+            @Override
+            protected List<Asset> onBackground() throws Exception {
+                return assetService.findAssets(domain);
+            }
+        }.execute();
     }
 
-    public void unsubscribeFetchKeyPair() {
-        if (fetchKeyPairUseCase != null) {
-            fetchKeyPairUseCase.unsubscribe();
-        }
+    public void operationAsset(final String assetUuid, final String command, final String value,
+                               final String sender, final String receiver, final String signature, Callback<Boolean> callback) {
+        new IrohaAsyncTask<Boolean>(callback) {
+            @Override
+            protected Boolean onBackground() throws Exception {
+                return assetService.operation(assetUuid, command, value, sender, receiver, signature);
+            }
+        }.execute();
     }
 
-    public String findUuid(Context context) {
-        if (fetchUuidUseCase == null) {
-            fetchUuidUseCase = new FetchUuidUseCase(
-                    AndroidSchedulers.mainThread(),
-                    AndroidSchedulers.mainThread(),
-                    new AccountDataRepository(context)
-            );
-        }
-
-        return fetchUuidUseCase.findUuid().toBlocking().first();
+    public void findTransactionHistory(final String uuid, Callback<List<Transaction>> callback) {
+        new IrohaAsyncTask<List<Transaction>>(callback) {
+            @Override
+            protected List<Transaction> onBackground() throws Exception {
+                return transactionService.findHistory(uuid);
+            }
+        }.execute();
     }
 
-    public void unsbscribeFindUuid() {
-        if (fetchUuidUseCase != null) {
-            fetchUuidUseCase.unsubscribe();
-        }
-    }
-
-    public void registerAccount(Context context, AccountRegisterRequest body, Subscriber<Account> callback) {
-        if (registerAccountUseCase == null) {
-            registerAccountUseCase = new RegisterAccountUseCase(
-                    Schedulers.from(new JobExecutor()),
-                    AndroidSchedulers.mainThread(),
-                    body,
-                    new AccountDataRepository(context.getApplicationContext())
-            );
-        }
-
-        registerAccountUseCase.execute(callback);
-    }
-
-    public void unsubscribeRegisterAccount() {
-        if (registerAccountUseCase != null) {
-            registerAccountUseCase.unsubscribe();
-        }
-    }
-
-    public void findAccountInfo(Context context, String uuid, Subscriber<Account> callback) {
-        if (fetchAccountUseCase == null) {
-            fetchAccountUseCase = new FetchAccountUseCase(
-                    Schedulers.from(new JobExecutor()),
-                    AndroidSchedulers.mainThread(),
-                    uuid,
-                    new AccountDataRepository(context.getApplicationContext())
-            );
-        }
-
-        fetchAccountUseCase.execute(callback);
-    }
-
-    public void unsubscribeFindAccount() {
-        if (fetchAccountUseCase != null) {
-            fetchAccountUseCase.unsubscribe();
-        }
-    }
-
-    public void registerDomain(DomainRegisterRequest body, Subscriber<Domain> callback) {
-        if (registerDomainUseCase == null) {
-            registerDomainUseCase = new RegisterDomainUseCase(
-                    Schedulers.from(new JobExecutor()),
-                    AndroidSchedulers.mainThread(),
-                    body,
-                    new DomainDataRepository()
-            );
-        }
-
-        registerAccountUseCase.execute(callback);
-    }
-
-    public void unsubscribeRegisterDomain() {
-        if (registerDomainUseCase != null) {
-            registerAccountUseCase.unsubscribe();
-        }
-    }
-
-    public void findDomains(Subscriber<List<Domain>> callback) {
-        if (fetchDomainUseCase == null) {
-            fetchDomainUseCase = new FetchDomainUseCase(
-                    Schedulers.from(new JobExecutor()),
-                    AndroidSchedulers.mainThread(),
-                    new DomainDataRepository()
-            );
-        }
-
-        fetchDomainUseCase.execute(callback);
-    }
-
-    public void unsubscribeFindDomains() {
-        if (fetchAccountUseCase != null) {
-            fetchAccountUseCase.unsubscribe();
-        }
-    }
-
-    public void createAsset(AssetRegisterRequest body, Subscriber<Asset> callback) {
-        if (registerAssetUseCase == null) {
-            registerAssetUseCase = new RegisterAssetUseCase(
-                    Schedulers.from(new JobExecutor()),
-                    AndroidSchedulers.mainThread(),
-                    body,
-                    new AssetDataRepository()
-            );
-        }
-
-        registerAccountUseCase.execute(callback);
-    }
-
-    public void unsubscribeCreateAsset() {
-        if (registerAssetUseCase != null) {
-            registerAssetUseCase.unsubscribe();
-        }
-    }
-
-    public void findAssets(String domain, Subscriber<List<Asset>> callback) {
-        if (fetchAssetUseCase == null) {
-            fetchAssetUseCase = new FetchAssetUseCase(
-                    Schedulers.from(new JobExecutor()),
-                    AndroidSchedulers.mainThread(),
-                    domain,
-                    new AssetDataRepository()
-            );
-        }
-
-        fetchAssetUseCase.execute(callback);
-    }
-
-    public void unsubscribeFindAssets() {
-        if (fetchAssetUseCase != null) {
-            fetchAssetUseCase.unsubscribe();
-        }
-    }
-
-    public void operationAsset(Context context, String command, String receiver, String value, Subscriber<Asset> callback) {
-        if (operationAssetUseCase == null) {
-            final String sender = Iroha.getInstance().findUuid(context);
-            final long timestamp = System.currentTimeMillis() / 1000;
-            final String message = sha3_256("timestamp:" + timestamp + ",sender:" + sender + ",receiver:" + receiver + ",command:" + command + ",amount:" + value);
-            final String signature = sign(Iroha.getInstance().findKeyPair(context), message);
-            Transaction.OperationParameter params = new Transaction.OperationParameter();
-            params.command = command;
-            params.value = value;
-            params.sender = sender;
-            params.receiver = receiver;
-            AssetOperationRequest body = new AssetOperationRequest();
-            body.params = params;
-            body.signature = signature;
-            body.timestamp = timestamp;
-
-            operationAssetUseCase = new OperationAssetUseCase(
-                    Schedulers.from(new JobExecutor()),
-                    AndroidSchedulers.mainThread(),
-                    body,
-                    new AssetDataRepository()
-            );
-        }
-
-        operationAssetUseCase.execute(callback);
-    }
-
-    public void unsubscribeOperationAsset() {
-        if (operationAssetUseCase != null) {
-            operationAssetUseCase.unsubscribe();
-        }
-    }
-
-    public void findTransactionHistory(Context context, Subscriber<TransactionHistory> callback) {
-        if (fetchTransactionHistoryUseCase == null) {
-            fetchTransactionHistoryUseCase = new FetchTransactionHistoryUseCase(
-                    Schedulers.from(new JobExecutor()),
-                    AndroidSchedulers.mainThread(),
-                    new AccountDataRepository(context),
-                    new TransactionDataRepository(context)
-            );
-        }
-
-        fetchTransactionHistoryUseCase.execute(callback);
-    }
-
-    public void unsubscribeFindTransactionHistory() {
-        if (fetchTransactionHistoryUseCase != null) {
-            fetchTransactionHistoryUseCase.unsubscribe();
-        }
-    }
-
-    public void findTransactionHistory(Context context, String uuid, String domain, String asset, Subscriber<TransactionHistory> callback) {
-        if (fetchMultiAssetsTransactionUseCase == null) {
-            fetchMultiAssetsTransactionUseCase = new FetchMultiAssetsTransactionUseCase(
-                    Schedulers.from(new JobExecutor()),
-                    AndroidSchedulers.mainThread(),
-                    uuid,
-                    domain,
-                    asset,
-                    new TransactionDataRepository(context)
-            );
-        }
-
-        fetchMultiAssetsTransactionUseCase.execute(callback);
-    }
-
-    public void unsubscribeFindMultAssetsTransactionHistory() {
-        if (fetchMultiAssetsTransactionUseCase != null) {
-            fetchMultiAssetsTransactionUseCase.unsubscribe();
-        }
-    }
-
-    public static KeyPair createKeyPair() {
-        return Ed25519.createKeyPair();
-    }
-
-    public static String sign(KeyPair keyPair, String message) {
-        return Ed25519.sign(message, keyPair);
-    }
-
-    public static boolean verify(String publicKey, String signature, String message) {
-        return Ed25519.verify(signature, message, publicKey);
-    }
-
-    public static String sha3_256(final String message) {
-        return sha3_x(new SHA3.Digest256(), message);
-    }
-
-    public static String sha3_384(final String message) {
-        return sha3_x(new SHA3.Digest384(), message);
-    }
-
-    public static String sha3_512(final String message) {
-        return sha3_x(new SHA3.Digest512(), message);
-    }
-
-    private static String sha3_x(SHA3.DigestSHA3 sha3, String message) {
-        sha3.update(message.getBytes());
-        return hashToString(sha3);
-    }
-
-    private static String hashToString(MessageDigest hash) {
-        return hashToString(hash.digest());
-    }
-
-    private static String hashToString(byte[] hash) {
-        StringBuilder buff = new StringBuilder();
-
-        for (byte b : hash) {
-            buff.append(String.format("%02x", b & 0xFF));
-        }
-
-        return buff.toString();
+    public void findTransactionHistory(final String uuid, final String domain, final String asset, Callback<List<Transaction>> callback) {
+        new IrohaAsyncTask<List<Transaction>>(callback) {
+            @Override
+            protected List<Transaction> onBackground() throws Exception {
+                return transactionService.findHistory(uuid, domain, asset);
+            }
+        }.execute();
     }
 }
