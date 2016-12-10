@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.databinding.FragmentTransactionHistoryBinding;
 import io.soramitsu.iroha.model.TransactionHistory;
@@ -69,7 +71,7 @@ public class TransactionHistoryFragment extends Fragment
 
         transactionListAdapter = new TransactionListAdapter(
                 getContext(),
-                Transaction.createMock(), // TODO mock用
+                new ArrayList<Transaction>(), // TODO mock用
                 KeyPair.getKeyPair(getContext()).publicKey
         );
         binding.transactionList.setAdapter(transactionListAdapter);

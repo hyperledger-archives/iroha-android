@@ -78,7 +78,7 @@ public class TransactionHistoryPresenter implements Presenter<TransactionHistory
         switch (state) {
             case RE_CREATED_FRAGMENT:
                 if (transactionHistoryView.getTransaction() == null) {
-                    renderFromNetwork();
+                    renderFromNetwork(state);
                     return;
                 }
 
@@ -86,7 +86,7 @@ public class TransactionHistoryPresenter implements Presenter<TransactionHistory
                 break;
             case EMPTY_REFRESH:
             case SWIPE_UP:
-                renderFromNetwork();
+                renderFromNetwork(state);
                 break;
         }
     }
@@ -96,8 +96,17 @@ public class TransactionHistoryPresenter implements Presenter<TransactionHistory
         transactionHistoryView.renderTransactionHistory(transactionHistoryView.getTransaction());
     }
 
-    private void renderFromNetwork() {
+    private void renderFromNetwork(TransactionHistoryFragment.RefreshState state) {
         Log.d(TAG, "transactionHistory: fetch network or cache");
+
+        switch (state) {
+            case RE_CREATED_FRAGMENT:
+            case SWIPE_UP:
+                break;
+            case EMPTY_REFRESH:
+                transactionHistoryView.showProgressDialog();
+                break;
+        }
 
         final Context context = transactionHistoryView.getContext();
         Iroha.getInstance().findAccount(Account.getUuid(context), new Callback<Account>() {
@@ -178,6 +187,11 @@ public class TransactionHistoryPresenter implements Presenter<TransactionHistory
             public void onScroll(AbsListView view, int firstVisibleItem,
                                  int visibleItemCount, int totalItemCount) {
                 if (transactionHistoryView.isRefreshing()) {
+                    return;
+                }
+
+                if (view.getChildCount() == 0) {
+                    transactionHistoryView.setRefreshEnable(true);
                     return;
                 }
 
