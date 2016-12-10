@@ -14,6 +14,8 @@ public class ErrorMessageFactory {
 
         if (exception instanceof UserNotFoundException) {
             message = "";
+        } else if (exception instanceof LargeNumberOfDigitsException) {
+            message = "桁数が多すぎます";
         }
 
         return message;

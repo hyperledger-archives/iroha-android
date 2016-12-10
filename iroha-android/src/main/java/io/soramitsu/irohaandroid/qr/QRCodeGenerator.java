@@ -1,4 +1,4 @@
-package io.soramitsu.iroha.util;
+package io.soramitsu.irohaandroid.qr;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -14,10 +14,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class QRCodeGenerator {
+    public static final String ENCODE_CHARACTER_TYPE_ISO_8859_1 = "ISO-8859-1";
+    public static final String ENCODE_CHARACTER_TYPE_UTF_8 = "UTF-8";
 
-    public static Bitmap generateQR(String qrText, int size) throws WriterException {
+    private QRCodeGenerator() {
+    }
+
+    public static Bitmap generateQR(String qrText, int size, String encodeCharacterSet) throws WriterException {
         Map<EncodeHintType,String> hints = new HashMap<>();
-        hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
+        hints.put(EncodeHintType.CHARACTER_SET, encodeCharacterSet);
         QRCode qrCode = Encoder.encode(qrText, ErrorCorrectionLevel.H, hints);
         ByteMatrix byteMatrix = qrCode.getMatrix();
         Bitmap bitmap = Bitmap.createBitmap(byteMatrix.getWidth(), byteMatrix.getHeight(), Bitmap.Config.ARGB_8888);

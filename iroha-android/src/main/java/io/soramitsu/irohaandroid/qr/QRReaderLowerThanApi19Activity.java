@@ -1,19 +1,13 @@
-package io.soramitsu.iroha.view.dialog;
+package io.soramitsu.irohaandroid.qr;
 
 import android.Manifest;
-import android.app.Dialog;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.databinding.DataBindingUtil;
 import android.hardware.Camera;
-import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.widget.RelativeLayout;
@@ -28,45 +22,21 @@ import com.google.zxing.common.HybridBinarizer;
 import java.io.IOException;
 import java.util.List;
 
-import io.soramitsu.iroha.R;
-import io.soramitsu.iroha.databinding.DialogQrReaderBinding;
-
-public class QRReaderApi19DialogFragment extends DialogFragment implements SurfaceHolder.Callback {
-    private static final String TAG = QRReaderApi19DialogFragment.class.getSimpleName();
-    private static final int PERMISSION_REQUEST_CODE = 70;
-
+public class QRReaderLowerThanApi19Activity extends QRReaderActivity {
     @SuppressWarnings("deprecation")
     private Camera camera;
     private Handler autoFocusHandler;
 
-    private DialogQrReaderBinding binding;
-
     private boolean flg;
 
-    public static QRReaderApi19DialogFragment newInstance() {
-        QRReaderApi19DialogFragment fragment = new QRReaderApi19DialogFragment();
-        return fragment;
-    }
-
-    @NonNull
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        super.onCreateDialog(savedInstanceState);
-        binding = DataBindingUtil.inflate(LayoutInflater.from(getContext()), R.layout.dialog_qr_reader, null, false);
-
-        if (binding.surfaceViewQrReaderFragment == null) {
-            throw new IllegalStateException("View must have @id/surfaceViewQrReaderFragment");
-        }
-
-        initialize();
-
-        return new AlertDialog.Builder(getActivity())
-                .setView(binding.getRoot())
-                .create();
+    public static Intent getCallingIntent(Context context) {
+        Intent intent = new Intent(context, QRReaderLowerThanApi19Activity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        return intent;
     }
 
     @Override
-    public void onStart() {
+    protected void onStart() {
         super.onStart();
         Log.d(TAG, "onStart: ");
         camera = Camera.open();
@@ -81,7 +51,7 @@ public class QRReaderApi19DialogFragment extends DialogFragment implements Surfa
     public void onStop() {
         Log.d(TAG, "onStop: ");
         autoFocusHandler.removeCallbacksAndMessages(null);
-        binding.surfaceViewQrReaderFragment.getHolder().removeCallback(this);
+        surfaceView.getHolder().removeCallback(this);
         camera.cancelAutoFocus();
         camera.stopPreview();
         camera.release();
@@ -90,7 +60,7 @@ public class QRReaderApi19DialogFragment extends DialogFragment implements Surfa
     }
 
     @SuppressWarnings("deprecation")
-    private void initialize() {
+    protected void initialize() {
         autoFocusHandler = new Handler();
         autoFocusHandler.postDelayed(new Runnable() {
             @Override
@@ -114,16 +84,17 @@ public class QRReaderApi19DialogFragment extends DialogFragment implements Surfa
                                     Result result = reader.decode(bitmap);
                                     String text = result.getText();
 
-                                    dismiss();
+                                    finish();
 
-                                    Fragment fragment = getActivity().getSupportFragmentManager().findFragmentById(R.id.container);
-                                    if (fragment instanceof OnQRReaderListener) {
-                                        OnQRReaderListener handler = (OnQRReaderListener) fragment;
-                                        handler.setOnResult(text);
-                                    }
+                                    callback.onSuccessful(text);
+//                                    Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container);
+//                                    if (fragment instanceof OnQRReaderListener) {
+//                                        OnQRReaderListener handler = (OnQRReaderListener) fragment;
+//                                        handler.setOnResult(text);
+//                                    }
                                 } catch (Exception e) {
                                     Log.e(TAG, "onPreviewFrame: " + e.getMessage());
-                                    e.printStackTrace();
+                                    callback.onFailure(e);
                                 }
                             }
                         });
@@ -132,17 +103,17 @@ public class QRReaderApi19DialogFragment extends DialogFragment implements Surfa
                 autoFocusHandler.postDelayed(this, 5000);
             }
         }, 1000);
-        binding.surfaceViewQrReaderFragment.getHolder().addCallback(this);
+        surfaceView.getHolder().addCallback(this);
     }
 
     @Override
-    public void surfaceCreated(SurfaceHolder holder) {
+    protected void onSurfaceCreated(SurfaceHolder holder) {
         Log.d(TAG, "surfaceCreated: ");
         try {
-            int cameraPermission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA);
+            int cameraPermission = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
             if (cameraPermission != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(
-                        getActivity(),
+                        this,
                         new String[]{Manifest.permission.CAMERA},
                         PERMISSION_REQUEST_CODE
                 );
@@ -161,7 +132,7 @@ public class QRReaderApi19DialogFragment extends DialogFragment implements Surfa
     }
 
     @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+    protected void onSurfaceChanged(SurfaceHolder holder, int format, int width, int height) {
         Log.d(TAG, "surfaceChanged: ");
         camera.stopPreview();
 
@@ -174,8 +145,8 @@ public class QRReaderApi19DialogFragment extends DialogFragment implements Surfa
     }
 
     @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-        Log.d(TAG, "surfaceDestroyed: ");
+    protected void onSurfaceDestroyed(SurfaceHolder holder) {
+        // nothing
     }
 
     @SuppressWarnings("deprecation")
@@ -191,7 +162,7 @@ public class QRReaderApi19DialogFragment extends DialogFragment implements Surfa
     private void setDisplayOrientation() {
         int degree;
 
-        switch (getActivity().getWindowManager().getDefaultDisplay()
+        switch (getWindowManager().getDefaultDisplay()
                 .getRotation()) {
             case Surface.ROTATION_0:
                 degree = 0;
@@ -216,8 +187,8 @@ public class QRReaderApi19DialogFragment extends DialogFragment implements Surfa
 
     @SuppressWarnings("deprecation")
     private void setSurfaceViewSize() {
-        float relativeWidth = binding.getRoot().getWidth();
-        float relativeHeight = binding.getRoot().getHeight();
+        float relativeWidth = surfaceView.getWidth();
+        float relativeHeight = surfaceView.getHeight();
         float previewWidth;
         float previewHeight;
 
@@ -243,6 +214,6 @@ public class QRReaderApi19DialogFragment extends DialogFragment implements Surfa
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
                 surfaceWidth, surfaceHeight);
         params.addRule(RelativeLayout.CENTER_IN_PARENT);
-        binding.surfaceViewQrReaderFragment.setLayoutParams(params);
+        surfaceView.setLayoutParams(params);
     }
 }

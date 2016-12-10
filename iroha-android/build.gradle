@@ -30,10 +30,13 @@ android {
     }
 }
 
+def SUPPORT_PACKAGE_VERSION = "25.0.1"
 def ESPRESSO_PACKAGE_VERSION = "2.2.2"
 def JUNIT_PACKAGE_VERSION = "4.12"
 def OKHTTP_PACKAGE_VERSION = "3.5.0";
 def GSON_PACKAGE_VERSION = "2.4";
+def PLAY_SERVICES_VISION_PACKAGE_VERSION = "10.0.1";
+def ZXING_PACKAGE_VERSION = "3.2.1";
 def BOUNCY_CASTLE_PACKAGE_VERSION = "1.55";
 
 dependencies {
@@ -43,9 +46,12 @@ dependencies {
     })
     testCompile "junit:junit:${JUNIT_PACKAGE_VERSION}"
 
+    compile "com.android.support:appcompat-v7:${SUPPORT_PACKAGE_VERSION}"
     compile "com.squareup.okhttp3:okhttp:${OKHTTP_PACKAGE_VERSION}"
     compile "com.squareup.okhttp3:logging-interceptor:${OKHTTP_PACKAGE_VERSION}"
     compile "com.google.code.gson:gson:${GSON_PACKAGE_VERSION}"
+    compile "com.google.android.gms:play-services-vision:${PLAY_SERVICES_VISION_PACKAGE_VERSION}"
+    compile "com.google.zxing:core:${ZXING_PACKAGE_VERSION}"
     compile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: "${BOUNCY_CASTLE_PACKAGE_VERSION}"
 }
 

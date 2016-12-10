@@ -11,15 +11,18 @@ import com.google.zxing.WriterException;
 import java.io.UnsupportedEncodingException;
 
 import io.soramitsu.iroha.R;
+import io.soramitsu.iroha.exception.ErrorMessageFactory;
+import io.soramitsu.iroha.exception.LargeNumberOfDigitsException;
+import io.soramitsu.iroha.model.QRType;
 import io.soramitsu.iroha.model.TransferQRParameter;
-import io.soramitsu.iroha.util.QRCodeGenerator;
 import io.soramitsu.iroha.view.AssetReceiverView;
 import io.soramitsu.irohaandroid.model.Account;
 import io.soramitsu.irohaandroid.model.KeyPair;
+import io.soramitsu.irohaandroid.qr.QRCodeGenerator;
+
+import static io.soramitsu.iroha.model.TransferQRParameter.QR_TEXT_DEFAULT;
 
 public class AssetReceiverPresenter implements Presenter<AssetReceiverView> {
-    private static final String QR_TEXT_DEFAULT = "{\"type\":\"trans\",\"account\":\"\",\"value\":0}";
-
     public static final String TAG = AssetReceiverPresenter.class.getSimpleName();
 
     private AssetReceiverView assetReceiverView;
@@ -60,16 +63,12 @@ public class AssetReceiverPresenter implements Presenter<AssetReceiverView> {
     }
 
     public void defaultQR() {
-        try {
-            assetReceiverView.setQR(QRCodeGenerator.generateQR(QR_TEXT_DEFAULT, 500));
-        } catch (WriterException e) {
-            assetReceiverView.showError(assetReceiverView.getContext().getString(R.string.error_message_cannot_generate_qr));
-        }
+        generateQR(QR_TEXT_DEFAULT);
     }
 
     private void generateQR(String qrParamsText) {
         try {
-            assetReceiverView.setQR(QRCodeGenerator.generateQR(qrParamsText, 500));
+            assetReceiverView.setQR(QRCodeGenerator.generateQR(qrParamsText, 500, QRCodeGenerator.ENCODE_CHARACTER_TYPE_UTF_8));
         } catch (WriterException e) {
             assetReceiverView.showError(assetReceiverView.getContext().getString(R.string.error_message_cannot_generate_qr));
         }
@@ -94,12 +93,17 @@ public class AssetReceiverPresenter implements Presenter<AssetReceiverView> {
                         return;
                     }
                     assetReceiverView.setAmount(buff.substring(0, buff.length() - 1));
-                    assetReceiverView.showError("桁数が多すぎます");
+                    assetReceiverView.showError(
+                            ErrorMessageFactory.create(
+                                    assetReceiverView.getContext(),
+                                    new LargeNumberOfDigitsException()
+                            )
+                    );
                     return;
                 }
 
                 final TransferQRParameter qrParams = new TransferQRParameter();
-                qrParams.type = "trans";
+                qrParams.type = QRType.TRANSFER.getType();
                 qrParams.account = KeyPair.getKeyPair(assetReceiverView.getContext()).publicKey;
                 qrParams.value = value;
 

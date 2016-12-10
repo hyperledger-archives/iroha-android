@@ -15,18 +15,19 @@ import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.databinding.FragmentAssetSenderBinding;
 import io.soramitsu.iroha.model.QRType;
 import io.soramitsu.iroha.model.TransferQRParameter;
+import io.soramitsu.iroha.navigator.Navigator;
 import io.soramitsu.iroha.presenter.AssetSenderPresenter;
 import io.soramitsu.iroha.util.AndroidSupportUtil;
 import io.soramitsu.iroha.view.AssetSenderView;
 import io.soramitsu.iroha.view.activity.MainActivity;
 import io.soramitsu.iroha.view.dialog.ErrorDialog;
-import io.soramitsu.iroha.view.dialog.OnQRReaderListener;
 import io.soramitsu.iroha.view.dialog.ProgressDialog;
 import io.soramitsu.iroha.view.dialog.SuccessDialog;
+import io.soramitsu.irohaandroid.callback.Callback;
 import io.soramitsu.irohaandroid.model.Account;
 
 public class AssetSenderFragment extends Fragment
-        implements AssetSenderView, MainActivity.MainActivityListener, OnQRReaderListener {
+        implements AssetSenderView, MainActivity.MainActivityListener {
     public static final String TAG = AssetSenderFragment.class.getSimpleName();
 
     private AssetSenderPresenter assetSenderPresenter = new AssetSenderPresenter();
@@ -117,7 +118,50 @@ public class AssetSenderFragment extends Fragment
 
     @Override
     public void showQRReader() {
-        AndroidSupportUtil.showQRReaderDialog(getChildFragmentManager());
+        Navigator.getInstance().navigateToQRReaderActivity(getContext(), new Callback<String>() {
+            @Override
+            public void onSuccessful(String result) {
+                Log.d(TAG, "onSuccessful: " + result);
+
+                TransferQRParameter params;
+                try {
+                    params = new Gson().fromJson(result, TransferQRParameter.class);
+                } catch (Exception e) {
+                    Log.e(TAG, "setOnResult: json could not parse to object!");
+                    errorDialog.show(getActivity(), getString(R.string.error_message_illegal_qr));
+                    return;
+                }
+
+                if (params == null || !params.type.equals(QRType.TRANSFER.getType())) {
+                    Log.e(TAG, "setOnResult: QR type is not transfer!");
+                    errorDialog.show(getActivity(), getString(R.string.error_message_illegal_qr));
+                    return;
+                }
+
+                if (params.value <= 0) {
+                    Log.e(TAG, "setOnResult: QR value is lower than 0!");
+                    errorDialog.show(getActivity(), getString(R.string.error_message_request_amount_is_incorrect));
+                    return;
+                }
+
+                if (params.account.equals(Account.getUuid(getContext()))) {
+                    Log.e(TAG, "setOnResult: This QR is mine!");
+                    errorDialog.show(getActivity(), getString(R.string.error_message_cannot_send_to_myself));
+                    return;
+                }
+
+                afterQRReadViewState(
+                        params.alias == null ? "不明な送信先" : params.alias,
+                        params.account,
+                        String.valueOf(params.value)
+                );
+            }
+
+            @Override
+            public void onFailure(Throwable throwable) {
+                Log.e(TAG, "onFailure: ", throwable);
+            }
+        });
     }
 
     @Override
@@ -161,41 +205,5 @@ public class AssetSenderFragment extends Fragment
     @Override
     public void onNavigationItemClicked() {
         // nothing
-    }
-
-    @Override
-    public void setOnResult(String result) {
-        TransferQRParameter params;
-        try {
-            params = new Gson().fromJson(result, TransferQRParameter.class);
-        } catch (Exception e) {
-            Log.e(TAG, "setOnResult: json could not parse to object!");
-            errorDialog.show(getActivity(), getString(R.string.error_message_illegal_qr));
-            return;
-        }
-
-        if (params == null || !params.type.equals(QRType.TRANSFER.getType())) {
-            Log.e(TAG, "setOnResult: QR type is not transfer!");
-            errorDialog.show(getActivity(), getString(R.string.error_message_illegal_qr));
-            return;
-        }
-
-        if (params.value <= 0) {
-            Log.e(TAG, "setOnResult: QR value is lower than 0!");
-            errorDialog.show(getActivity(), getString(R.string.error_message_request_amount_is_incorrect));
-            return;
-        }
-
-        if (params.account.equals(Account.getUuid(getContext()))) {
-            Log.e(TAG, "setOnResult: This QR is mine!");
-            errorDialog.show(getActivity(), getString(R.string.error_message_cannot_send_to_myself));
-            return;
-        }
-
-        afterQRReadViewState(
-                params.alias == null ? "不明な送信先" : params.alias,
-                params.account,
-                String.valueOf(params.value)
-        );
     }
 }
