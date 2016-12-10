@@ -6,8 +6,11 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.exception.ErrorMessageFactory;
+import io.soramitsu.iroha.exception.NetworkNotConnectedException;
 import io.soramitsu.iroha.exception.RequiredArgumentException;
+import io.soramitsu.iroha.util.NetworkUtil;
 import io.soramitsu.iroha.view.AccountRegisterView;
 import io.soramitsu.irohaandroid.Iroha;
 import io.soramitsu.irohaandroid.KeyGenerator;
@@ -79,7 +82,7 @@ public class AccountRegisterPresenter implements Presenter<AccountRegisterView> 
 
                 if (alias.isEmpty()) {
                     accountRegisterView.showError(
-                            ErrorMessageFactory.create(context, new RequiredArgumentException())
+                            ErrorMessageFactory.create(context, new RequiredArgumentException(), context.getString(R.string.name))
                     );
                     return;
                 }
@@ -107,15 +110,14 @@ public class AccountRegisterPresenter implements Presenter<AccountRegisterView> 
             public void onFailure(Throwable throwable) {
                 accountRegisterView.hideProgressDialog();
 
-//                        keyPair.delete(accountRegisterView.getContext());
+                keyPair.delete(accountRegisterView.getContext());
 
-//                        if (NetworkUtil.isOnline(accountRegisterView.getContext())) {
-//                            accountRegisterView.showError(accountRegisterView.getContext().getString(R.string.error_message_retry_again));
-//                        } else {
-//                            accountRegisterView.showError(accountRegisterView.getContext().getString(R.string.error_message_check_network_state));
-//                        }
-
-                accountRegisterView.registerSuccessful();
+                final Context context = accountRegisterView.getContext();
+                if (NetworkUtil.isOnline(accountRegisterView.getContext())) {
+                    accountRegisterView.showError(ErrorMessageFactory.create(context, throwable));
+                } else {
+                    accountRegisterView.showError(ErrorMessageFactory.create(context, new NetworkNotConnectedException()));
+                }
             }
         });
     }

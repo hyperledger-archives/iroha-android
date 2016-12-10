@@ -30,7 +30,7 @@ public class ErrorMessageFactory {
         } else if (exception instanceof SelfSendCanNotException) {
             message = context.getString(R.string.error_message_cannot_send_to_myself);
         } else if (exception instanceof RequiredArgumentException) {
-            message = context.getString(R.string.validation_message_required, params);
+            message = context.getString(R.string.validation_message_required, (Object[]) params);
         } else if (exception instanceof WriterException) {
             message = context.getString(R.string.error_message_cannot_generate_qr);
         } else if (exception instanceof NetworkNotConnectedException) {
