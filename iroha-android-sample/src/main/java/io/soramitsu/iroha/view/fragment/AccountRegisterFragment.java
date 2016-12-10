@@ -72,32 +72,22 @@ public class AccountRegisterFragment extends Fragment implements AccountRegister
 
     @Override
     public void showError(final String error) {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                errorDialog.show(getActivity(), error);
-            }
-        });
+        errorDialog.show(getActivity(), error);
     }
 
     @Override
     public void registerSuccessful() {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                successDialog.show(
-                        getActivity(),
-                        getString(R.string.register),
-                        getString(R.string.message_account_register_successful),
-                        new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                successDialog.hide();
-                                accountRegisterListener.onAccountRegisterSuccessful();
-                            }
-                        });
-            }
-        });
+        successDialog.show(
+                getActivity(),
+                getString(R.string.register),
+                getString(R.string.message_account_register_successful),
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        successDialog.hide();
+                        accountRegisterListener.onAccountRegisterSuccessful();
+                    }
+                });
     }
 
     @Override
@@ -107,21 +97,11 @@ public class AccountRegisterFragment extends Fragment implements AccountRegister
 
     @Override
     public void showProgressDialog() {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                progressDialog.show(getActivity(), getString(R.string.during_registration));
-            }
-        });
+        progressDialog.show(getActivity(), getString(R.string.during_registration));
     }
 
     @Override
     public void hideProgressDialog() {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                progressDialog.hide();
-            }
-        });
+        progressDialog.hide();
     }
 }
