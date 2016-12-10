@@ -24,4 +24,8 @@
     <string name="hint_receiver_amount">要求額</string>
     <string name="error_message_cannot_generate_qr">QRコードが生成できませんでした…</string>
     <string name="message_send_asset_successful">%1$sに%2$s送金しました</string>
+    <string name="error_message_large_number_of_digits">桁数が多すぎます</string>
+    <string name="unknown_receiver">不明な送信先</string>
+    <string name="error_message_account_duplicate">既にそのアカウントは存在しています</string>
+    <string name="error_message_user_not_found">アカウントが存在していません</string>
 </resources>
