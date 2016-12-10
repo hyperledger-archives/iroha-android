@@ -30,8 +30,7 @@ public class AccountRegisterActivity extends AppCompatActivity
     @Override
     public void onAccountRegisterSuccessful() {
         final Context context = getApplicationContext();
-//        navigator.navigateToMainActivity(context, Account.getUuid(context));
-        navigator.navigateToMainActivity(context, "test"); // TODO mock用
+        navigator.navigateToMainActivity(context, Account.getUuid(context));
         finish();
     }
 }
