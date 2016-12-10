@@ -16,5 +16,6 @@ public class TransactionEntity {
         public String value;
         public String sender;
         public String receiver;
+        public String opponent;
     }
 }

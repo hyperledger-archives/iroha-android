@@ -41,7 +41,7 @@ public final class BindingUtils {
             type = "from ";
         }
 
-        String displayText = type + transaction.params.receiver;
+        String displayText = type + transaction.params.oppoent;
         textView.setText(displayText);
     }
 }

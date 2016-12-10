@@ -50,6 +50,7 @@ public class TransactionEntityDataMapper {
                 operationParameter.value = operationParameterEntity.value;
                 operationParameter.sender = operationParameterEntity.sender;
                 operationParameter.receiver = operationParameterEntity.receiver;
+                operationParameter.oppoent = operationParameterEntity.opponent;
             }
 
             return operationParameter;
