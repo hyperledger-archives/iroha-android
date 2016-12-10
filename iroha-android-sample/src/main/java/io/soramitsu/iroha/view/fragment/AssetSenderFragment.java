@@ -111,6 +111,11 @@ public class AssetSenderFragment extends Fragment
     }
 
     @Override
+    public String getReceiverAlias() {
+        return binding.accountNum.getText().toString();
+    }
+
+    @Override
     public void showQRReader() {
         Navigator.getInstance().navigateToQRReaderActivity(getContext(), assetSenderPresenter.onReadQR());
     }

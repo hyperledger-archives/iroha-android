@@ -93,7 +93,7 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
                         assetSenderView.showSuccess(
                                 context.getString(R.string.successful_title_sent),
                                 context.getString(R.string.message_send_asset_successful,
-                                        assetSenderView.getReceiver(), assetSenderView.getAmount()),
+                                        assetSenderView.getReceiverAlias(), assetSenderView.getAmount()),
                                 new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {

@@ -8,6 +8,7 @@ public interface AssetSenderView extends LoadingView {
     void hideSuccess();
     String getAmount();
     String getReceiver();
+    String getReceiverAlias();
     void showQRReader();
     void reset();
     void beforeQRReadViewState();
