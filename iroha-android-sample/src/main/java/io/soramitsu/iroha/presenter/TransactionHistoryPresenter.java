@@ -109,12 +109,17 @@ public class TransactionHistoryPresenter implements Presenter<TransactionHistory
         }
 
         final Context context = transactionHistoryView.getContext();
-        Iroha.getInstance().findAccount(Account.getUuid(context), new Callback<Account>() {
+        final String uuid = Account.getUuid(context);
+        Iroha.getInstance().findAccount(uuid, new Callback<Account>() {
             @Override
             public void onSuccessful(final Account account) {
-                Iroha.getInstance().findTransactionHistory(account.uuid, new Callback<List<Transaction>>() {
+                Iroha.getInstance().findTransactionHistory(uuid, new Callback<List<Transaction>>() {
                     @Override
                     public void onSuccessful(List<Transaction> transactions) {
+                        if (transactionHistoryView.isRefreshing()) {
+                            transactionHistoryView.setRefreshing(false);
+                        }
+
                         transactionHistoryView.hideProgressDialog();
 
                         TransactionHistory transactionHistory = new TransactionHistory();
