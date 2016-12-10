@@ -48,7 +48,7 @@ public class TransactionHistory implements Parcelable {
 
     public static TransactionHistory createMock() {
         TransactionHistory mock = new TransactionHistory();
-        mock.value = "1000 iroha";
+        mock.value = "1000";
         mock.histories = Transaction.createMock();
         return mock;
     }

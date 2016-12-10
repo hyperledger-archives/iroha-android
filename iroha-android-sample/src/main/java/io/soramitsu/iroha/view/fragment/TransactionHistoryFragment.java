@@ -145,7 +145,7 @@ public class TransactionHistoryFragment extends Fragment
     @Override
     public void renderTransactionHistory(final TransactionHistory transactionHistory) {
         this.transactionHistory = transactionHistory;
-        binding.pocketMoney.setText(this.transactionHistory.value);
+        binding.pocketMoney.setText(getString(R.string.has_asset_amount, transactionHistory.value));
         transactionListAdapter.setItems(this.transactionHistory.histories);
         transactionListAdapter.notifyDataSetChanged();
     }
