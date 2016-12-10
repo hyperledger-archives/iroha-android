@@ -1,5 +1,6 @@
 package io.soramitsu.iroha.presenter;
 
+import android.content.Context;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -43,7 +44,7 @@ public class TransactionHistoryPresenter implements Presenter<TransactionHistory
         transactionRunnable = new Runnable() {
             @Override
             public void run() {
-                transactionHistory(null, TransactionHistoryFragment.RefreshState.SWIPE_UP);
+                transactionHistory(TransactionHistoryFragment.RefreshState.SWIPE_UP);
             }
         };
     }
@@ -72,59 +73,71 @@ public class TransactionHistoryPresenter implements Presenter<TransactionHistory
         // nothing
     }
 
-    public void transactionHistory(TransactionHistory transactionHistory, final TransactionHistoryFragment.RefreshState state) {
-        if (transactionHistory == null) {
-            Log.d(TAG, "transactionHistory: fetch network or cache");
-            if (state != TransactionHistoryFragment.RefreshState.SWIPE_UP) {
-                transactionHistoryView.showProgressDialog();
-            }
-
-            Iroha.getInstance().findAccount(Account.getUuid(transactionHistoryView.getContext()), new Callback<Account>() {
-                @Override
-                public void onSuccessful(final Account account) {
-                    Iroha.getInstance().findTransactionHistory(account.uuid, new Callback<List<Transaction>>() {
-                        @Override
-                        public void onSuccessful(List<Transaction> transactions) {
-                            transactionHistoryView.hideProgressDialog();
-
-                            TransactionHistory transactionHistory = new TransactionHistory();
-                            transactionHistory.value = account.assets.get(0).value; // TODO マルチアセット対応
-                            transactionHistory.histories = transactions;
-                            transactionHistoryView.renderTransactionHistory(transactionHistory);
-                        }
-
-                        @Override
-                        public void onFailure(Throwable throwable) {
-                            fail(state);
-                        }
-                    });
+    public void transactionHistory(final TransactionHistoryFragment.RefreshState state) {
+        switch (state) {
+            case RE_CREATED_FRAGMENT:
+                if (transactionHistoryView.getTransaction() == null) {
+                    renderFromNetwork();
+                    return;
                 }
 
-                @Override
-                public void onFailure(Throwable throwable) {
-                    fail(state);
-                }
-            });
-        } else {
-            Log.d(TAG, "transactionHistory: cache in memory");
-            transactionHistoryView.renderTransactionHistory(transactionHistory);
+                renderFromMemory();
+                break;
+            case EMPTY_REFRESH:
+            case SWIPE_UP:
+                renderFromNetwork();
+                break;
         }
     }
 
-    private void fail(TransactionHistoryFragment.RefreshState state) {
+    private void renderFromMemory() {
+        Log.d(TAG, "transactionHistory: cache in memory");
+        transactionHistoryView.renderTransactionHistory(transactionHistoryView.getTransaction());
+    }
+
+    private void renderFromNetwork() {
+        Log.d(TAG, "transactionHistory: fetch network or cache");
+
+        final Context context = transactionHistoryView.getContext();
+        Iroha.getInstance().findAccount(Account.getUuid(context), new Callback<Account>() {
+            @Override
+            public void onSuccessful(final Account account) {
+                Iroha.getInstance().findTransactionHistory(account.uuid, new Callback<List<Transaction>>() {
+                    @Override
+                    public void onSuccessful(List<Transaction> transactions) {
+                        transactionHistoryView.hideProgressDialog();
+
+                        TransactionHistory transactionHistory = new TransactionHistory();
+                        transactionHistory.value = account.assets.get(0).value; // TODO マルチアセット対応
+                        transactionHistory.histories = transactions;
+                        transactionHistoryView.renderTransactionHistory(transactionHistory);
+                    }
+
+                    @Override
+                    public void onFailure(Throwable throwable) {
+                        fail();
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(Throwable throwable) {
+                fail();
+            }
+        });
+    }
+
+    private void fail() {
         if (transactionHistoryView.isRefreshing()) {
             transactionHistoryView.setRefreshing(false);
         }
 
         transactionHistoryView.hideProgressDialog();
 
-        if (state == TransactionHistoryFragment.RefreshState.SWIPE_UP
-                || state == TransactionHistoryFragment.RefreshState.EMPTY_REFRESH) {
-            if (NetworkUtil.isOnline(transactionHistoryView.getContext())) {
-                transactionHistoryView.showError(transactionHistoryView.getContext().getString(R.string.error_message_retry_again));
-            } else {
-                transactionHistoryView.showError(transactionHistoryView.getContext().getString(R.string.error_message_check_network_state));
-            }
+        if (NetworkUtil.isOnline(transactionHistoryView.getContext())) {
+            transactionHistoryView.showError(transactionHistoryView.getContext().getString(R.string.error_message_retry_again));
+        } else {
+            transactionHistoryView.showError(transactionHistoryView.getContext().getString(R.string.error_message_check_network_state));
         }
     }
 
@@ -141,7 +154,7 @@ public class TransactionHistoryPresenter implements Presenter<TransactionHistory
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                transactionHistory(null, TransactionHistoryFragment.RefreshState.EMPTY_REFRESH);
+                transactionHistory(TransactionHistoryFragment.RefreshState.EMPTY_REFRESH);
             }
         };
     }

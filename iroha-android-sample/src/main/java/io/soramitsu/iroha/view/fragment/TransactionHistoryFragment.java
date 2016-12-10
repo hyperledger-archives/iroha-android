@@ -19,7 +19,8 @@ import io.soramitsu.iroha.view.adapter.TransactionListAdapter;
 import io.soramitsu.irohaandroid.model.KeyPair;
 import io.soramitsu.irohaandroid.model.Transaction;
 
-public class TransactionHistoryFragment extends Fragment implements TransactionHistoryView, MainActivity.MainActivityListener {
+public class TransactionHistoryFragment extends Fragment
+        implements TransactionHistoryView, MainActivity.MainActivityListener {
     public static final String TAG = TransactionHistoryFragment.class.getSimpleName();
 
     private TransactionHistoryPresenter transactionHistoryPresenter = new TransactionHistoryPresenter();
@@ -28,11 +29,6 @@ public class TransactionHistoryFragment extends Fragment implements TransactionH
     private TransactionListAdapter transactionListAdapter;
 
     private TransactionHistory transactionHistory;
-
-//    public interface TransactionHistoryListener {
-//        TransactionHistory getTransaction();
-//        void renderTransactionHistory(TransactionHistory transactionHistory);
-//    }
 
     public enum RefreshState {
         SWIPE_UP, RE_CREATED_FRAGMENT, EMPTY_REFRESH
@@ -71,35 +67,52 @@ public class TransactionHistoryFragment extends Fragment implements TransactionH
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-//        if (!(getActivity() instanceof TransactionHistoryListener)) {
-//            throw new ClassCastException();
-//        }
-
         transactionListAdapter = new TransactionListAdapter(
                 getContext(),
                 Transaction.createMock(), // TODO mock用
                 KeyPair.getKeyPair(getContext()).publicKey
         );
         binding.transactionList.setAdapter(transactionListAdapter);
+
+        if (savedInstanceState != null) {
+            transactionHistory = savedInstanceState.getParcelable(TransactionHistory.TAG);
+        }
     }
 
     @Override
     public void onStart() {
         super.onStart();
         transactionHistoryPresenter.onStart();
-        transactionHistoryPresenter.transactionHistory(transactionHistory, RefreshState.RE_CREATED_FRAGMENT);
+        transactionHistoryPresenter.transactionHistory(RefreshState.RE_CREATED_FRAGMENT);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        transactionHistoryPresenter.onResume();
     }
 
     @Override
     public void onPause() {
-        super.onPause();
         transactionHistoryPresenter.onPause();
+        super.onPause();
+    }
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(TransactionHistory.TAG, transactionHistory);
+    }
+
+    @Override
+    public void onStop() {
+        transactionHistoryPresenter.onStop();
+        super.onStop();
     }
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         transactionHistoryPresenter.onDestroy();
+        super.onDestroy();
     }
 
     @Override
@@ -109,32 +122,17 @@ public class TransactionHistoryFragment extends Fragment implements TransactionH
 
     @Override
     public void setRefreshing(final boolean refreshing) {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                binding.swipeRefresh.setRefreshing(refreshing);
-            }
-        });
+        binding.swipeRefresh.setRefreshing(refreshing);
     }
 
     @Override
     public void setRefreshEnable(final boolean enable) {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                binding.swipeRefresh.setEnabled(enable);
-            }
-        });
+        binding.swipeRefresh.setEnabled(enable);
     }
 
     @Override
     public void showError(final String error) {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(getContext(), error, Toast.LENGTH_SHORT).show();
-            }
-        });
+        Toast.makeText(getContext(), error, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -144,37 +142,22 @@ public class TransactionHistoryFragment extends Fragment implements TransactionH
 
     @Override
     public void renderTransactionHistory(final TransactionHistory transactionHistory) {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                TransactionHistoryFragment.this.transactionHistory = transactionHistory;
-                binding.pocketMoney.setText(TransactionHistoryFragment.this.transactionHistory.value);
-                transactionListAdapter.setItems(TransactionHistoryFragment.this.transactionHistory.histories);
-                transactionListAdapter.notifyDataSetChanged();
-            }
-        });
+        this.transactionHistory = transactionHistory;
+        binding.pocketMoney.setText(this.transactionHistory.value);
+        transactionListAdapter.setItems(this.transactionHistory.histories);
+        transactionListAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void showProgressDialog() {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                binding.progressBar.setVisibility(View.VISIBLE);
-                binding.transactionList.setVisibility(View.GONE);
-            }
-        });
+        binding.progressBar.setVisibility(View.VISIBLE);
+        binding.transactionList.setVisibility(View.GONE);
     }
 
     @Override
     public void hideProgressDialog() {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                binding.progressBar.setVisibility(View.GONE);
-                binding.transactionList.setVisibility(View.VISIBLE);
-            }
-        });
+        binding.progressBar.setVisibility(View.GONE);
+        binding.transactionList.setVisibility(View.VISIBLE);
     }
 
     @Override
