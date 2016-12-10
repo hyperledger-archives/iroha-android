@@ -2,6 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/action_receipt"
+        android:enabled="true"
+        android:icon="@drawable/receiver"
+        android:title="@string/receive"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/action_transaction_history"
         android:enabled="true"
         android:icon="@drawable/transaction"
@@ -12,11 +18,5 @@
         android:enabled="true"
         android:icon="@drawable/sender"
         android:title="@string/sender"
-        app:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/action_receipt"
-        android:enabled="true"
-        android:icon="@drawable/receiver"
-        android:title="@string/receive"
         app:showAsAction="ifRoom" />
 </menu>

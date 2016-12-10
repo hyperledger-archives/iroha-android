@@ -64,6 +64,11 @@ public class MainActivity extends AppCompatActivity {
                     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                         if (!item.isChecked()) {
                             switch (item.getItemId()) {
+                                case R.id.action_receipt:
+                                    Log.d(TAG, "onNavigationItemSelected: 要求");
+                                    switchFragment(assetReceiverFragment, AssetReceiverFragment.TAG);
+                                    binding.toolbar.setTitle(getString(R.string.receive));
+                                    break;
                                 case R.id.action_transaction_history:
                                     Log.d(TAG, "onNavigationItemSelected: 取引履歴");
                                     binding.toolbar.setTitle(getString(R.string.transaction_history));
@@ -73,11 +78,6 @@ public class MainActivity extends AppCompatActivity {
                                     Log.d(TAG, "onNavigationItemSelected: 送金");
                                     binding.toolbar.setTitle(getString(R.string.sender));
                                     switchFragment(assetSenderFragment, AssetSenderFragment.TAG);
-                                    break;
-                                case R.id.action_receipt:
-                                    Log.d(TAG, "onNavigationItemSelected: 要求");
-                                    switchFragment(assetReceiverFragment, AssetReceiverFragment.TAG);
-                                    binding.toolbar.setTitle(getString(R.string.receive));
                                     break;
                             }
                         } else {
@@ -91,22 +91,22 @@ public class MainActivity extends AppCompatActivity {
                 });
 
         final FragmentManager manager = getSupportFragmentManager();
+        assetReceiverFragment = (AssetReceiverFragment) manager.findFragmentByTag(AssetReceiverFragment.TAG);
         transactionHistoryFragment = (TransactionHistoryFragment) manager.findFragmentByTag(TransactionHistoryFragment.TAG);
         assetSenderFragment = (AssetSenderFragment) manager.findFragmentByTag(AssetSenderFragment.TAG);
-        assetReceiverFragment = (AssetReceiverFragment) manager.findFragmentByTag(AssetReceiverFragment.TAG);
 
+        if (assetReceiverFragment == null) {
+            assetReceiverFragment = AssetReceiverFragment.newInstance();
+        }
         if (transactionHistoryFragment == null) {
             transactionHistoryFragment = TransactionHistoryFragment.newInstance();
         }
         if (assetSenderFragment == null) {
             assetSenderFragment = AssetSenderFragment.newInstance();
         }
-        if (assetReceiverFragment == null) {
-            assetReceiverFragment = AssetReceiverFragment.newInstance();
-        }
 
         if (savedInstanceState == null) {
-            switchFragment(transactionHistoryFragment, TransactionHistoryFragment.TAG);
+            switchFragment(assetReceiverFragment, AssetReceiverFragment.TAG);
         }
     }
 
