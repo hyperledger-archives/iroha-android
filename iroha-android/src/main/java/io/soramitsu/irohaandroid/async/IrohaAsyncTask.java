@@ -1,10 +1,12 @@
 package io.soramitsu.irohaandroid.async;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import io.soramitsu.irohaandroid.callback.Callback;
 
 public abstract class IrohaAsyncTask<T> extends AsyncTask<Void, Void, Void> {
+    public static final String TAG = IrohaAsyncTask.class.getSimpleName();
 
     private final Callback<T> callback;
 
@@ -30,6 +32,7 @@ public abstract class IrohaAsyncTask<T> extends AsyncTask<Void, Void, Void> {
     @Override
     protected void onPostExecute(Void res) {
         if (exception != null) {
+            Log.e(TAG, "Iroha:  throw exception!", exception);
             callback.onFailure(exception);
             return;
         }
