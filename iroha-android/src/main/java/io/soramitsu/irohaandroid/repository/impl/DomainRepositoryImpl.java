@@ -31,6 +31,7 @@ public class DomainRepositoryImpl implements DomainRepository {
 
         switch (response.code()) {
             case 200:
+            case 201:
                 return gson.fromJson(response.body().string(), new TypeToken<DomainEntity>(){}.getType());
             default:
                 throw new HttpBadRequestException();

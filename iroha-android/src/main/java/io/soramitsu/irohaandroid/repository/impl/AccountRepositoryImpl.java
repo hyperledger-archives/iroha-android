@@ -9,9 +9,9 @@ import io.soramitsu.irohaandroid.entity.AccountEntity;
 import io.soramitsu.irohaandroid.exception.AccountDuplicateException;
 import io.soramitsu.irohaandroid.exception.HttpBadRequestException;
 import io.soramitsu.irohaandroid.exception.UserNotFoundException;
+import io.soramitsu.irohaandroid.net.IrohaHttpClient;
 import io.soramitsu.irohaandroid.net.Routes;
 import io.soramitsu.irohaandroid.net.dataset.reqest.AccountRegisterRequest;
-import io.soramitsu.irohaandroid.net.IrohaHttpClient;
 import io.soramitsu.irohaandroid.repository.AccountRepository;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -32,6 +32,7 @@ public class AccountRepositoryImpl implements AccountRepository {
 
         switch (response.code()) {
             case 200:
+            case 201:
                 return gson.fromJson(response.body().string(), new TypeToken<AccountEntity>(){}.getType());
             case 400:
                 throw new AccountDuplicateException();

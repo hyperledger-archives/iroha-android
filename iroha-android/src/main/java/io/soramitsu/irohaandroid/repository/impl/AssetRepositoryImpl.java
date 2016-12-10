@@ -31,6 +31,7 @@ public class AssetRepositoryImpl implements AssetRepository {
 
         switch (response.code()) {
             case 200:
+            case 201:
                 return gson.fromJson(response.body().string(), new TypeToken<AssetEntity>(){}.getType());
             default:
                 throw new HttpBadRequestException();
@@ -58,6 +59,7 @@ public class AssetRepositoryImpl implements AssetRepository {
 
         switch (response.code()) {
             case 200:
+            case 201:
                 return true;
             default:
                 throw new HttpBadRequestException();
