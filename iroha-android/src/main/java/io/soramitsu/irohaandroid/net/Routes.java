@@ -12,7 +12,7 @@ public class Routes {
 
     public static final String ASSET_CREATE = "/asset/create";
     public static final String ASSET_LIST = "/domain/list";
-    public static final String ASSET_OPERATION = "/domain/operation";
+    public static final String ASSET_OPERATION = "/asset/operation";
 
     public static final String TRANSACTION_HISTORY_WITH_UUID = "/history/transaction?uuid=";
     public static String TRANSACTION_HISTORY(final String domain, final String asset) {
