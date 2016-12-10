@@ -26,6 +26,9 @@ public class TransactionListAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
+        if (transactionHistory == null) {
+            return 0;
+        }
         return transactionHistory.size();
     }
 
@@ -40,10 +43,6 @@ public class TransactionListAdapter extends BaseAdapter {
             return null;
         }
         return transactionHistory.get(position);
-    }
-
-    public List<Transaction> getItems() {
-        return transactionHistory;
     }
 
     public void setItems(List<Transaction> transactionHistory) {
