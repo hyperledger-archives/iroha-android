@@ -7,6 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import io.soramitsu.iroha.R;
@@ -46,7 +49,14 @@ public class TransactionListAdapter extends BaseAdapter {
     }
 
     public void setItems(List<Transaction> transactionHistory) {
-        this.transactionHistory = transactionHistory;
+        ArrayList<Transaction> sortedTransactionList = new ArrayList<>(transactionHistory);
+        Collections.sort(sortedTransactionList, new Comparator<Transaction>() {
+            @Override
+            public int compare(Transaction t1, Transaction t2) {
+                return t1.timestamp < t2.timestamp ? 1 : t1.timestamp == t2.timestamp ? 0 : -1;
+            }
+        });
+        this.transactionHistory = sortedTransactionList;
     }
 
     @Override
@@ -59,7 +69,7 @@ public class TransactionListAdapter extends BaseAdapter {
         } else {
             binding = (RowTransactionListBinding) convertView.getTag();
         }
-        binding.setTransaction(getItem(getCount() - 1 - position));
+        binding.setTransaction(getItem(position));
         binding.setPublicKey(publicKey);
         binding.setContext(context);
         return convertView;

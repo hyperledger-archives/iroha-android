@@ -22,49 +22,59 @@ public class Transaction implements Serializable {
         ArrayList<Transaction> transactions = new ArrayList<>();
         transactions.add(new Transaction(){{
             this.params = new OperationParameter();
-            this.params.value = "100";
-            this.params.sender = "test1";
+            this.params.value = "200";
+            this.params.sender = "test2";
+            this.timestamp = System.currentTimeMillis() / 1000 - 60;
         }});
         transactions.add(new Transaction(){{
             this.params = new OperationParameter();
             this.params.value = "200";
             this.params.sender = "test2";
-        }});
-        transactions.add(new Transaction(){{
-            this.params = new OperationParameter();
-            this.params.value = "300";
-            this.params.sender = "test3";
+            this.timestamp = System.currentTimeMillis() / 1000 - 2592000;
         }});
         transactions.add(new Transaction(){{
             this.params = new OperationParameter();
             this.params.value = "100";
             this.params.sender = "test1";
-        }});
-        transactions.add(new Transaction(){{
-            this.params = new OperationParameter();
-            this.params.value = "200";
-            this.params.sender = "test2";
+            this.timestamp = System.currentTimeMillis() / 1000;
         }});
         transactions.add(new Transaction(){{
             this.params = new OperationParameter();
             this.params.value = "300";
             this.params.sender = "test3";
+            this.timestamp = System.currentTimeMillis() / 1000 - 86400;
+        }});
+        transactions.add(new Transaction(){{
+            this.params = new OperationParameter();
+            this.params.value = "300";
+            this.params.sender = "test3";
+            this.timestamp = System.currentTimeMillis() / 1000 - 600;
         }});
         transactions.add(new Transaction(){{
             this.params = new OperationParameter();
             this.params.value = "100";
             this.params.sender = "test1";
+            this.timestamp = System.currentTimeMillis() / 1000 - 259200;
         }});
         transactions.add(new Transaction(){{
             this.params = new OperationParameter();
-            this.params.value = "200";
-            this.params.sender = "test2";
+            this.params.value = "100";
+            this.params.sender = "test1";
+            this.timestamp = System.currentTimeMillis() / 1000 - 7200;
         }});
         transactions.add(new Transaction(){{
             this.params = new OperationParameter();
             this.params.value = "300";
             this.params.sender = "test3";
+            this.timestamp = System.currentTimeMillis() / 1000 - 31536000;
         }});
+        transactions.add(new Transaction(){{
+            this.params = new OperationParameter();
+            this.params.value = "200";
+            this.params.sender = "test2";
+            this.timestamp = System.currentTimeMillis() / 1000 - 50400;
+        }});
+
         return transactions;
     }
 
