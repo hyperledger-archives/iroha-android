@@ -18,7 +18,9 @@ public class AccountEntityDataMapper {
             account = new Account();
             account.uuid = accountEntity.uuid;
             account.alias = accountEntity.alias;
-            account.assets = assetEntityDataMapper.transform(accountEntity.assets);
+            if (accountEntity.assets != null) {
+                account.assets = assetEntityDataMapper.transform(accountEntity.assets);
+            }
         }
 
         return account;
