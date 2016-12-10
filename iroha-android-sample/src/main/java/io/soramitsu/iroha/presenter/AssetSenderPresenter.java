@@ -2,18 +2,29 @@ package io.soramitsu.iroha.presenter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.View;
 
+import com.google.gson.Gson;
+
 import io.soramitsu.iroha.R;
+import io.soramitsu.iroha.exception.ErrorMessageFactory;
+import io.soramitsu.iroha.exception.IlligalQRCodeException;
+import io.soramitsu.iroha.exception.IlligalRequestAmountException;
+import io.soramitsu.iroha.exception.NetworkNotConnectedException;
+import io.soramitsu.iroha.exception.SelfSendCanNotException;
 import io.soramitsu.iroha.model.QRType;
+import io.soramitsu.iroha.model.TransferQRParameter;
 import io.soramitsu.iroha.util.NetworkUtil;
 import io.soramitsu.iroha.view.AssetSenderView;
 import io.soramitsu.irohaandroid.Iroha;
 import io.soramitsu.irohaandroid.MessageDigest;
 import io.soramitsu.irohaandroid.callback.Callback;
+import io.soramitsu.irohaandroid.model.Account;
 import io.soramitsu.irohaandroid.model.KeyPair;
 
 public class AssetSenderPresenter implements Presenter<AssetSenderView> {
+    public static final String TAG = AssetSenderPresenter.class.getSimpleName();
 
     private AssetSenderView assetSenderView;
 
@@ -97,9 +108,9 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
                         assetSenderView.hideProgressDialog();
 
                         if (NetworkUtil.isOnline(assetSenderView.getContext())) {
-                            assetSenderView.showError(context.getString(R.string.error_message_retry_again));
+                            assetSenderView.showError(ErrorMessageFactory.create(context, throwable));
                         } else {
-                            assetSenderView.showError(context.getString(R.string.error_message_check_network_state));
+                            assetSenderView.showError(ErrorMessageFactory.create(context, new NetworkNotConnectedException()));
                         }
                     }
                 }
@@ -121,6 +132,55 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
             public void onClick(View view) {
                 assetSenderView.reset();
                 assetSenderView.beforeQRReadViewState();
+            }
+        };
+    }
+
+    public Callback<String> onReadQR() {
+        return new Callback<String>() {
+            @Override
+            public void onSuccessful(String result) {
+                Log.d(TAG, "onSuccessful: " + result);
+
+                final Context context = assetSenderView.getContext();
+
+                TransferQRParameter params;
+                try {
+                    params = new Gson().fromJson(result, TransferQRParameter.class);
+                } catch (Exception e) {
+                    Log.e(TAG, "setOnResult: json could not parse to object!");
+                    assetSenderView.showError(ErrorMessageFactory.create(context, new IlligalQRCodeException()));
+                    return;
+                }
+
+                if (params == null || !params.type.equals(QRType.TRANSFER.getType())) {
+                    Log.e(TAG, "setOnResult: QR type is not transfer!");
+                    assetSenderView.showError(ErrorMessageFactory.create(context, new IlligalQRCodeException()));
+                    return;
+                }
+
+                if (params.value <= 0) {
+                    Log.e(TAG, "setOnResult: QR value is lower than 0!");
+                    assetSenderView.showError(ErrorMessageFactory.create(context, new IlligalRequestAmountException()));
+                    return;
+                }
+
+                if (params.account.equals(Account.getUuid(context))) {
+                    Log.e(TAG, "setOnResult: This QR is mine!");
+                    assetSenderView.showError(ErrorMessageFactory.create(context, new SelfSendCanNotException()));
+                    return;
+                }
+
+                assetSenderView.afterQRReadViewState(
+                        params.alias == null ? context.getString(R.string.unknown_receiver) : params.alias,
+                        params.account,
+                        String.valueOf(params.value)
+                );
+            }
+
+            @Override
+            public void onFailure(Throwable throwable) {
+                Log.e(TAG, "onFailure: ", throwable);
             }
         };
     }

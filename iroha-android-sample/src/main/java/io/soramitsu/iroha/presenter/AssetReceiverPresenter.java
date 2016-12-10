@@ -10,7 +10,6 @@ import com.google.zxing.WriterException;
 
 import java.io.UnsupportedEncodingException;
 
-import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.exception.ErrorMessageFactory;
 import io.soramitsu.iroha.exception.LargeNumberOfDigitsException;
 import io.soramitsu.iroha.model.QRType;
@@ -70,7 +69,7 @@ public class AssetReceiverPresenter implements Presenter<AssetReceiverView> {
         try {
             assetReceiverView.setQR(QRCodeGenerator.generateQR(qrParamsText, 500, QRCodeGenerator.ENCODE_CHARACTER_TYPE_UTF_8));
         } catch (WriterException e) {
-            assetReceiverView.showError(assetReceiverView.getContext().getString(R.string.error_message_cannot_generate_qr));
+            assetReceiverView.showError(ErrorMessageFactory.create(assetReceiverView.getContext(), e));
         }
     }
 

@@ -10,7 +10,8 @@ import android.widget.AbsListView;
 
 import java.util.List;
 
-import io.soramitsu.iroha.R;
+import io.soramitsu.iroha.exception.ErrorMessageFactory;
+import io.soramitsu.iroha.exception.NetworkNotConnectedException;
 import io.soramitsu.iroha.model.TransactionHistory;
 import io.soramitsu.iroha.util.NetworkUtil;
 import io.soramitsu.iroha.view.TransactionHistoryView;
@@ -115,30 +116,37 @@ public class TransactionHistoryPresenter implements Presenter<TransactionHistory
 
                     @Override
                     public void onFailure(Throwable throwable) {
-                        fail();
+                        fail(throwable);
                     }
                 });
             }
 
             @Override
             public void onFailure(Throwable throwable) {
-                fail();
+                fail(throwable);
             }
         });
     }
 
-    private void fail() {
+    private void fail(Throwable throwable) {
         if (transactionHistoryView.isRefreshing()) {
             transactionHistoryView.setRefreshing(false);
         }
 
         transactionHistoryView.hideProgressDialog();
 
+        final Context context = transactionHistoryView.getContext();
         if (NetworkUtil.isOnline(transactionHistoryView.getContext())) {
-            transactionHistoryView.showError(transactionHistoryView.getContext().getString(R.string.error_message_retry_again));
+            transactionHistoryView.showError(
+                    ErrorMessageFactory.create(context, throwable)
+            );
         } else {
-            transactionHistoryView.showError(transactionHistoryView.getContext().getString(R.string.error_message_check_network_state));
+            transactionHistoryView.showError(
+                    ErrorMessageFactory.create(context, new NetworkNotConnectedException())
+            );
         }
+
+        transactionHistoryView.renderTransactionHistory(TransactionHistory.createMock());
     }
 
     public SwipeRefreshLayout.OnRefreshListener onSwipeRefresh() {

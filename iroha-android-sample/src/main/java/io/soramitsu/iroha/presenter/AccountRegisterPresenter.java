@@ -6,7 +6,8 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
-import io.soramitsu.iroha.R;
+import io.soramitsu.iroha.exception.ErrorMessageFactory;
+import io.soramitsu.iroha.exception.RequiredArgumentException;
 import io.soramitsu.iroha.view.AccountRegisterView;
 import io.soramitsu.irohaandroid.Iroha;
 import io.soramitsu.irohaandroid.KeyGenerator;
@@ -78,7 +79,7 @@ public class AccountRegisterPresenter implements Presenter<AccountRegisterView> 
 
                 if (alias.isEmpty()) {
                     accountRegisterView.showError(
-                            context.getString(R.string.validation_message_required, context.getString(R.string.name))
+                            ErrorMessageFactory.create(context, new RequiredArgumentException())
                     );
                     return;
                 }
