@@ -1,0 +1,24 @@
+machine:
+  environment:
+    ANDROID_HOME: /usr/local/android-sdk-linux
+    JAVA_OPTS: "-Xms512m -Xmx1024m"
+    GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
+  java:
+    version: 'oraclejdk8'
+
+dependencies:
+  pre:
+    - echo y | android update sdk --no-ui --all --filter "android-25,build-tools-25.0.1,extra-android-m2repository,extra-android-support"
+  cache_directories:
+      - ~/.android
+  override:
+    - ./gradlew dependencies
+
+test:
+  override:
+    - echo "Nothing to do here"
+#    - ./gradlew clean assembleProductionDebug check
+
+general:
+  artifacts:
+    - "app/build/outputs/apk/app-production-release.apk"
