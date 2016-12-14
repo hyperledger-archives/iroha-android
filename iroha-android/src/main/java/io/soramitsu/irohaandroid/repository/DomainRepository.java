@@ -11,6 +11,6 @@ public interface DomainRepository {
     DomainEntity register(DomainRegisterRequest body)
             throws IOException, HttpBadRequestException;
 
-    DomainListEntity findDomains()
+    DomainListEntity findDomains(int limit, int offset)
             throws IOException, HttpBadRequestException;
 }

@@ -39,9 +39,9 @@ public class DomainRepositoryImpl implements DomainRepository {
     }
 
     @Override
-    public DomainListEntity findDomains()
+    public DomainListEntity findDomains(int limit, int offset)
             throws IOException, HttpBadRequestException {
-        Request request = createRequest(Routes.DOMAIN_LIST);
+        Request request = createRequest(Routes.DOMAIN_LIST + "?limit=" + limit + "&offset=" + offset);
         Response response = httpClient.call(request);
 
         switch (response.code()) {

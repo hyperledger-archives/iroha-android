@@ -21,17 +21,31 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     private Gson gson = new Gson();
 
     @Override
-    public TransactionListEntity findHistory(String uuid)
+    public TransactionListEntity findHistory(String uuid, int limit, int offset)
             throws IOException, HttpBadRequestException {
 
-        return findHistory(createRequest(Routes.TRANSACTION_HISTORY_WITH_UUID + uuid));
+        return findHistory(
+                createRequest(
+                        Routes.TRANSACTION_HISTORY_WITH_UUID
+                                + "?uuid=" + uuid
+                                + "&limit=" + limit
+                                + "&offset=" + offset
+                )
+        );
     }
 
     @Override
-    public TransactionListEntity findHistory(String uuid, String domain, String asset)
+    public TransactionListEntity findHistory(String uuid, String domain, String asset, int limit, int offset)
             throws IOException, HttpBadRequestException {
 
-        return findHistory(createRequest(Routes.TRANSACTION_HISTORY(domain, asset) + uuid));
+        return findHistory(
+                createRequest(
+                        Routes.TRANSACTION_HISTORY(domain, asset)
+                                + "?uuid=" + uuid
+                                + "&limit=" + limit
+                                + "&offset=" + offset
+                )
+        );
     }
 
     private TransactionListEntity findHistory(Request request)
@@ -40,7 +54,8 @@ public class TransactionRepositoryImpl implements TransactionRepository {
 
         switch (response.code()) {
             case 200:
-                return gson.fromJson(response.body().string(), new TypeToken<TransactionListEntity>(){}.getType());
+                return gson.fromJson(response.body().string(), new TypeToken<TransactionListEntity>() {
+                }.getType());
             default:
                 throw new HttpBadRequestException();
         }

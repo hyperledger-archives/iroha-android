@@ -55,7 +55,7 @@ public class Iroha {
         new IrohaAsyncTask<Account>(callback) {
             @Override
             protected Account onBackground() throws Exception {
-                    return accountService.register(publicKey, alias);
+                return accountService.register(publicKey, alias);
             }
         }.execute();
     }
@@ -64,7 +64,7 @@ public class Iroha {
         new IrohaAsyncTask<Account>(callback) {
             @Override
             protected Account onBackground() throws Exception {
-                    return accountService.findAccount(uuid);
+                return accountService.findAccount(uuid);
             }
         }.execute();
     }
@@ -79,11 +79,11 @@ public class Iroha {
         }.execute();
     }
 
-    public void findDomains(Callback<List<Domain>> callback) {
+    public void findDomains(final int limit, final int offset, Callback<List<Domain>> callback) {
         new IrohaAsyncTask<List<Domain>>(callback) {
             @Override
             protected List<Domain> onBackground() throws Exception {
-                return domainService.findDomains();
+                return domainService.findDomains(limit, offset);
             }
         }.execute();
     }
@@ -98,17 +98,18 @@ public class Iroha {
         }.execute();
     }
 
-    public void findAssets(final String domain, Callback<List<Asset>> callback) {
+    public void findAssets(final String domain, final int limit, final int offset, Callback<List<Asset>> callback) {
         new IrohaAsyncTask<List<Asset>>(callback) {
             @Override
             protected List<Asset> onBackground() throws Exception {
-                return assetService.findAssets(domain);
+                return assetService.findAssets(domain, limit, offset);
             }
         }.execute();
     }
 
     public void operationAsset(final String assetUuid, final String command, final String value,
-                               final String sender, final String receiver, final String signature, Callback<Boolean> callback) {
+                               final String sender, final String receiver, final String signature,
+                               Callback<Boolean> callback) {
         new IrohaAsyncTask<Boolean>(callback) {
             @Override
             protected Boolean onBackground() throws Exception {
@@ -117,20 +118,22 @@ public class Iroha {
         }.execute();
     }
 
-    public void findTransactionHistory(final String uuid, Callback<List<Transaction>> callback) {
+    public void findTransactionHistory(final String uuid, final int limit, final int offset,
+                                       Callback<List<Transaction>> callback) {
         new IrohaAsyncTask<List<Transaction>>(callback) {
             @Override
             protected List<Transaction> onBackground() throws Exception {
-                return transactionService.findHistory(uuid);
+                return transactionService.findHistory(uuid, limit, offset);
             }
         }.execute();
     }
 
-    public void findTransactionHistory(final String uuid, final String domain, final String asset, Callback<List<Transaction>> callback) {
+    public void findTransactionHistory(final String uuid, final String domain, final String asset,
+                                       final int limit, final int offset, Callback<List<Transaction>> callback) {
         new IrohaAsyncTask<List<Transaction>>(callback) {
             @Override
             protected List<Transaction> onBackground() throws Exception {
-                return transactionService.findHistory(uuid, domain, asset);
+                return transactionService.findHistory(uuid, domain, asset, limit, offset);
             }
         }.execute();
     }

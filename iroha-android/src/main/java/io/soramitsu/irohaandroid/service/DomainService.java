@@ -27,8 +27,8 @@ public class DomainService {
         return domainEntityDataMapper.transform(domainRepository.register(body));
     }
 
-    public List<Domain> findDomains()
+    public List<Domain> findDomains(final int limit, final int offset)
             throws IOException, HttpBadRequestException {
-        return domainEntityDataMapper.transform(domainRepository.findDomains());
+        return domainEntityDataMapper.transform(domainRepository.findDomains(limit, offset));
     }
 }

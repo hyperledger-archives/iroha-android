@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.WindowManager;
 
 import io.soramitsu.irohaandroid.R;
 import io.soramitsu.irohaandroid.callback.Callback;
@@ -27,6 +28,10 @@ public abstract class QRReaderActivity extends AppCompatActivity implements Surf
 
         surfaceView = (SurfaceView) findViewById(R.id.surface_view);
         surfaceView.getHolder().addCallback(this);
+
+        WindowManager.LayoutParams lp = getWindow().getAttributes();
+        lp.screenBrightness = 1.0f;
+        getWindow().setAttributes(lp);
     }
 
     @Override

@@ -12,7 +12,7 @@ public interface AssetRepository {
     AssetEntity create(AssetRegisterRequest body)
             throws IOException, HttpBadRequestException;
 
-    AssetListEntity findAssets(String domain)
+    AssetListEntity findAssets(String domain, int limit, int offset)
             throws IOException, HttpBadRequestException;
 
     boolean operation(AssetOperationRequest body)

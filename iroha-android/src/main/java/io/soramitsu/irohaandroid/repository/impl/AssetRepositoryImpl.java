@@ -39,8 +39,9 @@ public class AssetRepositoryImpl implements AssetRepository {
     }
 
     @Override
-    public AssetListEntity findAssets(String domain) throws IOException, HttpBadRequestException {
-        Request request = createRequest("/" + domain + Routes.ASSET_LIST);
+    public AssetListEntity findAssets(String domain, int limit, int offset)
+            throws IOException, HttpBadRequestException {
+        Request request = createRequest("/" + domain + Routes.ASSET_LIST + "?limit=" + limit + "&offset=" + offset);
         Response response = httpClient.call(request);
 
         switch (response.code()) {

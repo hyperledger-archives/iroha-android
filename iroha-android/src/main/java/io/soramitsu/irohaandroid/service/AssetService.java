@@ -30,9 +30,9 @@ public class AssetService {
         return assetEntityDataMapper.transform(assetRepository.create(body));
     }
 
-    public List<Asset> findAssets(String domain)
+    public List<Asset> findAssets(String domain, int limit, int offset)
             throws IOException, HttpBadRequestException {
-        return assetEntityDataMapper.transform(assetRepository.findAssets(domain));
+        return assetEntityDataMapper.transform(assetRepository.findAssets(domain, limit, offset));
     }
 
     public boolean operation(String assetUuid, String command, String value,

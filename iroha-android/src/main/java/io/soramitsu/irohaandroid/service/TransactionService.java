@@ -14,13 +14,13 @@ public class TransactionService {
     private final TransactionRepository transactionRepository = new TransactionRepositoryImpl();
     private final TransactionEntityDataMapper transactionEntityDataMapper = new TransactionEntityDataMapper();
 
-    public List<Transaction> findHistory(String uuid)
+    public List<Transaction> findHistory(String uuid, int limit, int offset)
             throws IOException, HttpBadRequestException {
-        return transactionEntityDataMapper.transform(transactionRepository.findHistory(uuid));
+        return transactionEntityDataMapper.transform(transactionRepository.findHistory(uuid, limit, offset));
     }
 
-    public List<Transaction> findHistory(String uuid, String domain, String asset)
+    public List<Transaction> findHistory(String uuid, String domain, String asset, int limit, int offset)
             throws IOException, HttpBadRequestException {
-        return transactionEntityDataMapper.transform(transactionRepository.findHistory(uuid, domain, asset));
+        return transactionEntityDataMapper.transform(transactionRepository.findHistory(uuid, domain, asset, limit, offset));
     }
 }
