@@ -1,5 +1,6 @@
-package io.soramitsu.irohaandroid;
+package io.soramitsu.irohaandroid.security;
 
+import io.soramitsu.irohaandroid.Ed25519;
 import io.soramitsu.irohaandroid.model.KeyPair;
 
 public class KeyGenerator {

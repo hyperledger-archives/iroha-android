@@ -9,10 +9,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import io.soramitsu.irohaandroid.model.KeyPair;
+import io.soramitsu.irohaandroid.security.MessageDigest;
 
-import static io.soramitsu.irohaandroid.KeyGenerator.createKeyPair;
-import static io.soramitsu.irohaandroid.KeyGenerator.sign;
-import static io.soramitsu.irohaandroid.KeyGenerator.verify;
+import static io.soramitsu.irohaandroid.security.KeyGenerator.createKeyPair;
+import static io.soramitsu.irohaandroid.security.KeyGenerator.sign;
+import static io.soramitsu.irohaandroid.security.KeyGenerator.verify;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 

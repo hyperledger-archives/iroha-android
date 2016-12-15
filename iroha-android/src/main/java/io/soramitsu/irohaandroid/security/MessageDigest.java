@@ -1,4 +1,4 @@
-package io.soramitsu.irohaandroid;
+package io.soramitsu.irohaandroid.security;
 
 import org.bouncycastle.jcajce.provider.digest.SHA3;
 
