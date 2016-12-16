@@ -5,7 +5,7 @@ public class Routes {
     }
 
     public static final String ACCOUNT_REGISTER = "/account/register";
-    public static final String ACCOUNT_INFO = "/account?uuid=";
+    public static final String ACCOUNT_INFO = "/account";
 
     public static final String DOMAIN_REGISTER = "/domain/register";
     public static final String DOMAIN_LIST = "/domain/list";

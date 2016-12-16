@@ -44,7 +44,7 @@ public class AccountRepositoryImpl implements AccountRepository {
     @Override
     public AccountEntity findByUuid(String uuid)
             throws IOException, UserNotFoundException, HttpBadRequestException {
-        Request request = IrohaHttpClient.createRequest(Routes.ACCOUNT_INFO + uuid);
+        Request request = IrohaHttpClient.createRequest(Routes.ACCOUNT_INFO + "?uuid=" + uuid);
         Response response = httpClient.call(request);
 
         switch (response.code()) {
