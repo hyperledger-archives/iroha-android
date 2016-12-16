@@ -21,6 +21,15 @@ public class Iroha {
     private final AssetService assetService = new AssetService();
     private final TransactionService transactionService = new TransactionService();
 
+    private IrohaAsyncTask<Account> accountRegisterAsyncTask;
+    private IrohaAsyncTask<Account> findAccountAsyncTask;
+    private IrohaAsyncTask<Domain> domainRegisterAsyncTask;
+    private IrohaAsyncTask<List<Domain>> findDomainsAsyncTask;
+    private IrohaAsyncTask<Asset> createAssetAsyncTask;
+    private IrohaAsyncTask<List<Asset>> findAssetsAsyncTask;
+    private IrohaAsyncTask<Boolean> operationAssetAsyncTask;
+    private IrohaAsyncTask<List<Transaction>> findTransactionHistoryAsyncTask;
+
     public String baseUrl;
 
     private Iroha(Builder builder) {
@@ -52,89 +61,130 @@ public class Iroha {
     }
 
     public void registerAccount(final String publicKey, final String alias, Callback<Account> callback) {
-        new IrohaAsyncTask<Account>(callback) {
+        accountRegisterAsyncTask = new IrohaAsyncTask<Account>(callback) {
             @Override
             protected Account onBackground() throws Exception {
                 return accountService.register(publicKey, alias);
             }
-        }.execute();
+        };
+        accountRegisterAsyncTask.execute();
+    }
+
+    public boolean cancelRegisterAccount() {
+        return accountRegisterAsyncTask != null && accountRegisterAsyncTask.cancel(true);
     }
 
     public void findAccount(final String uuid, final Callback<Account> callback) {
-        new IrohaAsyncTask<Account>(callback) {
+        findAccountAsyncTask = new IrohaAsyncTask<Account>(callback) {
             @Override
             protected Account onBackground() throws Exception {
                 return accountService.findAccount(uuid);
             }
-        }.execute();
+        };
+        findAccountAsyncTask.execute();
+    }
+
+    public boolean cancelFindAccount() {
+        return findAccountAsyncTask != null && findAccountAsyncTask.cancel(true);
     }
 
     public void registerDomain(final String name, final String owner,
                                final String signature, Callback<Domain> callback) {
-        new IrohaAsyncTask<Domain>(callback) {
+        domainRegisterAsyncTask = new IrohaAsyncTask<Domain>(callback) {
             @Override
             protected Domain onBackground() throws Exception {
                 return domainService.register(name, owner, signature);
             }
-        }.execute();
+        };
+        domainRegisterAsyncTask.execute();
+    }
+
+    public boolean cancelRegisterDomain() {
+        return domainRegisterAsyncTask != null && domainRegisterAsyncTask.cancel(true);
     }
 
     public void findDomains(final int limit, final int offset, Callback<List<Domain>> callback) {
-        new IrohaAsyncTask<List<Domain>>(callback) {
+        findDomainsAsyncTask = new IrohaAsyncTask<List<Domain>>(callback) {
             @Override
             protected List<Domain> onBackground() throws Exception {
                 return domainService.findDomains(limit, offset);
             }
-        }.execute();
+        };
+        findDomainsAsyncTask.execute();
+    }
+
+    public boolean cancelFindDomains() {
+        return findDomainsAsyncTask != null && findDomainsAsyncTask.cancel(true);
     }
 
     public void createAsset(final String name, final String domain,
                             final String creator, final String signature, Callback<Asset> callback) {
-        new IrohaAsyncTask<Asset>(callback) {
+        createAssetAsyncTask = new IrohaAsyncTask<Asset>(callback) {
             @Override
             protected Asset onBackground() throws Exception {
                 return assetService.create(name, domain, creator, signature);
             }
-        }.execute();
+        };
+        createAssetAsyncTask.execute();
+    }
+
+    public boolean cancelCreateAsset() {
+        return createAssetAsyncTask != null && createAssetAsyncTask.cancel(true);
     }
 
     public void findAssets(final String domain, final int limit, final int offset, Callback<List<Asset>> callback) {
-        new IrohaAsyncTask<List<Asset>>(callback) {
+        findAssetsAsyncTask = new IrohaAsyncTask<List<Asset>>(callback) {
             @Override
             protected List<Asset> onBackground() throws Exception {
                 return assetService.findAssets(domain, limit, offset);
             }
-        }.execute();
+        };
+        findAssetsAsyncTask.execute();
+    }
+
+    public boolean cancelFindAssets() {
+        return findAssetsAsyncTask != null && findAssetsAsyncTask.cancel(true);
     }
 
     public void operationAsset(final String assetUuid, final String command, final String value,
                                final String sender, final String receiver, final String signature,
                                Callback<Boolean> callback) {
-        new IrohaAsyncTask<Boolean>(callback) {
+       operationAssetAsyncTask =  new IrohaAsyncTask<Boolean>(callback) {
             @Override
             protected Boolean onBackground() throws Exception {
                 return assetService.operation(assetUuid, command, value, sender, receiver, signature);
             }
-        }.execute();
+        };
+        operationAssetAsyncTask.execute();
+    }
+
+    public boolean cancelOperationAsset() {
+        return operationAssetAsyncTask != null && operationAssetAsyncTask.cancel(true);
     }
 
     public void findTransactionHistory(final String uuid, final int limit, final int offset,
                                        Callback<List<Transaction>> callback) {
-        new IrohaAsyncTask<List<Transaction>>(callback) {
+        findTransactionHistoryAsyncTask = new IrohaAsyncTask<List<Transaction>>(callback) {
             @Override
             protected List<Transaction> onBackground() throws Exception {
                 return transactionService.findHistory(uuid, limit, offset);
             }
-        }.execute();
+        };
+        findTransactionHistoryAsyncTask.execute();
     }
 
     public void findTransactionHistory(final String uuid, final String domain, final String asset,
                                        final int limit, final int offset, Callback<List<Transaction>> callback) {
-        new IrohaAsyncTask<List<Transaction>>(callback) {
+        findTransactionHistoryAsyncTask = new IrohaAsyncTask<List<Transaction>>(callback) {
             @Override
             protected List<Transaction> onBackground() throws Exception {
                 return transactionService.findHistory(uuid, domain, asset, limit, offset);
             }
-        }.execute();
+        };
+        findTransactionHistoryAsyncTask.execute();
+    }
+
+    public boolean cancelFindTransactionHistory() {
+        return findTransactionHistoryAsyncTask != null && findTransactionHistoryAsyncTask.cancel(true);
     }
 }

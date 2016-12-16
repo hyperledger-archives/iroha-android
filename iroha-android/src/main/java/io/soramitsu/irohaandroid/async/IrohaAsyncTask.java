@@ -39,4 +39,10 @@ public abstract class IrohaAsyncTask<T> extends AsyncTask<Void, Void, Void> {
 
         callback.onSuccessful(result);
     }
+
+    @Override
+    protected void onCancelled() {
+        super.onCancelled();
+        Log.d(TAG, "onCancelled: ");
+    }
 }
