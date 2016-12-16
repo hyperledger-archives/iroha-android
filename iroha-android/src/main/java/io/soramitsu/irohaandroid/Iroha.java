@@ -147,12 +147,11 @@ public class Iroha {
     }
 
     public void operationAsset(final String assetUuid, final String command, final String value,
-                               final String sender, final String receiver, final String signature,
-                               Callback<Boolean> callback) {
+                               final String sender, final String receiver, Callback<Boolean> callback) {
        operationAssetAsyncTask =  new IrohaAsyncTask<Boolean>(callback) {
             @Override
             protected Boolean onBackground() throws Exception {
-                return assetService.operation(assetUuid, command, value, sender, receiver, signature);
+                return assetService.operation(assetUuid, command, value, sender, receiver);
             }
         };
         operationAssetAsyncTask.execute();

@@ -11,6 +11,7 @@ import io.soramitsu.irohaandroid.net.dataset.reqest.AssetOperationRequest;
 import io.soramitsu.irohaandroid.net.dataset.reqest.AssetRegisterRequest;
 import io.soramitsu.irohaandroid.repository.AssetRepository;
 import io.soramitsu.irohaandroid.repository.impl.AssetRepositoryImpl;
+import io.soramitsu.irohaandroid.security.MessageDigest;
 
 public class AssetService {
 
@@ -36,7 +37,7 @@ public class AssetService {
     }
 
     public boolean operation(String assetUuid, String command, String value,
-                             String sender, String receiver, String signature)
+                             String sender, String receiver)
             throws IOException, HttpBadRequestException {
 
         final AssetOperationRequest body = new AssetOperationRequest();
@@ -46,9 +47,19 @@ public class AssetService {
         body.params.value = value;
         body.params.sender = sender;
         body.params.receiver = receiver;
-        body.signature = signature;
         body.timestamp = System.currentTimeMillis() / 1000;
+        body.signature = MessageDigest.digest(generateMessage(body), MessageDigest.Algorithm.SHA3_256);
 
         return assetRepository.operation(body);
+    }
+
+    private String generateMessage(AssetOperationRequest body) {
+        Transaction.OperationParameter params = body.params;
+        return "timestamp:" + body.timestamp
+                + ",value:" + params.value
+                + ",sender:" + params.sender
+                + ",receiver:" + params.receiver
+                + ",command:" + params.command
+                + ",asset-uuid:" + body.uuid;
     }
 }
