@@ -2,6 +2,7 @@ package io.soramitsu.irohaandroid.model;
 
 import android.content.Context;
 
+import java.io.File;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.KeyStoreException;
@@ -28,19 +29,13 @@ public class KeyPair implements KeyPairCache {
 
         KeyStoreManager keyStoreManager = new KeyStoreManager.Builder(context).build();
 
-        String privateKey = keyStoreManager.decrypt(fileManager.readFileContent(context.getExternalFilesDir("private_key.txt")));
-        String publicKey = keyStoreManager.decrypt(fileManager.readFileContent(context.getExternalFilesDir("public_key.txt")));
+        File extStorage = context.getExternalFilesDir("keypair");
+        File privateKeyFile = new File(extStorage, "private_key.txt");
+        File publicKeyFile = new File(extStorage, "public_key.txt");
 
-//        String privateKey = fileManager.getStringFromPreferences(
-//                context,
-//                FileManager.PREFERENCES_FILE_NAME,
-//                KeyPairCache.PREFERENCES_KEY_PRIVATE_KEY
-//        );
-//        String publicKey = fileManager.getStringFromPreferences(
-//                context,
-//                FileManager.PREFERENCES_FILE_NAME,
-//                KeyPairCache.PREFERENCES_KEY_PUBLIC_KEY
-//        );
+        String privateKey = keyStoreManager.decrypt(fileManager.readFileContent(privateKeyFile));
+        String publicKey = keyStoreManager.decrypt(fileManager.readFileContent(publicKeyFile));
+
         return new KeyPair(privateKey, publicKey);
     }
 
@@ -59,20 +54,12 @@ public class KeyPair implements KeyPairCache {
         String encryptedPrivateKey = keyStoreManager.encrypt(privateKey);
         String encryptedPublicKey = keyStoreManager.encrypt(publicKey);
 
-        fileManager.writeToFile(context.getExternalFilesDir("private_key.txt"), encryptedPrivateKey);
-        fileManager.writeToFile(context.getExternalFilesDir("public_key.txt"), encryptedPublicKey);
-//        fileManager.writeToPreferences(
-//                context,
-//                FileManager.PREFERENCES_FILE_NAME,
-//                KeyPairCache.PREFERENCES_KEY_PRIVATE_KEY,
-//                privateKey
-//        );
-//        fileManager.writeToPreferences(
-//                context,
-//                FileManager.PREFERENCES_FILE_NAME,
-//                KeyPairCache.PREFERENCES_KEY_PUBLIC_KEY,
-//                publicKey
-//        );
+        File extStorage = context.getExternalFilesDir("keypair");
+        File privateKeyFile = new File(extStorage, "private_key.txt");
+        File publicKeyFile = new File(extStorage, "public_key.txt");
+
+        fileManager.writeToFile(privateKeyFile, encryptedPrivateKey);
+        fileManager.writeToFile(publicKeyFile, encryptedPublicKey);
     }
 
     @Override
@@ -80,12 +67,6 @@ public class KeyPair implements KeyPairCache {
         FileManager fileManager = new FileManager();
         fileManager.clearDirectory(context.getExternalFilesDir("private_key.txt"));
         fileManager.clearDirectory(context.getExternalFilesDir("public_key.txt"));
-//        fileManager.removeFromPreferences(
-//                context,
-//                FileManager.PREFERENCES_FILE_NAME,
-//                KeyPairCache.PREFERENCES_KEY_PRIVATE_KEY,
-//                KeyPairCache.PREFERENCES_KEY_PUBLIC_KEY
-//        );
     }
 
     public boolean isEmpty() {
