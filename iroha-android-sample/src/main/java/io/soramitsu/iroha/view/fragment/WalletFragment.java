@@ -4,6 +4,7 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,22 +13,24 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import io.soramitsu.iroha.R;
-import io.soramitsu.iroha.databinding.FragmentTransactionHistoryBinding;
+import io.soramitsu.iroha.databinding.FragmentWalletBinding;
 import io.soramitsu.iroha.model.TransactionHistory;
-import io.soramitsu.iroha.presenter.TransactionHistoryPresenter;
-import io.soramitsu.iroha.view.TransactionHistoryView;
+import io.soramitsu.iroha.presenter.WalletPresenter;
+import io.soramitsu.iroha.view.WalletView;
 import io.soramitsu.iroha.view.activity.MainActivity;
 import io.soramitsu.iroha.view.adapter.TransactionListAdapter;
 import io.soramitsu.irohaandroid.model.KeyPair;
 import io.soramitsu.irohaandroid.model.Transaction;
 
-public class TransactionHistoryFragment extends Fragment
-        implements TransactionHistoryView, MainActivity.MainActivityListener {
-    public static final String TAG = TransactionHistoryFragment.class.getSimpleName();
+public class WalletFragment extends Fragment
+        implements WalletView, MainActivity.MainActivityListener {
+    public static final String TAG = WalletFragment.class.getSimpleName();
 
-    private TransactionHistoryPresenter transactionHistoryPresenter = new TransactionHistoryPresenter();
+    private static final String ARG_WALLET_KEY_UUID = "uuid";
 
-    private FragmentTransactionHistoryBinding binding;
+    private WalletPresenter walletPresenter = new WalletPresenter();
+
+    private FragmentWalletBinding binding;
     private TransactionListAdapter transactionListAdapter;
 
     private TransactionHistory transactionHistory;
@@ -36,22 +39,26 @@ public class TransactionHistoryFragment extends Fragment
         SWIPE_UP, RE_CREATED_FRAGMENT, EMPTY_REFRESH
     }
 
-    public static TransactionHistoryFragment newInstance() {
-        TransactionHistoryFragment fragment = new TransactionHistoryFragment();
+    public static WalletFragment newInstance(String uuid) {
+        WalletFragment fragment = new WalletFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_WALLET_KEY_UUID, uuid);
+        fragment.setArguments(args);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        transactionHistoryPresenter.setView(this);
-        transactionHistoryPresenter.onCreate();
+        walletPresenter.setView(this);
+        walletPresenter.setUuid(getArguments().getString(ARG_WALLET_KEY_UUID));
+        walletPresenter.onCreate();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_transaction_history, container, false);
+        return inflater.inflate(R.layout.fragment_wallet, container, false);
     }
 
     @Override
@@ -59,20 +66,27 @@ public class TransactionHistoryFragment extends Fragment
         super.onViewCreated(view, savedInstanceState);
         binding = DataBindingUtil.bind(view);
         binding.swipeRefresh.setColorSchemeResources(R.color.red600, R.color.green600, R.color.blue600, R.color.orange600);
-        binding.swipeRefresh.setOnRefreshListener(transactionHistoryPresenter.onSwipeRefresh());
-        binding.transactionList.setOnScrollListener(transactionHistoryPresenter.onTransactionListScroll());
+        binding.swipeRefresh.setOnRefreshListener(walletPresenter.onSwipeRefresh());
+        binding.transactionList.setOnScrollListener(walletPresenter.onTransactionListScroll());
         binding.transactionList.setEmptyView(binding.emptyView);
-        binding.emptyText.setOnClickListener(transactionHistoryPresenter.onRefresh());
+        binding.emptyText.setOnClickListener(walletPresenter.onRefresh());
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        String publicKey = null;
+        try {
+            publicKey = KeyPair.getKeyPair(getContext()).publicKey;
+        } catch (Exception e) {
+            Log.e(TAG, "onActivityCreated: ", e);
+        }
+
         transactionListAdapter = new TransactionListAdapter(
                 getContext(),
-                new ArrayList<Transaction>(), // TODO mock用
-                KeyPair.getKeyPair(getContext()).publicKey
+                new ArrayList<Transaction>(),
+                publicKey
         );
         binding.transactionList.setAdapter(transactionListAdapter);
 
@@ -84,21 +98,22 @@ public class TransactionHistoryFragment extends Fragment
     @Override
     public void onStart() {
         super.onStart();
-        transactionHistoryPresenter.onStart();
-        transactionHistoryPresenter.transactionHistory(RefreshState.RE_CREATED_FRAGMENT);
+        walletPresenter.onStart();
+        walletPresenter.transactionHistory(RefreshState.RE_CREATED_FRAGMENT);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        transactionHistoryPresenter.onResume();
+        walletPresenter.onResume();
     }
 
     @Override
     public void onPause() {
-        transactionHistoryPresenter.onPause();
+        walletPresenter.onPause();
         super.onPause();
     }
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -107,13 +122,13 @@ public class TransactionHistoryFragment extends Fragment
 
     @Override
     public void onStop() {
-        transactionHistoryPresenter.onStop();
+        walletPresenter.onStop();
         super.onStop();
     }
 
     @Override
     public void onDestroy() {
-        transactionHistoryPresenter.onDestroy();
+        walletPresenter.onDestroy();
         super.onDestroy();
     }
 
@@ -145,19 +160,21 @@ public class TransactionHistoryFragment extends Fragment
     @Override
     public void renderTransactionHistory(final TransactionHistory transactionHistory) {
         this.transactionHistory = transactionHistory;
-        binding.pocketMoney.setText(getString(R.string.has_asset_amount, transactionHistory.value));
+        if (transactionHistory.value != null) {
+            binding.pocketMoney.setText(getString(R.string.has_asset_amount, transactionHistory.value));
+        }
         transactionListAdapter.setItems(this.transactionHistory.histories);
         transactionListAdapter.notifyDataSetChanged();
     }
 
     @Override
-    public void showProgressDialog() {
+    public void showProgress() {
         binding.progressBar.setVisibility(View.VISIBLE);
         binding.transactionList.setVisibility(View.GONE);
     }
 
     @Override
-    public void hideProgressDialog() {
+    public void hideProgress() {
         binding.progressBar.setVisibility(View.GONE);
         binding.transactionList.setVisibility(View.VISIBLE);
     }

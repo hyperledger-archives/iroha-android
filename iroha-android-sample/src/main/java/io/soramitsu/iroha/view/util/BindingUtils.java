@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.TextView;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.util.AndroidSupportUtil;
 import io.soramitsu.irohaandroid.model.Transaction;
@@ -19,13 +20,15 @@ import io.soramitsu.irohaandroid.model.Transaction;
 @SuppressWarnings("unused")
 public final class BindingUtils {
     @BindingAdapter({"background", "public_key", "context"})
-    public static void setTransactionTypeBackgroundDrawable(View view, Transaction transaction, String publicKey, Context c) {
-        Drawable target;
+    public static void setBackgroundDrawableByTransactionType(
+            CircleImageView view, Transaction transaction, String publicKey, Context c) {
+
+        final Drawable target;
 
         if (transaction.isSender(publicKey)) {
-            target = AndroidSupportUtil.getDrawable(c, R.drawable.shape_rounded_corners_send);
+            target = AndroidSupportUtil.getDrawable(c, R.drawable.icon_rec);
         } else {
-            target = AndroidSupportUtil.getDrawable(c, R.drawable.shape_rounded_corners_receiver);
+            target = AndroidSupportUtil.getDrawable(c, R.drawable.icon_send);
         }
 
         view.setBackground(target);
@@ -41,7 +44,7 @@ public final class BindingUtils {
             type = "from ";
         }
 
-        String displayText = type + transaction.params.oppoent;
+        String displayText = type + transaction.params.receiver;
         textView.setText(displayText);
     }
 }

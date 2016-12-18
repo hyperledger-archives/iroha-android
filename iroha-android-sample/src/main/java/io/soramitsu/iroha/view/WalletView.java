@@ -2,7 +2,7 @@ package io.soramitsu.iroha.view;
 
 import io.soramitsu.iroha.model.TransactionHistory;
 
-public interface TransactionHistoryView extends LoadingView {
+public interface WalletView extends LoadingView {
     boolean isRefreshing();
 
     void setRefreshing(boolean refreshing);

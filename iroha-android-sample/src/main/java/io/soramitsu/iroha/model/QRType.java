@@ -1,7 +1,7 @@
 package io.soramitsu.iroha.model;
 
 public enum QRType {
-    GIFT("gift"), TRANSFER("trans");
+    GIFT("gift"), TRANSFER("transfer");
 
     private String type;
 

@@ -27,7 +27,7 @@
             android:id="@+id/container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="16dp">
+            android:padding="8dp">
 
             <TextView
                 android:id="@+id/transfer_amount"
@@ -37,21 +37,21 @@
                 android:layout_centerVertical="true"
                 android:layout_marginEnd="8dp"
                 android:gravity="center"
-                android:text='@{transaction.params.value + " iroha"}'
-                android:textColor="@color/colorPrimary"
+                android:text="@{transaction.params.value}"
+                android:textColor="@color/primary_text"
                 android:textSize="24sp"
                 tools:text="100 iroha" />
 
-            <View
+            <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/state"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_alignTop="@id/transfer_amount"
                 android:layout_centerVertical="true"
                 app:background="@{transaction}"
                 app:context="@{context}"
                 app:public_key="@{publicKey}"
-                tools:background="@drawable/shape_rounded_corners_receiver" />
+                tools:src="@drawable/icon_rec" />
 
             <TextView
                 android:id="@+id/trading_partner_name"

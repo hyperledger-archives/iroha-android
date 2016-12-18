@@ -23,9 +23,9 @@ public class ErrorMessageFactory {
             message = context.getString(R.string.error_message_account_duplicate);
         } else if (exception instanceof LargeNumberOfDigitsException) {
             message = context.getString(R.string.error_message_large_number_of_digits);
-        } else if (exception instanceof IlligalQRCodeException) {
+        } else if (exception instanceof IllegalQRCodeException) {
             message = context.getString(R.string.error_message_illegal_qr);
-        } else if (exception instanceof IlligalRequestAmountException) {
+        } else if (exception instanceof IllegalRequestAmountException) {
             message = context.getString(R.string.error_message_request_amount_is_incorrect);
         } else if (exception instanceof SelfSendCanNotException) {
             message = context.getString(R.string.error_message_cannot_send_to_myself);
@@ -33,6 +33,8 @@ public class ErrorMessageFactory {
             message = context.getString(R.string.validation_message_required, (Object[]) params);
         } else if (exception instanceof WriterException) {
             message = context.getString(R.string.error_message_cannot_generate_qr);
+        } else if (exception instanceof ReceiverNotFoundException) {
+            message = context.getString(R.string.error_receiver_not_found);
         } else if (exception instanceof NetworkNotConnectedException) {
             message = context.getString(R.string.error_message_check_network_state);
         } else if (exception instanceof HttpBadRequestException) {

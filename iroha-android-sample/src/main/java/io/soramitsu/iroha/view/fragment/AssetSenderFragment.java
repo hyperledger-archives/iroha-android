@@ -13,7 +13,6 @@ import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.databinding.FragmentAssetSenderBinding;
 import io.soramitsu.iroha.navigator.Navigator;
 import io.soramitsu.iroha.presenter.AssetSenderPresenter;
-import io.soramitsu.iroha.util.AndroidSupportUtil;
 import io.soramitsu.iroha.view.AssetSenderView;
 import io.soramitsu.iroha.view.activity.MainActivity;
 import io.soramitsu.iroha.view.dialog.ErrorDialog;
@@ -56,22 +55,18 @@ public class AssetSenderFragment extends Fragment
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         binding = DataBindingUtil.bind(view);
-        View.OnClickListener onQRShowClickListener = assetSenderPresenter.onQRShowClicked();
-        binding.qrImage.setOnClickListener(onQRShowClickListener);
-        binding.qrLabel.setOnClickListener(onQRShowClickListener);
-        binding.resetButton.setOnClickListener(assetSenderPresenter.onResetClicked());
+        binding.qrButton.setOnClickListener(assetSenderPresenter.onQRShowClicked());
         binding.submitButton.setOnClickListener(assetSenderPresenter.onSubmitClicked());
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        if (binding.accountNum.getText().length() != 0) {
-            Log.d(TAG, "onStart: " + binding.hiddenReceiverPublicKey.getText().toString());
+        if (binding.receiver.getText().length() != 0) {
+            Log.d(TAG, "onStart: " + binding.receiver.getText().toString());
             afterQRReadViewState(
-                    binding.accountNum.getText().toString(),
-                    binding.hiddenReceiverPublicKey.getText().toString(),
-                    binding.remittanceAmount.getText().toString()
+                    binding.receiver.getText().toString(),
+                    binding.amount.getText().toString()
             );
         } else {
             beforeQRReadViewState();
@@ -101,18 +96,13 @@ public class AssetSenderFragment extends Fragment
 
     @Override
     public String getAmount() {
-        return binding.remittanceAmount.getText().toString();
+        return binding.amount.getText().toString();
     }
 
     @Override
     public String getReceiver() {
-        Log.d(TAG, "getReceiver: " + binding.hiddenReceiverPublicKey.getText().toString());
-        return binding.hiddenReceiverPublicKey.getText().toString();
-    }
-
-    @Override
-    public String getReceiverAlias() {
-        return binding.accountNum.getText().toString();
+        Log.d(TAG, "getReceiver: " + binding.receiver.getText().toString());
+        return binding.receiver.getText().toString();
     }
 
     @Override
@@ -121,40 +111,24 @@ public class AssetSenderFragment extends Fragment
     }
 
     @Override
-    public void reset() {
-        binding.accountNum.setText("");
-        binding.remittanceAmount.setText("");
-    }
-
-    @Override
     public void beforeQRReadViewState() {
-        binding.hiddenReceiverPublicKey.setText("");
-        binding.accountNum.setText("");
-        binding.remittanceAmount.setText("");
-        binding.getRoot().setBackgroundColor(AndroidSupportUtil.getColor(getContext(), R.color.colorPrimary));
-        binding.qrContainer.setVisibility(View.VISIBLE);
-        binding.accountNumContainerWrapper.setVisibility(View.GONE);
-        binding.buttonContainer.setVisibility(View.GONE);
+        binding.receiver.setText("");
+        binding.amount.setText("");
     }
 
     @Override
-    public void afterQRReadViewState(String alias, String receiver, String value) {
-        binding.hiddenReceiverPublicKey.setText(receiver);
-        binding.accountNum.setText(alias);
-        binding.remittanceAmount.setText(value);
-        binding.getRoot().setBackground(null);
-        binding.qrContainer.setVisibility(View.GONE);
-        binding.accountNumContainerWrapper.setVisibility(View.VISIBLE);
-        binding.buttonContainer.setVisibility(View.VISIBLE);
+    public void afterQRReadViewState(String receiver, String value) {
+        binding.receiver.setText(receiver);
+        binding.amount.setText(value);
     }
 
     @Override
-    public void showProgressDialog() {
+    public void showProgress() {
         progressDialog.show(getActivity(), getString(R.string.sending));
     }
 
     @Override
-    public void hideProgressDialog() {
+    public void hideProgress() {
         progressDialog.hide();
     }
 

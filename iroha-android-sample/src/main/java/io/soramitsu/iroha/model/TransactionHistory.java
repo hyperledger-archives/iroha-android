@@ -46,10 +46,10 @@ public class TransactionHistory implements Parcelable {
         dest.writeList(this.histories);
     }
 
-    public static TransactionHistory createMock() {
-        TransactionHistory mock = new TransactionHistory();
-        mock.value = "1000";
-        mock.histories = Transaction.createMock();
-        return mock;
-    }
+//    public static TransactionHistory createMock() {
+//        TransactionHistory mock = new TransactionHistory();
+//        mock.amount = "1000";
+//        mock.histories = Transaction.createMock();
+//        return mock;
+//    }
 }

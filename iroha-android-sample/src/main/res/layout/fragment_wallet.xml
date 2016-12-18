@@ -10,17 +10,14 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:weightSum="7">
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/pocket_money"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
+                android:layout_height="114dp"
                 android:background="@color/colorPrimary"
                 android:gravity="center"
-                android:paddingBottom="16dp"
                 android:textColor="@color/white"
                 android:textSize="32sp"
                 tools:text="4500 iroha" />
@@ -29,22 +26,19 @@
                 android:id="@+id/progress_bar"
                 style="?android:attr/progressBarStyleLarge"
                 android:layout_width="wrap_content"
-                android:layout_height="0dp"
+                android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:layout_weight="6"
                 android:visibility="gone" />
 
             <ListView
                 android:id="@+id/transaction_list"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="6" />
+                android:layout_height="wrap_content" />
 
             <LinearLayout
                 android:id="@+id/empty_view"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="6"
+                android:layout_height="match_parent"
                 android:gravity="center"
                 android:orientation="vertical"
                 tools:visibility="visible">
@@ -55,7 +49,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:gravity="center"
-                    android:text="取引履歴がありません" />
+                    android:text="@string/transaction_history_not_found" />
             </LinearLayout>
 
         </LinearLayout>

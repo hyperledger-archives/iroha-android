@@ -8,30 +8,39 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AbsListView;
 
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
 import java.util.List;
+
+import javax.crypto.NoSuchPaddingException;
 
 import io.soramitsu.iroha.exception.ErrorMessageFactory;
 import io.soramitsu.iroha.exception.NetworkNotConnectedException;
 import io.soramitsu.iroha.model.TransactionHistory;
 import io.soramitsu.iroha.util.NetworkUtil;
-import io.soramitsu.iroha.view.TransactionHistoryView;
-import io.soramitsu.iroha.view.fragment.TransactionHistoryFragment;
+import io.soramitsu.iroha.view.WalletView;
+import io.soramitsu.iroha.view.fragment.WalletFragment;
 import io.soramitsu.irohaandroid.Iroha;
 import io.soramitsu.irohaandroid.callback.Callback;
 import io.soramitsu.irohaandroid.model.Account;
 import io.soramitsu.irohaandroid.model.Transaction;
 
-public class TransactionHistoryPresenter implements Presenter<TransactionHistoryView> {
-    public static final String TAG = TransactionHistoryPresenter.class.getSimpleName();
+public class WalletPresenter implements Presenter<WalletView> {
+    public static final String TAG = WalletPresenter.class.getSimpleName();
 
-    private TransactionHistoryView transactionHistoryView;
+    private WalletView walletView;
 
     private Handler refreshHandler;
     private Runnable transactionRunnable;
 
+    private String uuid;
+
     @Override
-    public void setView(@NonNull TransactionHistoryView view) {
-        transactionHistoryView = view;
+    public void setView(@NonNull WalletView view) {
+        walletView = view;
     }
 
     @Override
@@ -45,7 +54,7 @@ public class TransactionHistoryPresenter implements Presenter<TransactionHistory
         transactionRunnable = new Runnable() {
             @Override
             public void run() {
-                transactionHistory(TransactionHistoryFragment.RefreshState.SWIPE_UP);
+                transactionHistory(WalletFragment.RefreshState.SWIPE_UP);
             }
         };
     }
@@ -57,16 +66,18 @@ public class TransactionHistoryPresenter implements Presenter<TransactionHistory
 
     @Override
     public void onPause() {
-        if (transactionHistoryView.isRefreshing()) {
+        if (walletView.isRefreshing()) {
             refreshHandler.removeCallbacks(transactionRunnable);
-            transactionHistoryView.setRefreshing(false);
-            transactionHistoryView.setRefreshEnable(true);
+            walletView.setRefreshing(false);
+            walletView.setRefreshEnable(true);
         }
     }
 
     @Override
     public void onStop() {
-        // nothing
+        Iroha iroha = Iroha.getInstance();
+        iroha.cancelFindAccount();
+        iroha.cancelFindTransactionHistory();
     }
 
     @Override
@@ -74,10 +85,14 @@ public class TransactionHistoryPresenter implements Presenter<TransactionHistory
         // nothing
     }
 
-    public void transactionHistory(final TransactionHistoryFragment.RefreshState state) {
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
+    public void transactionHistory(final WalletFragment.RefreshState state) {
         switch (state) {
             case RE_CREATED_FRAGMENT:
-                if (transactionHistoryView.getTransaction() == null) {
+                if (walletView.getTransaction() == null) {
                     renderFromNetwork(state);
                     return;
                 }
@@ -93,10 +108,10 @@ public class TransactionHistoryPresenter implements Presenter<TransactionHistory
 
     private void renderFromMemory() {
         Log.d(TAG, "transactionHistory: cache in memory");
-        transactionHistoryView.renderTransactionHistory(transactionHistoryView.getTransaction());
+        walletView.renderTransactionHistory(walletView.getTransaction());
     }
 
-    private void renderFromNetwork(TransactionHistoryFragment.RefreshState state) {
+    private void renderFromNetwork(WalletFragment.RefreshState state) {
         Log.d(TAG, "transactionHistory: fetch network or cache");
 
         switch (state) {
@@ -104,28 +119,32 @@ public class TransactionHistoryPresenter implements Presenter<TransactionHistory
             case SWIPE_UP:
                 break;
             case EMPTY_REFRESH:
-                transactionHistoryView.showProgressDialog();
+                walletView.showProgress();
                 break;
         }
 
-        final Context context = transactionHistoryView.getContext();
-        final String uuid = Account.getUuid(context);
+        if (uuid == null || uuid.isEmpty()) {
+            uuid = getUuid();
+        }
+
         Iroha.getInstance().findAccount(uuid, new Callback<Account>() {
             @Override
             public void onSuccessful(final Account account) {
-                Iroha.getInstance().findTransactionHistory(uuid, new Callback<List<Transaction>>() {
+                Iroha.getInstance().findTransactionHistory(uuid, 30, 0, new Callback<List<Transaction>>() {
                     @Override
                     public void onSuccessful(List<Transaction> transactions) {
-                        if (transactionHistoryView.isRefreshing()) {
-                            transactionHistoryView.setRefreshing(false);
+                        if (walletView.isRefreshing()) {
+                            walletView.setRefreshing(false);
                         }
 
-                        transactionHistoryView.hideProgressDialog();
+                        walletView.hideProgress();
 
                         TransactionHistory transactionHistory = new TransactionHistory();
-                        transactionHistory.value = account.assets.get(0).value; // TODO マルチアセット対応
+                        if (account.assets != null && !account.assets.isEmpty()) {
+                            transactionHistory.value = account.assets.get(0).value;
+                        }
                         transactionHistory.histories = transactions;
-                        transactionHistoryView.renderTransactionHistory(transactionHistory);
+                        walletView.renderTransactionHistory(transactionHistory);
                     }
 
                     @Override
@@ -143,24 +162,22 @@ public class TransactionHistoryPresenter implements Presenter<TransactionHistory
     }
 
     private void fail(Throwable throwable) {
-        if (transactionHistoryView.isRefreshing()) {
-            transactionHistoryView.setRefreshing(false);
+        if (walletView.isRefreshing()) {
+            walletView.setRefreshing(false);
         }
 
-        transactionHistoryView.hideProgressDialog();
+        walletView.hideProgress();
 
-        final Context context = transactionHistoryView.getContext();
-        if (NetworkUtil.isOnline(transactionHistoryView.getContext())) {
-            transactionHistoryView.showError(
+        final Context context = walletView.getContext();
+        if (NetworkUtil.isOnline(walletView.getContext())) {
+            walletView.showError(
                     ErrorMessageFactory.create(context, throwable)
             );
         } else {
-            transactionHistoryView.showError(
+            walletView.showError(
                     ErrorMessageFactory.create(context, new NetworkNotConnectedException())
             );
         }
-
-        transactionHistoryView.renderTransactionHistory(TransactionHistory.createMock());
     }
 
     public SwipeRefreshLayout.OnRefreshListener onSwipeRefresh() {
@@ -176,7 +193,7 @@ public class TransactionHistoryPresenter implements Presenter<TransactionHistory
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                transactionHistory(TransactionHistoryFragment.RefreshState.EMPTY_REFRESH);
+                transactionHistory(WalletFragment.RefreshState.EMPTY_REFRESH);
             }
         };
     }
@@ -191,12 +208,12 @@ public class TransactionHistoryPresenter implements Presenter<TransactionHistory
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem,
                                  int visibleItemCount, int totalItemCount) {
-                if (transactionHistoryView.isRefreshing()) {
+                if (walletView.isRefreshing()) {
                     return;
                 }
 
                 if (view.getChildCount() == 0) {
-                    transactionHistoryView.setRefreshEnable(true);
+                    walletView.setRefreshEnable(true);
                     return;
                 }
 
@@ -207,8 +224,22 @@ public class TransactionHistoryPresenter implements Presenter<TransactionHistory
                             && view.getChildAt(0).getTop() == view.getPaddingTop();
                     enable = firstItemVisible || topOfFirstItemVisible;
                 }
-                transactionHistoryView.setRefreshEnable(enable);
+                walletView.setRefreshEnable(enable);
             }
         };
     }
+
+    private String getUuid() {
+        final Context context = walletView.getContext();
+        final String uuid;
+        try {
+            uuid = Account.getUuid(context);
+        } catch (NoSuchPaddingException | UnrecoverableKeyException | NoSuchAlgorithmException
+                | KeyStoreException | InvalidKeyException | IOException e) {
+            walletView.showError(ErrorMessageFactory.create(context, e));
+            return null;
+        }
+        return uuid;
+    }
+
 }

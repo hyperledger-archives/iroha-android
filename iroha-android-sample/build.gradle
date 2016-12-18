@@ -26,6 +26,7 @@ android {
 }
 
 def SUPPORT_PACKAGE_VERSION = "25.0.1"
+def CIRCLE_IMAGE_VIEW_PACKAGE_VERSION = "2.1.0"
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -34,5 +35,7 @@ dependencies {
     compile "com.android.support:support-v4:${SUPPORT_PACKAGE_VERSION}"
     compile "com.android.support:design:${SUPPORT_PACKAGE_VERSION}"
     compile "com.android.support:gridlayout-v7:${SUPPORT_PACKAGE_VERSION}"
+    compile "de.hdodenhof:circleimageview:${CIRCLE_IMAGE_VIEW_PACKAGE_VERSION}"
+    compile 'com.mikepenz:aboutlibraries:5.9.1'
     testCompile 'junit:junit:4.12'
 }
