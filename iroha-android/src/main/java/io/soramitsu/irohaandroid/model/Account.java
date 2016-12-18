@@ -73,6 +73,7 @@ public class Account implements Serializable, AccountCache {
 
     public static void delete(Context context) {
         FileManager fileManager = new FileManager();
+        fileManager.clearDirectory(context.getExternalFilesDir("keypair"));
         fileManager.clearDirectory(context.getExternalFilesDir("account"));
     }
 }
