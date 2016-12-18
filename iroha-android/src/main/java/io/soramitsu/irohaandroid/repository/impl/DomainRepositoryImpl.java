@@ -1,5 +1,7 @@
 package io.soramitsu.irohaandroid.repository.impl;
 
+import android.util.Log;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -18,6 +20,7 @@ import okhttp3.Response;
 import static io.soramitsu.irohaandroid.net.IrohaHttpClient.createRequest;
 
 public class DomainRepositoryImpl implements DomainRepository {
+    public static final String TAG = DomainRepositoryImpl.class.getSimpleName();
 
     private IrohaHttpClient httpClient = IrohaHttpClient.getInstance();
     private Gson gson = new Gson();
@@ -29,10 +32,13 @@ public class DomainRepositoryImpl implements DomainRepository {
         Request request = createRequest(Routes.DOMAIN_REGISTER, json);
         Response response = httpClient.call(request);
 
-        switch (response.code()) {
+        final int code = response.code();
+        final String responseBody = response.body().string();
+        Log.d(TAG, "register domain: json[\n" + responseBody + "]\nresponse code: " + code);
+        switch (code) {
             case 200:
             case 201:
-                return gson.fromJson(response.body().string(), new TypeToken<DomainEntity>(){}.getType());
+                return gson.fromJson(responseBody, new TypeToken<DomainEntity>(){}.getType());
             default:
                 throw new HttpBadRequestException();
         }
@@ -44,9 +50,12 @@ public class DomainRepositoryImpl implements DomainRepository {
         Request request = createRequest(Routes.DOMAIN_LIST + "?limit=" + limit + "&offset=" + offset);
         Response response = httpClient.call(request);
 
-        switch (response.code()) {
+        final int code = response.code();
+        final String responseBody = response.body().string();
+        Log.d(TAG, "find domains: json[\n" + responseBody + "]\nresponse code: " + code);
+        switch (code) {
             case 200:
-                return gson.fromJson(response.body().string(), new TypeToken<DomainListEntity>(){}.getType());
+                return gson.fromJson(responseBody, new TypeToken<DomainListEntity>(){}.getType());
             default:
                 throw new HttpBadRequestException();
         }

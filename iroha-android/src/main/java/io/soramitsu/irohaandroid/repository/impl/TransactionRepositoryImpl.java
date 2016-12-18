@@ -1,5 +1,7 @@
 package io.soramitsu.irohaandroid.repository.impl;
 
+import android.util.Log;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -16,6 +18,7 @@ import okhttp3.Response;
 import static io.soramitsu.irohaandroid.net.IrohaHttpClient.createRequest;
 
 public class TransactionRepositoryImpl implements TransactionRepository {
+    public static final String TAG = TransactionRepositoryImpl.class.getSimpleName();
 
     private IrohaHttpClient httpClient = IrohaHttpClient.getInstance();
     private Gson gson = new Gson();
@@ -52,10 +55,12 @@ public class TransactionRepositoryImpl implements TransactionRepository {
             throws IOException, HttpBadRequestException {
         Response response = httpClient.call(request);
 
-        switch (response.code()) {
+        final int code = response.code();
+        final String responseBody = response.body().string();
+        Log.d(TAG, "find history: json[\n" + responseBody + "]\nresponse code: " + code);
+        switch (code) {
             case 200:
-                return gson.fromJson(response.body().string(), new TypeToken<TransactionListEntity>() {
-                }.getType());
+                return gson.fromJson(responseBody, new TypeToken<TransactionListEntity>(){}.getType());
             default:
                 throw new HttpBadRequestException();
         }

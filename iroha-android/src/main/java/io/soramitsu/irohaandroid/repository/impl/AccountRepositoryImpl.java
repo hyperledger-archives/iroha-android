@@ -1,5 +1,7 @@
 package io.soramitsu.irohaandroid.repository.impl;
 
+import android.util.Log;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -19,6 +21,7 @@ import okhttp3.Response;
 import static io.soramitsu.irohaandroid.net.IrohaHttpClient.createRequest;
 
 public class AccountRepositoryImpl implements AccountRepository {
+    public static final String TAG = AccountRepositoryImpl.class.getSimpleName();
 
     private IrohaHttpClient httpClient = IrohaHttpClient.getInstance();
     private Gson gson = new Gson();
@@ -30,10 +33,13 @@ public class AccountRepositoryImpl implements AccountRepository {
         Request request = createRequest(Routes.ACCOUNT_REGISTER, json);
         Response response = httpClient.call(request);
 
-        switch (response.code()) {
+        final int code = response.code();
+        final String responseBody = response.body().string();
+        Log.d(TAG, "register account: json[\n" + responseBody + "]\nresponse code: " + code);
+        switch (code) {
             case 200:
             case 201:
-                return gson.fromJson(response.body().string(), new TypeToken<AccountEntity>(){}.getType());
+                return gson.fromJson(responseBody, new TypeToken<AccountEntity>(){}.getType());
             case 400:
                 throw new AccountDuplicateException();
             default:
@@ -47,9 +53,12 @@ public class AccountRepositoryImpl implements AccountRepository {
         Request request = IrohaHttpClient.createRequest(Routes.ACCOUNT_INFO + "?uuid=" + uuid);
         Response response = httpClient.call(request);
 
-        switch (response.code()) {
+        final int code = response.code();
+        final String responseBody = response.body().string();
+        Log.d(TAG, "find account: json[\n" + responseBody + "]\nresponse code: " + code);
+        switch (code) {
             case 200:
-                return gson.fromJson(response.body().string(), new TypeToken<AccountEntity>(){}.getType());
+                return gson.fromJson(responseBody, new TypeToken<AccountEntity>(){}.getType());
             case 400:
                 throw new UserNotFoundException();
             default:

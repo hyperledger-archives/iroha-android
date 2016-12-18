@@ -1,5 +1,7 @@
 package io.soramitsu.irohaandroid.repository.impl;
 
+import android.util.Log;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -19,6 +21,7 @@ import okhttp3.Response;
 import static io.soramitsu.irohaandroid.net.IrohaHttpClient.createRequest;
 
 public class AssetRepositoryImpl implements AssetRepository {
+    public static final String TAG = AssetRepositoryImpl.class.getSimpleName();
 
     private IrohaHttpClient httpClient = IrohaHttpClient.getInstance();
     private Gson gson = new Gson();
@@ -29,10 +32,13 @@ public class AssetRepositoryImpl implements AssetRepository {
         Request request = createRequest(Routes.ASSET_CREATE, json);
         Response response = httpClient.call(request);
 
-        switch (response.code()) {
+        final int code = response.code();
+        final String responseBody = response.body().string();
+        Log.d(TAG, "create asset: json[\n" + responseBody + "]\nresponse code: " + code);
+        switch (code) {
             case 200:
             case 201:
-                return gson.fromJson(response.body().string(), new TypeToken<AssetEntity>(){}.getType());
+                return gson.fromJson(responseBody, new TypeToken<AssetEntity>(){}.getType());
             default:
                 throw new HttpBadRequestException();
         }
@@ -44,9 +50,12 @@ public class AssetRepositoryImpl implements AssetRepository {
         Request request = createRequest("/" + domain + Routes.ASSET_LIST + "?limit=" + limit + "&offset=" + offset);
         Response response = httpClient.call(request);
 
-        switch (response.code()) {
+        final int code = response.code();
+        final String responseBody = response.body().string();
+        Log.d(TAG, "find assets: json[\n" + responseBody + "]\nresponse code: " + code);
+        switch (code) {
             case 200:
-                return gson.fromJson(response.body().string(), new TypeToken<AssetListEntity>(){}.getType());
+                return gson.fromJson(responseBody, new TypeToken<AssetListEntity>(){}.getType());
             default:
                 throw new HttpBadRequestException();
         }
@@ -58,7 +67,10 @@ public class AssetRepositoryImpl implements AssetRepository {
         Request request = createRequest(Routes.ASSET_OPERATION, json);
         Response response = httpClient.call(request);
 
-        switch (response.code()) {
+        final int code = response.code();
+        final String responseBody = response.body().string();
+        Log.d(TAG, "operation: json[\n" + responseBody + "]\nresponse code: " + code);
+        switch (code) {
             case 200:
             case 201:
                 return true;
