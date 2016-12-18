@@ -15,5 +15,4 @@ public interface KeyPairCache {
 
     void save(Context context)
             throws InvalidKeyException, NoSuchAlgorithmException, KeyStoreException, NoSuchPaddingException, IOException;
-    void delete(Context context);
 }

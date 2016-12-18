@@ -25,6 +25,7 @@ public class KeyPair implements KeyPairCache {
     public static KeyPair getKeyPair(Context context)
             throws NoSuchPaddingException, UnrecoverableKeyException, NoSuchAlgorithmException,
             KeyStoreException, InvalidKeyException, IOException {
+
         FileManager fileManager = new FileManager();
 
         KeyStoreManager keyStoreManager = new KeyStoreManager.Builder(context).build();
@@ -48,6 +49,7 @@ public class KeyPair implements KeyPairCache {
     public void save(Context context)
             throws InvalidKeyException, NoSuchAlgorithmException, KeyStoreException,
             NoSuchPaddingException, IOException {
+
         FileManager fileManager = new FileManager();
 
         KeyStoreManager keyStoreManager = new KeyStoreManager.Builder(context).build();
@@ -62,11 +64,9 @@ public class KeyPair implements KeyPairCache {
         fileManager.writeToFile(publicKeyFile, encryptedPublicKey);
     }
 
-    @Override
-    public void delete(Context context) {
+    public static void delete(Context context) {
         FileManager fileManager = new FileManager();
-        fileManager.clearDirectory(context.getExternalFilesDir("private_key.txt"));
-        fileManager.clearDirectory(context.getExternalFilesDir("public_key.txt"));
+        fileManager.clearDirectory(context.getExternalFilesDir("keypair"));
     }
 
     public boolean isEmpty() {
