@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:id="@+id/menu_first_group">
+        <item
+            android:id="@+id/action_home"
+            android:checked="true"
+            android:icon="@drawable/ic_home_white_24dp"
+            android:title="@string/home" />
+        <item
+            android:id="@+id/action_unregister"
+            android:icon="@drawable/ic_exit_to_app_white_24dp"
+            android:title="@string/unregister" />
+        <item
+            android:id="@+id/action_oss"
+            android:icon="@drawable/ic_library_books_white_24dp"
+            android:title="@string/open_source_license" />
+    </group>
+</menu>

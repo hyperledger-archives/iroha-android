@@ -1,0 +1,56 @@
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp"
+        tools:background="@color/colorPrimaryDark">
+
+        <ImageView
+            android:id="@+id/logo"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="16dp"
+            android:layout_marginTop="16dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:src="@drawable/reg_logo" />
+
+        <requestFocus />
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/user_name_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/logo"
+            android:layout_marginBottom="8dp"
+            android:textColorHint="@color/white"
+            app:errorTextAppearance="@style/EditTextErrorAppearance"
+            app:hintTextAppearance="@style/EditTextHint">
+
+            <EditText
+                android:id="@+id/user_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/placeholder_account_name"
+                android:maxLength="10"
+                android:maxLines="1"
+                android:textColor="@color/white"
+                android:theme="@style/EditTextColorControl" />
+        </android.support.design.widget.TextInputLayout>
+
+        <Button
+            android:id="@+id/register_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/user_name_container"
+            android:background="@drawable/button_frame"
+            android:padding="16dp"
+            android:text="@string/register"
+            android:textColor="@color/white" />
+
+    </RelativeLayout>
+</layout>
