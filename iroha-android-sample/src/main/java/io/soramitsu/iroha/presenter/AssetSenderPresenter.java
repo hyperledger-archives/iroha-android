@@ -2,6 +2,8 @@ package io.soramitsu.iroha.presenter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 
@@ -121,6 +123,31 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
             @Override
             public void onFailure(Throwable throwable) {
                 Log.e(TAG, "onFailure: ", throwable);
+            }
+        };
+    }
+
+    public TextWatcher textWatcher() {
+        return new TextWatcher() {
+            private boolean isAmountEmpty;
+
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                String amount = assetSenderView.getAmount();
+                isAmountEmpty = amount == null || amount.isEmpty();
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (isAmountEmpty && charSequence.toString().equals("0")) {
+                    assetSenderView.setAmount("");
+                    return;
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                // nothing
             }
         };
     }

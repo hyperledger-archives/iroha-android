@@ -57,6 +57,7 @@ public class AssetSenderFragment extends Fragment
         binding = DataBindingUtil.bind(view);
         binding.qrButton.setOnClickListener(assetSenderPresenter.onQRShowClicked());
         binding.submitButton.setOnClickListener(assetSenderPresenter.onSubmitClicked());
+        binding.amount.addTextChangedListener(assetSenderPresenter.textWatcher());
     }
 
     @Override
@@ -98,6 +99,11 @@ public class AssetSenderFragment extends Fragment
     @Override
     public String getAmount() {
         return binding.amount.getText().toString();
+    }
+
+    @Override
+    public void setAmount(String amount) {
+        binding.amount.setText(amount);
     }
 
     @Override

@@ -11,6 +11,8 @@ public interface AssetSenderView extends LoadingView {
 
     String getAmount();
 
+    void setAmount(String amount);
+
     String getReceiver();
 
     void showQRReader();
