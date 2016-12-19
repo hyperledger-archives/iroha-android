@@ -26,9 +26,9 @@ public final class BindingUtils {
         final Drawable target;
 
         if (transaction.isSender(publicKey)) {
-            target = AndroidSupportUtil.getDrawable(c, R.drawable.icon_rec);
-        } else {
             target = AndroidSupportUtil.getDrawable(c, R.drawable.icon_send);
+        } else {
+            target = AndroidSupportUtil.getDrawable(c, R.drawable.icon_rec);
         }
 
         view.setBackground(target);
