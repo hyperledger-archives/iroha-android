@@ -67,7 +67,7 @@
                     android:layout_below="@+id/qr_code"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:textColor="@color/primary_text"
+                    android:textColor="@color/link_color"
                     tools:text="agoajesfjdslafjasldfgawehgalsdagehlfgkajsdfasffereafeag19t34==" />
             </RelativeLayout>
         </RelativeLayout>

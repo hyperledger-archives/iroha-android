@@ -13,6 +13,8 @@ public interface AssetReceiveView extends View {
 
     void setAmount(String amount);
 
+    String getPublicKey();
+
     void setPublicKey(String publicKey);
 
     void invalidate();

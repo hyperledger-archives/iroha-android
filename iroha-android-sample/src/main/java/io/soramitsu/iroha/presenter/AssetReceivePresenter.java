@@ -1,5 +1,8 @@
 package io.soramitsu.iroha.presenter;
 
+import android.content.ClipData;
+import android.content.ClipDescription;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Handler;
@@ -8,6 +11,8 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.View;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -23,6 +28,7 @@ import java.security.UnrecoverableKeyException;
 
 import javax.crypto.NoSuchPaddingException;
 
+import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.exception.ErrorMessageFactory;
 import io.soramitsu.iroha.model.TransferQRParameter;
 import io.soramitsu.iroha.view.AssetReceiveView;
@@ -31,6 +37,8 @@ import io.soramitsu.irohaandroid.callback.Callback;
 import io.soramitsu.irohaandroid.model.Account;
 import io.soramitsu.irohaandroid.model.KeyPair;
 import io.soramitsu.irohaandroid.qr.QRCodeGenerator;
+
+import static android.content.Context.CLIPBOARD_SERVICE;
 
 public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
     public static final String TAG = AssetReceivePresenter.class.getSimpleName();
@@ -100,6 +108,29 @@ public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
             @Override
             public void onRefresh() {
                 refreshHandler.postDelayed(transactionRunnable, 1500);
+            }
+        };
+    }
+
+    public View.OnClickListener onPublicKeyTextClicked() {
+        return new View.OnClickListener() {
+            private static final String CLIP_DATA_LABEL_TEXT_DATA = "text_data";
+
+            @Override
+            public void onClick(View view) {
+                final Context context = assetReceiveView.getContext();
+
+                ClipData.Item item = new ClipData.Item(assetReceiveView.getPublicKey());
+
+                String[] mimeType = new String[1];
+                mimeType[0] = ClipDescription.MIMETYPE_TEXT_URILIST;
+
+                ClipData cd = new ClipData(new ClipDescription(CLIP_DATA_LABEL_TEXT_DATA, mimeType), item);
+
+                ClipboardManager cm = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
+                cm.setPrimaryClip(cd);
+
+                Toast.makeText(context, R.string.message_copy_to_clipboard, Toast.LENGTH_SHORT).show();
             }
         };
     }

@@ -56,6 +56,7 @@ public class AssetReceiveFragment extends Fragment implements AssetReceiveView, 
         binding.swipeRefresh.setColorSchemeResources(R.color.red600, R.color.green600, R.color.blue600, R.color.orange600);
         binding.swipeRefresh.setOnRefreshListener(assetReceivePresenter.onSwipeRefresh());
         binding.receiverAmount.addTextChangedListener(assetReceivePresenter.textWatcher());
+        binding.publicKey.setOnClickListener(assetReceivePresenter.onPublicKeyTextClicked());
     }
 
     @Override
@@ -93,6 +94,11 @@ public class AssetReceiveFragment extends Fragment implements AssetReceiveView, 
     @Override
     public void setAmount(String amount) {
         binding.receiverAmount.setText(amount);
+    }
+
+    @Override
+    public String getPublicKey() {
+        return binding.publicKey.getText().toString();
     }
 
     @Override

@@ -9,6 +9,7 @@
     <color name="primary_text">#212121</color>
     <color name="secondary_text">#727272</color>
     <color name="divider_color">#B6B6B6</color>
+    <color name="link_color">#1111CC</color>
 
     <!-- Greyscales -->
     <color name="grey200">#EEEEEE</color>
