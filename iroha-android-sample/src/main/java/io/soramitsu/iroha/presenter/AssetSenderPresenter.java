@@ -7,6 +7,8 @@ import android.view.View;
 
 import com.google.gson.Gson;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.KeyStoreException;
@@ -27,7 +29,6 @@ import io.soramitsu.iroha.util.NetworkUtil;
 import io.soramitsu.iroha.view.AssetSenderView;
 import io.soramitsu.irohaandroid.Iroha;
 import io.soramitsu.irohaandroid.callback.Callback;
-import io.soramitsu.irohaandroid.model.Account;
 import io.soramitsu.irohaandroid.model.KeyPair;
 
 public class AssetSenderPresenter implements Presenter<AssetSenderView> {
@@ -35,7 +36,6 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
 
     private AssetSenderView assetSenderView;
 
-    private String uuid;
     private KeyPair keyPair;
 
     @Override
@@ -50,7 +50,7 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
 
     @Override
     public void onStart() {
-        // nothing
+        keyPair = getKeyPair();
     }
 
     @Override
@@ -112,16 +112,6 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
                     return;
                 }
 
-                if (uuid == null || uuid.isEmpty()) {
-                    uuid = getUuid();
-                }
-
-                if (params.account.equals(uuid)) {
-                    Log.e(TAG, "setOnResult: This QR is mine!");
-                    assetSenderView.showError(ErrorMessageFactory.create(context, new SelfSendCanNotException()));
-                    return;
-                }
-
                 final String value = String.valueOf(params.amount).equals("0")
                         ? ""
                         : String.valueOf(params.amount);
@@ -136,52 +126,58 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
     }
 
     private void send() throws ReceiverNotFoundException {
-        if (assetSenderView.getReceiver().isEmpty() || assetSenderView.getAmount().isEmpty()) {
+        final Context context = assetSenderView.getContext();
+        final String receiver = assetSenderView.getReceiver();
+        final String amount = assetSenderView.getAmount();
+
+        if (receiver.isEmpty() || amount.isEmpty()) {
             throw new ReceiverNotFoundException();
         }
 
         assetSenderView.showProgress();
 
-        final String assetUuid = "60f4a396b520d6c54e33634d060751814e0c4bf103a81c58da704bba82461c32";
-        final String command = QRType.TRANSFER.getType();
-        final String value = assetSenderView.getAmount();
-        final String receiver = assetSenderView.getReceiver();
-        final String sender = getKeyPair().publicKey;
+        if (validation()) {
+            final String assetUuid = "60f4a396b520d6c54e33634d060751814e0c4bf103a81c58da704bba82461c32";
+            final String command = QRType.TRANSFER.getType();
+            final String sender = keyPair.publicKey;
 
-        final Context context = assetSenderView.getContext();
-        Iroha.getInstance().operationAsset(assetUuid, command, value, sender, receiver,
-                new Callback<Boolean>() {
-                    @Override
-                    public void onSuccessful(Boolean result) {
-                        assetSenderView.hideProgress();
+            Iroha.getInstance().operationAsset(assetUuid, command, amount, sender, receiver,
+                    new Callback<Boolean>() {
+                        @Override
+                        public void onSuccessful(Boolean result) {
+                            assetSenderView.hideProgress();
 
-                        assetSenderView.showSuccess(
-                                context.getString(R.string.successful_title_sent),
-                                context.getString(R.string.message_send_asset_successful,
-                                        assetSenderView.getReceiver(), assetSenderView.getAmount()),
-                                new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-                                        assetSenderView.hideSuccess();
-                                        assetSenderView.beforeQRReadViewState();
-                                    }
-                                });
-                    }
+                            assetSenderView.showSuccess(
+                                    context.getString(R.string.successful_title_sent),
+                                    context.getString(R.string.message_send_asset_successful,
+                                            assetSenderView.getReceiver(), assetSenderView.getAmount()),
+                                    new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            assetSenderView.hideSuccess();
+                                            assetSenderView.beforeQRReadViewState();
+                                        }
+                                    });
+                        }
 
-                    @Override
-                    public void onFailure(Throwable throwable) {
-                        assetSenderView.hideProgress();
+                        @Override
+                        public void onFailure(Throwable throwable) {
+                            assetSenderView.hideProgress();
 
-                        if (NetworkUtil.isOnline(assetSenderView.getContext())) {
-                            assetSenderView.showError(ErrorMessageFactory.create(context, throwable));
-                        } else {
-                            assetSenderView.showError(ErrorMessageFactory.create(context, new NetworkNotConnectedException()));
+                            if (NetworkUtil.isOnline(assetSenderView.getContext())) {
+                                assetSenderView.showError(ErrorMessageFactory.create(context, throwable));
+                            } else {
+                                assetSenderView.showError(ErrorMessageFactory.create(context, new NetworkNotConnectedException()));
+                            }
                         }
                     }
-                }
-        );
+            );
+        } else {
+            assetSenderView.hideProgress();
+        }
     }
 
+    @NotNull
     private KeyPair getKeyPair() {
         if (keyPair == null) {
             final Context context = assetSenderView.getContext();
@@ -191,22 +187,23 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
                     | KeyStoreException | InvalidKeyException | IOException e) {
                 Log.e(TAG, "getKeyPair: ", e);
                 assetSenderView.showError(ErrorMessageFactory.create(context, e));
-                return null;
+                return new KeyPair("", "");
             }
         }
         return keyPair;
     }
 
-    private String getUuid() {
-        final Context context = assetSenderView.getContext();
-        final String uuid;
-        try {
-            uuid = Account.getUuid(context);
-        } catch (NoSuchPaddingException | UnrecoverableKeyException | NoSuchAlgorithmException
-                | KeyStoreException | InvalidKeyException | IOException e) {
-            assetSenderView.showError(ErrorMessageFactory.create(context, e));
-            return null;
+    private boolean validation() {
+        if (assetSenderView.getReceiver().equals(keyPair.publicKey)) {
+            Log.e(TAG, "setOnResult: This QR is mine!");
+            assetSenderView.showError(
+                    ErrorMessageFactory.create(
+                            assetSenderView.getContext(),
+                            new SelfSendCanNotException()
+                    )
+            );
+            return false;
         }
-        return uuid;
+        return true;
     }
 }

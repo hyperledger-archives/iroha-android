@@ -62,6 +62,7 @@ public class AssetSenderFragment extends Fragment
     @Override
     public void onStart() {
         super.onStart();
+        assetSenderPresenter.onStart();
         if (binding.receiver.getText().length() != 0) {
             Log.d(TAG, "onStart: " + binding.receiver.getText().toString());
             afterQRReadViewState(
@@ -75,8 +76,8 @@ public class AssetSenderFragment extends Fragment
 
     @Override
     public void onStop() {
-        super.onStop();
         assetSenderPresenter.onStop();
+        super.onStop();
     }
 
     @Override
