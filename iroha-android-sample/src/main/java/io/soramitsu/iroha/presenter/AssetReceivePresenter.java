@@ -137,13 +137,20 @@ public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
 
     public TextWatcher textWatcher() {
         return new TextWatcher() {
+            private boolean isAmountEmpty;
+
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                // nothing
+                String amount = assetReceiveView.getAmount();
+                isAmountEmpty = amount == null || amount.isEmpty();
             }
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (isAmountEmpty && charSequence.toString().equals("0")) {
+                    assetReceiveView.setAmount("");
+                    return;
+                }
                 changeQR();
             }
 
