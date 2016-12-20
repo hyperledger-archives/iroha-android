@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initToolbar() {
-        binding.toolbar.setTitle(getString(R.string.transaction_history));
+        binding.toolbar.setTitle(getString(R.string.receive));
         binding.toolbar.setNavigationIcon(
                 ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_menu_white_24dp));
         binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -229,7 +229,7 @@ public class MainActivity extends AppCompatActivity {
                                     break;
                                 case R.id.action_sender:
                                     Log.d(TAG, "onNavigationItemSelected: Sender");
-                                    binding.toolbar.setTitle(getString(R.string.sender));
+                                    binding.toolbar.setTitle(getString(R.string.send));
                                     switchFragment(assetSenderFragment, AssetSenderFragment.TAG);
                                     break;
                             }

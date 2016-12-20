@@ -9,7 +9,7 @@
     <string name="message_account_register_successful">Account registered!</string>
     <string name="placeholder_account_name">username:</string>
     <string name="transaction_history">Transaction</string>
-    <string name="sender">Transfer</string>
+    <string name="send">Send</string>
     <string name="receive">Receive</string>
     <string name="during_fetch_account_info">Fetching account…</string>
     <string name="error_message_retry_again">Please retry again.</string>

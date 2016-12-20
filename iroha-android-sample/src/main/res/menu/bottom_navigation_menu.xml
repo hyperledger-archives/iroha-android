@@ -17,6 +17,6 @@
         android:id="@+id/action_sender"
         android:enabled="true"
         android:icon="@drawable/tab_send"
-        android:title="@string/sender"
+        android:title="@string/send"
         app:showAsAction="ifRoom" />
 </menu>
