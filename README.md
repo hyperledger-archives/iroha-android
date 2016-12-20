@@ -214,7 +214,7 @@ import io.soramitsu.irohaandroid.model.Asset;
 Iroha.getInstance().operationAsset("asset-uuid", "command", "amount", "sender", "receiver", "signature",
          new Callback<Boolean>() {
              @Override
-             public void onSuccessful(Account result) {
+             public void onSuccessful(Boolean result) {
                  // Success!
              }
 
@@ -235,7 +235,7 @@ import io.soramitsu.irohaandroid.model.Transaction;
 Iroha.getInstance().findTransactionHistory("uuid", /* limit */30, /* offset */0,
          new Callback<List<Transaction>>() {
              @Override
-             public void onSuccessful(Account result) {
+             public void onSuccessful(List<Transaction> result) {
                  // Success!
              }
 
@@ -250,7 +250,7 @@ Iroha.getInstance().findTransactionHistory("uuid", /* limit */30, /* offset */0,
 Iroha.getInstance().findTransactionHistory("uuid", "domain", "asset-uuid",  /* limit */30, /* offset */0,
          new Callback<List<Transaction>>() {
              @Override
-             public void onSuccessful(Account result) {
+             public void onSuccessful(List<Transaction> result) {
                  // Success!
              }
 
