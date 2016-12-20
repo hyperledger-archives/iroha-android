@@ -70,7 +70,7 @@ boolean verify = Iroha.verify(keyPair.publicKey, signature, "message")
 #### digest
 ```java
 String hashedMessage = MessageDigest.digest("message", MessageDigest.SHA3_256);
-// => hashed message by SHA3_256
+// ===> hashed message by SHA3_256
 ```
 
 ### io.soramitsu.irohaandroid.Iroha
