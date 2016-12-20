@@ -22,7 +22,8 @@ Android Build Tools >=v25
 ## Installation
 
 ### Gradle
-In your ```app/build.gradle```
+In your ```app/build.gradle```   
+Useage ```gh-pages``` branch.
 
 ```gradle
 repositories {
