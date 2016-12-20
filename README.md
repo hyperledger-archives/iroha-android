@@ -231,7 +231,23 @@ Iroha.getInstance().operationAsset("asset-uuid", "command", "amount", "sender", 
 import io.soramitsu.irohaandroid.Iroha;
 import io.soramitsu.irohaandroid.model.Transaction;
 
+// Single asset
 Iroha.getInstance().findTransactionHistory("uuid", /* limit */30, /* offset */0,
+         new Callback<List<Transaction>>() {
+             @Override
+             public void onSuccessful(Account result) {
+                 // Success!
+             }
+
+             @Override
+             public void onFailure(Throwable throwable) {
+                 // Error!
+             }
+         }
+ );
+
+// Multi assets
+Iroha.getInstance().findTransactionHistory("uuid", "domain", "asset-uuid",  /* limit */30, /* offset */0,
          new Callback<List<Transaction>>() {
              @Override
              public void onSuccessful(Account result) {
