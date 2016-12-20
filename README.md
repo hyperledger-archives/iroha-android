@@ -111,7 +111,7 @@ Iroha.getInstance().registerAccount("publicKey", "alias",
 import io.soramitsu.irohaandroid.Iroha;
 import io.soramitsu.irohaandroid.model.Account;
 
-Iroha.getInstance().registerAccount("uuid",
+Iroha.getInstance().findAccount("uuid",
          new Callback<Account>() {
              @Override
              public void onSuccessful(Account result) {
