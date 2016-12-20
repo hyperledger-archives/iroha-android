@@ -134,12 +134,12 @@ public class Iroha {
         return findDomainsAsyncTask != null && findDomainsAsyncTask.cancel(true);
     }
 
-    public void createAsset(final String name, final String domain,
-                            final String creator, final String signature, Callback<Asset> callback) {
+    public void createAsset(final String name, final String domain, final String creator,
+                            final String signature, final long timestamp, Callback<Asset> callback) {
         createAssetAsyncTask = new IrohaAsyncTask<Asset>(callback) {
             @Override
             protected Asset onBackground() throws Exception {
-                return assetService.create(name, domain, creator, signature);
+                return assetService.create(name, domain, creator, signature, timestamp);
             }
         };
         createAssetAsyncTask.execute();
@@ -164,11 +164,12 @@ public class Iroha {
     }
 
     public void operationAsset(final String assetUuid, final String command, final String value,
-                               final String sender, final String receiver, Callback<Boolean> callback) {
-       operationAssetAsyncTask =  new IrohaAsyncTask<Boolean>(callback) {
+                               final String sender, final String receiver, final String signature,
+                               final long timestamp, Callback<Boolean> callback) {
+        operationAssetAsyncTask = new IrohaAsyncTask<Boolean>(callback) {
             @Override
             protected Boolean onBackground() throws Exception {
-                return assetService.operation(assetUuid, command, value, sender, receiver);
+                return assetService.operation(assetUuid, command, value, sender, receiver, signature, timestamp);
             }
         };
         operationAssetAsyncTask.execute();

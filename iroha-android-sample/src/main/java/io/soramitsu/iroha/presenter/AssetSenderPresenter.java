@@ -32,6 +32,7 @@ import io.soramitsu.iroha.view.AssetSenderView;
 import io.soramitsu.irohaandroid.Iroha;
 import io.soramitsu.irohaandroid.callback.Callback;
 import io.soramitsu.irohaandroid.model.KeyPair;
+import io.soramitsu.irohaandroid.security.MessageDigest;
 
 public class AssetSenderPresenter implements Presenter<AssetSenderView> {
     public static final String TAG = AssetSenderPresenter.class.getSimpleName();
@@ -167,8 +168,11 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
             final String assetUuid = "60f4a396b520d6c54e33634d060751814e0c4bf103a81c58da704bba82461c32";
             final String command = QRType.TRANSFER.getType();
             final String sender = keyPair.publicKey;
+            final long timestamp = System.currentTimeMillis() / 1000;
+            final String message = generateMessage(timestamp, amount, sender, receiver, command, assetUuid);
+            final String signature = MessageDigest.digest(message, MessageDigest.Algorithm.SHA3_256);
 
-            Iroha.getInstance().operationAsset(assetUuid, command, amount, sender, receiver,
+            Iroha.getInstance().operationAsset(assetUuid, command, amount, sender, receiver, signature, timestamp,
                     new Callback<Boolean>() {
                         @Override
                         public void onSuccessful(Boolean result) {
@@ -202,6 +206,16 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
         } else {
             assetSenderView.hideProgress();
         }
+    }
+
+    private String generateMessage(long timestamp, String value, String sender,
+                                   String receiver, String command, String uuid) {
+        return "timestamp:" + timestamp
+                + ",value:" + value
+                + ",sender:" + sender
+                + ",receiver:" + receiver
+                + ",command:" + command
+                + ",asset-uuid:" + uuid;
     }
 
     @NotNull
