@@ -30,7 +30,7 @@ repositories {
 }
 
 dependencies {
-    compile 'io.soramitsu:iroha-android:1.0'
+    compile 'io.soramitsu:iroha-android:1.1'
 }
 ```
 
