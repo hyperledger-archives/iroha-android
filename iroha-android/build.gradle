@@ -1,6 +1,8 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.novoda.bintray-release'
 
+def IROHA_LIBRARY_VERSION = "1.1"
+
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.1"
@@ -9,7 +11,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 25
         versionCode 2
-        versionName "2.0"
+        versionName ${IROHA_LIBRARY_VERSION}
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
@@ -27,6 +29,9 @@ android {
         cmake {
             path "CMakeLists.txt"
         }
+    }
+    lintOptions {
+        abortOnError false
     }
 }
 
@@ -59,7 +64,7 @@ publish {
     userOrg = 'hyperledger'
     groupId = 'org.hyperledger'
     artifactId = 'iroha-android'
-    publishVersion = '1.0'
+    publishVersion = ${IROHA_LIBRARY_VERSION}
     desc = 'Android library for Iroha, a simple distributed ledger.'
     website = 'https://github.com/hyperledger/iroha-android'
 }
