@@ -23,17 +23,23 @@ Android Build Tools >=v25
 
 ### Gradle
 In your ```app/build.gradle```   
-Useage ```gh-pages``` branch.
 
 ```gradle
-repositories {
-    maven { url 'http://hyperledger.github.com/iroha-android/repository' }
-}
-
-dependencies {
-    compile 'io.soramitsu:iroha-android:1.1'
-}
+compile 'org.hyperledger:iroha-android:1.1'
 ```
+
+### Maven
+Or if you use Maven, like this
+
+```maven
+<dependency>
+  <groupId>org.hyperledger</groupId>
+  <artifactId>iroha-android</artifactId>
+  <version>2.0</version>
+  <type>pom</type>
+</dependency>
+```
+
 
 ## Usage
 ### API
