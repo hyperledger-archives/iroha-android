@@ -11,7 +11,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 25
         versionCode 2
-        versionName ${IROHA_LIBRARY_VERSION}
+        versionName IROHA_LIBRARY_VERSION
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
@@ -64,7 +64,7 @@ publish {
     userOrg = 'hyperledger'
     groupId = 'org.hyperledger'
     artifactId = 'iroha-android'
-    publishVersion = ${IROHA_LIBRARY_VERSION}
+    publishVersion = IROHA_LIBRARY_VERSION
     desc = 'Android library for Iroha, a simple distributed ledger.'
     website = 'https://github.com/hyperledger/iroha-android'
 }
