@@ -15,25 +15,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package io.soramitsu.irohaandroid;
+package io.soramitsu.irohaandroid.model;
 
-/**
- * KeyPair for ed25519.
- */
-public class KeyPair {
-    private String privateKey;
-    private String publicKey;
+import com.google.gson.annotations.SerializedName;
 
-    public KeyPair(String privateKey, String publicKey) {
-        this.privateKey = privateKey;
-        this.publicKey = publicKey;
-    }
+import java.io.Serializable;
 
-    public String getPrivateKey() {
-        return privateKey;
-    }
-
-    public String getPublicKey() {
-        return publicKey;
-    }
+public class Asset implements Serializable {
+    @SerializedName(value = "asset-uuid")
+    public String uuid;
+    public String name;
+    public String domain;
+    public String creator;
+    public String signature;
+    public String value;
+    public long timestamp;
 }
