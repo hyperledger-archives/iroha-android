@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_header_layout"
+    android:layout_width="match_parent"
+    android:layout_height="150dp"
+    android:background="@color/colorPrimaryDark">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/icon"
+        style="@style/NavigationDrawerImage"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@mipmap/ic_launcher" />
+
+    <LinearLayout
+        android:id="@+id/drawer_header_bottom_layout"
+        style="@style/NavigationDrawerBottom"
+        android:layout_width="match_parent"
+        android:layout_height="56dp">
+
+        <TextView
+            android:id="@+id/name"
+            style="@style/NavigationDrawerHeaderText.MainText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="makoto" />
+
+        <TextView
+            android:id="@+id/email"
+            style="@style/NavigationDrawerHeaderText.SubText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="makoto@soramitsu.co.jp" />
+    </LinearLayout>
+</RelativeLayout>

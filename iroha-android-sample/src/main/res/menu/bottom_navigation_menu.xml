@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_receipt"
+        android:enabled="true"
+        android:icon="@drawable/tab_receive"
+        android:title="@string/receive"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_wallet"
+        android:enabled="true"
+        android:icon="@drawable/tab_wallet"
+        android:title="@string/wallet"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_sender"
+        android:enabled="true"
+        android:icon="@drawable/tab_send"
+        android:title="@string/send"
+        app:showAsAction="ifRoom" />
+</menu>
