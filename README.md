@@ -35,7 +35,7 @@ Or if you use Maven, like this
 <dependency>
   <groupId>org.hyperledger</groupId>
   <artifactId>iroha-android</artifactId>
-  <version>2.0</version>
+  <version>1.1</version>
   <type>pom</type>
 </dependency>
 ```
