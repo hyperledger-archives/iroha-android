@@ -5,7 +5,7 @@ def IROHA_LIBRARY_VERSION = "1.1"
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.1"
+    buildToolsVersion "25.0.2"
 
     defaultConfig {
         minSdkVersion 19
@@ -35,7 +35,7 @@ android {
     }
 }
 
-def SUPPORT_PACKAGE_VERSION = "25.0.1"
+def SUPPORT_PACKAGE_VERSION = "25.1.0"
 def ESPRESSO_PACKAGE_VERSION = "2.2.2"
 def JUNIT_PACKAGE_VERSION = "4.12"
 def OKHTTP_PACKAGE_VERSION = "3.5.0";
