@@ -29,6 +29,7 @@ public abstract class IrohaAsyncTask<T> extends AsyncTask<Void, Void, Void> {
 
     private T result;
     private Exception exception;
+    private boolean finished;
 
     protected IrohaAsyncTask(Callback<T> callback) {
         this.callback = callback;
@@ -55,11 +56,16 @@ public abstract class IrohaAsyncTask<T> extends AsyncTask<Void, Void, Void> {
         }
 
         callback.onSuccessful(result);
+        finished = true;
     }
 
     @Override
     protected void onCancelled() {
         super.onCancelled();
         Log.d(TAG, "onCancelled: ");
+    }
+
+    public boolean isFinished() {
+        return finished;
     }
 }

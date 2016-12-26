@@ -94,10 +94,10 @@ public class Iroha {
         return iroha;
     }
 
-    public <T> void runAsyncTask(final String tag, final Callback<T> callback,
-                                 final Function<T> func, boolean clear) {
+    public <T> void runAsyncTask(final String tag, final Function<T> func,
+                                 final Callback<T> callback, boolean clear) {
         IrohaAsyncTask<?> asyncTask = asyncTaskMap.get(tag);
-        if (asyncTask == null || clear) {
+        if (asyncTask == null || clear || asyncTask.isFinished()) {
             asyncTask = new IrohaAsyncTask<T>(callback) {
                 @Override
                 protected T onBackground() throws Exception {
