@@ -15,19 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package io.soramitsu.iroha;
+package io.soramitsu.irohaandroid.callback;
 
-import android.app.Application;
-
-import io.soramitsu.irohaandroid.Iroha;
-
-public class IrohaApplication extends Application {
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        new Iroha.Builder()
-                .baseUrl("https://point-demo.iroha.tech")
-                .build();
-    }
+public interface Function<R> {
+    R call() throws Exception;
 }

@@ -26,7 +26,7 @@
 In your ```app/build.gradle```   
 
 ```gradle
-compile 'org.hyperledger:iroha-android:1.1'
+compile 'org.hyperledger:iroha-android:1.2'
 ```
 
 ### Maven
@@ -36,7 +36,7 @@ Or if you use Maven, like this
 <dependency>
   <groupId>org.hyperledger</groupId>
   <artifactId>iroha-android</artifactId>
-  <version>1.1</version>
+  <version>1.2</version>
   <type>pom</type>
 </dependency>
 ```
@@ -82,7 +82,7 @@ String hashedMessage = MessageDigest.digest("message", MessageDigest.SHA3_256);
 ```
 
 ### io.soramitsu.irohaandroid.Iroha
-#### Initialize
+### Initialize
 In your app
 on 'onCreate' your class inheriting Application
 
@@ -94,180 +94,152 @@ new Iroha.Builder()
         .build();
 ```
 
+### Web API
 #### registerAccount
 ```java
-import io.soramitsu.irohaandroid.Iroha;
-import io.soramitsu.irohaandroid.model.Account;
-
-Iroha.getInstance().registerAccount("publicKey", "alias",
-         new Callback<Account>() {
-             @Override
-             public void onSuccessful(Account result) {
-                 // Success!
-             }
-
-             @Override
-             public void onFailure(Throwable throwable) {
-                 // Error!
-             }
-         }
- );
+Iroha.getInstance().registerAccountFunction("publicKey", "alias");
+// ===> return Function for register account
 ```
 
 #### findAccount
 ```java
-import io.soramitsu.irohaandroid.Iroha;
-import io.soramitsu.irohaandroid.model.Account;
-
-Iroha.getInstance().findAccount("uuid",
-         new Callback<Account>() {
-             @Override
-             public void onSuccessful(Account result) {
-                 // Success!
-             }
-
-             @Override
-             public void onFailure(Throwable throwable) {
-                 // Error!
-             }
-         }
- );
+Iroha.getInstance().findAccount("uuid");
+// ===> return Function for find account
 ```
 
 #### registerDomain
 ```java
-import io.soramitsu.irohaandroid.Iroha;
-import io.soramitsu.irohaandroid.model.Domain;
-
-Iroha.getInstance().registerDomain("name", "owner", "signature",
-         new Callback<Domain>() {
-             @Override
-             public void onSuccessful(Domain result) {
-                 // Success!
-             }
-
-             @Override
-             public void onFailure(Throwable throwable) {
-                 // Error!
-             }
-         }
- );
+Iroha.getInstance().registerDomain("name", "owner", "signature");
+// ===> return Function for register domain
 ```
 
 #### findDomains
 ```java
-import io.soramitsu.irohaandroid.Iroha;
-import io.soramitsu.irohaandroid.model.Domain;
-
-Iroha.getInstance().findDomains(/* limit */30, /* offset */0,
-         new Callback<List<Domain>>() {
-             @Override
-             public void onSuccessful(List<Domain> result) {
-                 // Success!
-             }
-
-             @Override
-             public void onFailure(Throwable throwable) {
-                 // Error!
-             }
-         }
- );
+Iroha.getInstance().findDomains(/* limit */30, /* offset */0);
+// ===> return Function for find domains
 ```
 
 #### createAsset
 ```java
-import io.soramitsu.irohaandroid.Iroha;
-import io.soramitsu.irohaandroid.model.Asset;
-
-Iroha.getInstance().createAsset("name", "owner", "creator", "signature",
-         new Callback<Asset>() {
-             @Override
-             public void onSuccessful(Asset result) {
-                 // Success!
-             }
-
-             @Override
-             public void onFailure(Throwable throwable) {
-                 // Error!
-             }
-         }
- );
+Iroha.getInstance().createAsset("name", "owner", "creator", "signature");
+// ===> return Function for create asset
 ```
 
 #### findAssets
 ```java
-import io.soramitsu.irohaandroid.Iroha;
-import io.soramitsu.irohaandroid.model.Asset;
-
-Iroha.getInstance().findAssets("domain", /* limit */30, /* offset */0,
-         new Callback<List<Asset>>() {
-             @Override
-             public void onSuccessful(List<Asset> result) {
-                 // Success!
-             }
-
-             @Override
-             public void onFailure(Throwable throwable) {
-                 // Error!
-             }
-         }
- );
+Iroha.getInstance().findAssets("domain", /* limit */30, /* offset */0);
+// ===> return Function for find assets
 ```
 
 #### operationAsset
 ```java
-import io.soramitsu.irohaandroid.Iroha;
-import io.soramitsu.irohaandroid.model.Asset;
-
-Iroha.getInstance().operationAsset("asset-uuid", "command", "amount", "sender", "receiver", "signature",
-         new Callback<Boolean>() {
-             @Override
-             public void onSuccessful(Boolean result) {
-                 // Success!
-             }
-
-             @Override
-             public void onFailure(Throwable throwable) {
-                 // Error!
-             }
-         }
- );
+Iroha.getInstance().operationAsset(
+            "asset-uuid",
+            "command",
+            "amount",
+            "sender",
+            "receiver",
+            "signature",
+            /* timestamp */100000
+);
+// ===> return Function for operation
 ```
 
 #### findTransactionHistory
 ```java
-import io.soramitsu.irohaandroid.Iroha;
-import io.soramitsu.irohaandroid.model.Transaction;
-
 // Single asset
-Iroha.getInstance().findTransactionHistory("uuid", /* limit */30, /* offset */0,
-         new Callback<List<Transaction>>() {
-             @Override
-             public void onSuccessful(List<Transaction> result) {
-                 // Success!
-             }
-
-             @Override
-             public void onFailure(Throwable throwable) {
-                 // Error!
-             }
-         }
- );
+Iroha.getInstance().findTransactionHistory("uuid", /* limit */30, /* offset */0);
+// ===> return Function for find transaction history
 
 // Multi assets
-Iroha.getInstance().findTransactionHistory("uuid", "domain", "asset-uuid",  /* limit */30, /* offset */0,
-         new Callback<List<Transaction>>() {
-             @Override
-             public void onSuccessful(List<Transaction> result) {
-                 // Success!
-             }
+Iroha.getInstance().findTransactionHistory("uuid", "domain", "asset-uuid",  /* limit */30, /* offset */0);
+// ===> return Function for find transaction history
+```
 
-             @Override
-             public void onFailure(Throwable throwable) {
-                 // Error!
-             }
-         }
- );
+### Async
+#### runAsyncTask(single task)
+```java
+Iroha.getInstance().runAsyncTask(
+        "task's tag",
+        irohaWebApiFunction,
+        callback
+);
+```
+
+#### runAsyncTask(multi task)
+Now, you can 2 or 3 tasks in parallel.
+```java
+Iroha.getInstance().runParallelAsyncTask(
+        activity, // Required to run on UI thread
+        "task's tag1",
+        irohaWebApiFunction1,
+        "task's tag2",
+        irohaWebApiFunction2,
+        collectFunction, // collect the result of function 1 and 2
+        callback
+);
+```
+
+#### cancelAsyncTask
+```java
+Iroha.getInstance().cancelAsyncTask("task's tag");
+```
+
+### Usage example
+If you use iroha web api, should call Iroha#runAsyncTask.
+
+ex.) registerAccount
+```java
+Iroha iroha = Iroha.getInstance();
+iroha.runAsyncTask(
+        "AccountRegister",
+        iroha.registerAccountFunction(keyPair.publicKey, alias),
+        new Callback<Account>() {
+            @Override
+            public void onSuccessful(Account result) {
+                // Success!
+            }
+
+            @Override
+            public void onFailure(Throwable throwable) {
+                // Error!
+            }
+        }
+);
+```
+
+ex.) findAccount and findTransactionHistory
+```java
+Iroha iroha = Iroha.getInstance();
+iroha.runParallelAsyncTask(
+        getActivity(),
+        "UserInfo",
+        iroha.findAccountFunction(uuid),
+        "Transaction",
+        iroha.findTransactionHistoryFunction(uuid, 30, 0),
+        new Func2<Account, List<Transaction>, TransactionHistory>() {
+            @Override
+            public TransactionHistory call(Account account, List<Transaction> transactions) {
+                TransactionHistory transactionHistory = new TransactionHistory();
+                if (account != null && account.assets != null && !account.assets.isEmpty()) {
+                    transactionHistory.value = account.assets.get(0).value;
+                }
+                transactionHistory.histories = transactions;
+                return transactionHistory;
+            }
+        },
+        new Callback<TransactionHistory>() {
+            @Override
+            public void onSuccessful(TransactionHistory result) {
+                // Success!
+            }
+
+            @Override
+            public void onFailure(Throwable throwable) {
+                // Error!
+            }
+        }
+);
 ```
 
 

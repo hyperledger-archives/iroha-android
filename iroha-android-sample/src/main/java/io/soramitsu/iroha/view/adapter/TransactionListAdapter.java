@@ -69,7 +69,9 @@ public class TransactionListAdapter extends BaseAdapter {
         Collections.sort(sortedTransactionList, new Comparator<Transaction>() {
             @Override
             public int compare(Transaction t1, Transaction t2) {
-                return t1.timestamp < t2.timestamp ? 1 : t1.timestamp == t2.timestamp ? 0 : -1;
+                long ts1 = t1.params.timestamp;
+                long ts2 = t2.params.timestamp;
+                return ts1 < ts2 ? 1 : ts1 == ts2 ? 0 : -1;
             }
         });
         this.transactionHistory = sortedTransactionList;

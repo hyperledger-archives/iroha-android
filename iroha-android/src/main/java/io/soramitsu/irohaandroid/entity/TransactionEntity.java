@@ -26,7 +26,6 @@ public class TransactionEntity {
     public String assetName;
     public OperationParameterEntity params;
     public String signature;
-    public long timestamp;
 
     public class OperationParameterEntity {
         public String command;
@@ -34,5 +33,6 @@ public class TransactionEntity {
         public String sender;
         public String receiver;
         public String opponent;
+        public long timestamp;
     }
 }

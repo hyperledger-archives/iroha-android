@@ -15,19 +15,34 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package io.soramitsu.iroha;
+package io.soramitsu.irohaandroid.async;
 
-import android.app.Application;
+public class DataSet<T1, T2, T3> {
+    private T1 t1;
+    private T2 t2;
+    private T3 t3;
 
-import io.soramitsu.irohaandroid.Iroha;
+    public T1 getT1() {
+        return t1;
+    }
 
-public class IrohaApplication extends Application {
+    public void setT1(T1 t1) {
+        this.t1 = t1;
+    }
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        new Iroha.Builder()
-                .baseUrl("https://point-demo.iroha.tech")
-                .build();
+    public T2 getT2() {
+        return t2;
+    }
+
+    public void setT2(T2 t2) {
+        this.t2 = t2;
+    }
+
+    public T3 getT3() {
+        return t3;
+    }
+
+    public void setT3(T3 t3) {
+        this.t3 = t3;
     }
 }

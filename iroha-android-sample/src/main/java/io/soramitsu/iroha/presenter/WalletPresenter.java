@@ -42,11 +42,15 @@ import io.soramitsu.iroha.view.WalletView;
 import io.soramitsu.iroha.view.fragment.WalletFragment;
 import io.soramitsu.irohaandroid.Iroha;
 import io.soramitsu.irohaandroid.callback.Callback;
+import io.soramitsu.irohaandroid.callback.Func2;
 import io.soramitsu.irohaandroid.model.Account;
 import io.soramitsu.irohaandroid.model.Transaction;
 
 public class WalletPresenter implements Presenter<WalletView> {
     public static final String TAG = WalletPresenter.class.getSimpleName();
+
+    private static final String IROHA_TASK_TAG_USER_INFO_ON_WALLET = "UserInfoOnWallet";
+    private static final String IROHA_TASK_TAG_TRANSACTION = "Transaction";
 
     private WalletView walletView;
 
@@ -93,8 +97,8 @@ public class WalletPresenter implements Presenter<WalletView> {
     @Override
     public void onStop() {
         Iroha iroha = Iroha.getInstance();
-        iroha.cancelFindAccount();
-        iroha.cancelFindTransactionHistory();
+        iroha.cancelAsyncTask(IROHA_TASK_TAG_USER_INFO_ON_WALLET);
+        iroha.cancelAsyncTask(IROHA_TASK_TAG_TRANSACTION);
     }
 
     @Override
@@ -144,38 +148,50 @@ public class WalletPresenter implements Presenter<WalletView> {
             uuid = getUuid();
         }
 
-        Iroha.getInstance().findAccount(uuid, new Callback<Account>() {
+        Iroha iroha = Iroha.getInstance();
+        iroha.runParallelAsyncTask(
+                walletView.getActivity(),
+                IROHA_TASK_TAG_USER_INFO_ON_WALLET,
+                iroha.findAccountFunction(uuid),
+                IROHA_TASK_TAG_TRANSACTION,
+                iroha.findTransactionHistoryFunction(uuid, 30, 0),
+                collectFunc(),
+                callback()
+        );
+    }
+
+    private Func2<Account, List<Transaction>, TransactionHistory> collectFunc() {
+        return new Func2<Account, List<Transaction>, TransactionHistory>() {
             @Override
-            public void onSuccessful(final Account account) {
-                Iroha.getInstance().findTransactionHistory(uuid, 30, 0, new Callback<List<Transaction>>() {
-                    @Override
-                    public void onSuccessful(List<Transaction> transactions) {
-                        if (walletView.isRefreshing()) {
-                            walletView.setRefreshing(false);
-                        }
+            public TransactionHistory call(Account account, List<Transaction> transactions) {
+                TransactionHistory transactionHistory = new TransactionHistory();
+                if (account != null && account.assets != null && !account.assets.isEmpty()) {
+                    transactionHistory.value = account.assets.get(0).value;
+                }
+                transactionHistory.histories = transactions;
+                return transactionHistory;
+            }
+        };
+    }
 
-                        walletView.hideProgress();
+    private Callback<TransactionHistory> callback() {
+        return new Callback<TransactionHistory>() {
+            @Override
+            public void onSuccessful(TransactionHistory result) {
+                if (walletView.isRefreshing()) {
+                    walletView.setRefreshing(false);
+                }
 
-                        TransactionHistory transactionHistory = new TransactionHistory();
-                        if (account.assets != null && !account.assets.isEmpty()) {
-                            transactionHistory.value = account.assets.get(0).value;
-                        }
-                        transactionHistory.histories = transactions;
-                        walletView.renderTransactionHistory(transactionHistory);
-                    }
+                walletView.hideProgress();
 
-                    @Override
-                    public void onFailure(Throwable throwable) {
-                        fail(throwable);
-                    }
-                });
+                walletView.renderTransactionHistory(result);
             }
 
             @Override
             public void onFailure(Throwable throwable) {
                 fail(throwable);
             }
-        });
+        };
     }
 
     private void fail(Throwable throwable) {

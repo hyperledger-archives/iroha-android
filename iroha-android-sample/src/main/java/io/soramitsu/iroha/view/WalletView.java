@@ -17,9 +17,13 @@ limitations under the License.
 
 package io.soramitsu.iroha.view;
 
+import android.app.Activity;
+
 import io.soramitsu.iroha.model.TransactionHistory;
 
 public interface WalletView extends LoadingView {
+    Activity getActivity();
+
     boolean isRefreshing();
 
     void setRefreshing(boolean refreshing);
