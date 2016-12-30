@@ -60,6 +60,8 @@ import static android.content.Context.CLIPBOARD_SERVICE;
 public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
     public static final String TAG = AssetReceivePresenter.class.getSimpleName();
 
+    private static final String IROHA_TASK_TAG_USER_INFO_ON_RECEIVE = "UserInfoOnReceive";
+
     private final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
 
     private AssetReceiveView assetReceiveView;
@@ -108,7 +110,7 @@ public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
 
     @Override
     public void onStop() {
-        Iroha.getInstance().cancelFindAccount();
+        Iroha.getInstance().cancelAsyncTask(IROHA_TASK_TAG_USER_INFO_ON_RECEIVE);
     }
 
     @Override
@@ -188,13 +190,21 @@ public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
     }
 
     private void fetchAccountAssetFromApi() {
-        final Context context = assetReceiveView.getContext();
-
         if (uuid == null || uuid.isEmpty()) {
             uuid = getUuid();
         }
 
-        Iroha.getInstance().findAccount(uuid, new Callback<Account>() {
+        Iroha iroha = Iroha.getInstance();
+        iroha.runAsyncTask(
+                IROHA_TASK_TAG_USER_INFO_ON_RECEIVE,
+                iroha.findAccountFunction(uuid),
+                callback(),
+                false
+        );
+    }
+
+    private Callback<Account> callback() {
+        return new Callback<Account>() {
             @Override
             public void onSuccessful(Account result) {
                 if (assetReceiveView.isRefreshing()) {
@@ -212,9 +222,11 @@ public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
                     assetReceiveView.setRefreshing(false);
                 }
 
-                assetReceiveView.showError(ErrorMessageFactory.create(context, throwable));
+                assetReceiveView.showError(
+                        ErrorMessageFactory.create(assetReceiveView.getContext(), throwable)
+                );
             }
-        });
+        };
     }
 
     private void setPublicKey() {

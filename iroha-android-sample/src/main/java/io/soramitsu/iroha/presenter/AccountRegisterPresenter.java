@@ -38,13 +38,15 @@ import io.soramitsu.iroha.exception.RequiredArgumentException;
 import io.soramitsu.iroha.util.NetworkUtil;
 import io.soramitsu.iroha.view.AccountRegisterView;
 import io.soramitsu.irohaandroid.Iroha;
-import io.soramitsu.irohaandroid.security.KeyGenerator;
 import io.soramitsu.irohaandroid.callback.Callback;
 import io.soramitsu.irohaandroid.model.Account;
 import io.soramitsu.irohaandroid.model.KeyPair;
+import io.soramitsu.irohaandroid.security.KeyGenerator;
 
 public class AccountRegisterPresenter implements Presenter<AccountRegisterView> {
     public static final String TAG = AccountRegisterPresenter.class.getSimpleName();
+
+    private static final String IROHA_TASK_TAG_ACCOUNT_REGISTER = "AccountRegister";
 
     private AccountRegisterView accountRegisterView;
 
@@ -75,7 +77,8 @@ public class AccountRegisterPresenter implements Presenter<AccountRegisterView> 
 
     @Override
     public void onStop() {
-        Iroha.getInstance().cancelRegisterAccount();
+        Iroha.getInstance().cancelAsyncTask(IROHA_TASK_TAG_ACCOUNT_REGISTER);
+        accountRegisterView.hideProgress();
     }
 
     @Override
@@ -127,38 +130,57 @@ public class AccountRegisterPresenter implements Presenter<AccountRegisterView> 
     }
 
     private void register(final KeyPair keyPair, final String alias) {
-        final Context context = accountRegisterView.getContext();
-        Iroha.getInstance().registerAccount(keyPair.publicKey, alias, new Callback<Account>() {
+        Log.d(TAG, "register: " + keyPair.publicKey);
+        Iroha iroha = Iroha.getInstance();
+        iroha.runAsyncTask(
+                IROHA_TASK_TAG_ACCOUNT_REGISTER,
+                iroha.registerAccountFunction(keyPair.publicKey, alias),
+                callback(),
+                true
+        );
+    }
+
+    private Callback<Account> callback() {
+        return new Callback<Account>() {
             @Override
             public void onSuccessful(Account result) {
-                accountRegisterView.hideProgress();
-
-                try {
-                    result.alias = accountRegisterView.getAlias();
-                    result.save(accountRegisterView.getContext());
-                } catch (InvalidKeyException | NoSuchAlgorithmException
-                        | KeyStoreException | NoSuchPaddingException | IOException e) {
-                    Log.e(TAG, "onSuccessful: ", e);
-                    KeyPair.delete(accountRegisterView.getContext());
-                    accountRegisterView.showError(ErrorMessageFactory.create(context, e));
-                    return;
-                }
-
-                accountRegisterView.registerSuccessful();
+                registerSuccessful(result);
             }
 
             @Override
             public void onFailure(Throwable throwable) {
-                accountRegisterView.hideProgress();
-
-                KeyPair.delete(accountRegisterView.getContext());
-
-                if (NetworkUtil.isOnline(accountRegisterView.getContext())) {
-                    accountRegisterView.showError(ErrorMessageFactory.create(context, throwable));
-                } else {
-                    accountRegisterView.showError(ErrorMessageFactory.create(context, new NetworkNotConnectedException()));
-                }
+                registerFailure(throwable);
             }
-        });
+        };
+    }
+
+    private void registerSuccessful(Account result) {
+        accountRegisterView.hideProgress();
+
+        try {
+            result.alias = accountRegisterView.getAlias();
+            result.save(accountRegisterView.getContext());
+        } catch (InvalidKeyException | NoSuchAlgorithmException
+                | KeyStoreException | NoSuchPaddingException | IOException e) {
+            Log.e(TAG, "onSuccessful: ", e);
+            KeyPair.delete(accountRegisterView.getContext());
+            accountRegisterView.showError(ErrorMessageFactory.create(accountRegisterView.getContext(), e));
+            return;
+        }
+
+        accountRegisterView.registerSuccessful();
+    }
+
+    private void registerFailure(Throwable throwable) {
+        accountRegisterView.hideProgress();
+
+        KeyPair.delete(accountRegisterView.getContext());
+
+        Context c = accountRegisterView.getContext();
+        if (NetworkUtil.isOnline(accountRegisterView.getContext())) {
+            accountRegisterView.showError(ErrorMessageFactory.create(c, throwable));
+        } else {
+            accountRegisterView.showError(ErrorMessageFactory.create(c, new NetworkNotConnectedException()));
+        }
     }
 }
