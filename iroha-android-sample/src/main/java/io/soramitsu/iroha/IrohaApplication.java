@@ -27,7 +27,7 @@ public class IrohaApplication extends Application {
     public void onCreate() {
         super.onCreate();
         new Iroha.Builder()
-                .baseUrl("https://point-demo.iroha.tech/api/v1")
+                .baseUrl("https://point-demo.iroha.tech")
                 .build();
     }
 }
