@@ -6,8 +6,6 @@ import android.util.Log;
 public abstract class BaseIrohaAsyncTask<T> extends AsyncTask<Void, Void, Void> {
     public static final String TAG = BaseIrohaAsyncTask.class.getSimpleName();
 
-    private boolean finished;
-
     protected T result;
     protected Exception exception;
 
@@ -28,16 +26,11 @@ public abstract class BaseIrohaAsyncTask<T> extends AsyncTask<Void, Void, Void> 
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
         onMainThread();
-        finished = true;
     }
 
     @Override
     protected void onCancelled() {
         super.onCancelled();
         Log.d(TAG, "onCancelled: ");
-    }
-
-    public boolean isFinished() {
-        return finished;
     }
 }

@@ -194,7 +194,7 @@ public class Iroha {
     /* ============ 【Async Task Management】 from here ============  */
 
     public <T> void runAsyncTask(final String tag, final Function<? extends T> func,
-                                 final Callback<T> callback, boolean clear) {
+                                 final Callback<T> callback) {
 
         IrohaAsyncTask<T> asyncTask = new IrohaAsyncTask<T>(callback) {
             @Override
@@ -202,7 +202,7 @@ public class Iroha {
                 return func.call();
             }
         };
-        execute(tag, asyncTask, clear);
+        execute(tag, asyncTask);
     }
 
     public <T1, T2, R> void runParallelAsyncTask(
@@ -229,7 +229,7 @@ public class Iroha {
                                     return f1.call();
                                 }
                             };
-                    execute(tag1, firstParallelAsyncTask, false);
+                    execute(tag1, firstParallelAsyncTask);
 
                     IrohaParallelAsyncTask<?> secondParallelAsyncTask =
                             new IrohaParallelAsyncTask<T2>(dataSet, countDownLatch) {
@@ -238,7 +238,7 @@ public class Iroha {
                                     return f2.call();
                                 }
                             };
-                    execute(tag2, secondParallelAsyncTask, false);
+                    execute(tag2, secondParallelAsyncTask);
 
                     countDownLatch.await();
                     Log.d(TAG, "run: all async task finished.");
@@ -299,7 +299,7 @@ public class Iroha {
                                     return f1.call();
                                 }
                             };
-                    execute(tag1, firstParallelAsyncTask, false);
+                    execute(tag1, firstParallelAsyncTask);
 
                     IrohaParallelAsyncTask<?> secondParallelAsyncTask =
                             new IrohaParallelAsyncTask<T2>(dataSet, countDownLatch) {
@@ -308,7 +308,7 @@ public class Iroha {
                                     return f2.call();
                                 }
                             };
-                    execute(tag2, secondParallelAsyncTask, false);
+                    execute(tag2, secondParallelAsyncTask);
 
                     IrohaParallelAsyncTask<?> threeParallelAsyncTask =
                             new IrohaParallelAsyncTask<T3>(dataSet, countDownLatch) {
@@ -317,7 +317,7 @@ public class Iroha {
                                     return f3.call();
                                 }
                             };
-                    execute(tag3, threeParallelAsyncTask, false);
+                    execute(tag3, threeParallelAsyncTask);
 
                     countDownLatch.await();
                     Log.d(TAG, "run: all async task finished.");
@@ -353,22 +353,17 @@ public class Iroha {
     }
 
     public boolean cancelAsyncTask(final String tag) {
+        Log.d(TAG, "cancelAsyncTask: " + tag);
         BaseIrohaAsyncTask asyncTask = asyncTaskMap.get(tag);
         return asyncTask != null && asyncTask.cancel(true);
     }
 
     private <C extends BaseIrohaAsyncTask<?>> void execute(
             @NonNull final String tag,
-            @NonNull C newAsyncTask,
-            boolean clear) {
+            @NonNull C newAsyncTask) {
 
-        BaseIrohaAsyncTask asyncTask = asyncTaskMap.get(tag);
-        if (shouldReCreateAsyncTask(asyncTask, clear)) {
-            asyncTaskMap.put(tag, newAsyncTask);
-            execute(newAsyncTask);
-        } else {
-            execute(asyncTask);
-        }
+        asyncTaskMap.put(tag, newAsyncTask);
+        execute(newAsyncTask);
     }
 
     private void execute(@NonNull BaseIrohaAsyncTask<?> asyncTask) {
@@ -379,10 +374,6 @@ public class Iroha {
             IrohaParallelAsyncTask<?> irohaParallelAsyncTask = (IrohaParallelAsyncTask<?>) asyncTask;
             irohaParallelAsyncTask.execute();
         }
-    }
-
-    private boolean shouldReCreateAsyncTask(BaseIrohaAsyncTask asyncTask, boolean clear) {
-        return asyncTask == null || asyncTask.isFinished() || clear;
     }
 
     /* ============ 【Async Task Management】 to here ============  */

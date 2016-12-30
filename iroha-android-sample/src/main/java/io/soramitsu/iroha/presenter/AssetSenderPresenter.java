@@ -173,7 +173,6 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
     }
 
     private void send() throws ReceiverNotFoundException {
-        final Context context = assetSenderView.getContext();
         final String receiver = assetSenderView.getReceiver();
         final String amount = assetSenderView.getAmount();
 
@@ -203,8 +202,7 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
                             signature,
                             timestamp
                     ),
-                    callback(),
-                    false
+                    callback()
             );
         } else {
             assetSenderView.hideProgress();
