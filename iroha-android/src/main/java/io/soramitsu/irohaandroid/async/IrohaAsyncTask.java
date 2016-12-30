@@ -17,38 +17,21 @@ limitations under the License.
 
 package io.soramitsu.irohaandroid.async;
 
-import android.os.AsyncTask;
 import android.util.Log;
 
 import io.soramitsu.irohaandroid.callback.Callback;
 
-public abstract class IrohaAsyncTask<T> extends AsyncTask<Void, Void, Void> {
+public abstract class IrohaAsyncTask<T> extends BaseIrohaAsyncTask<T> {
     public static final String TAG = IrohaAsyncTask.class.getSimpleName();
 
     private final Callback<T> callback;
-
-    private T result;
-    private Exception exception;
-    private boolean finished;
 
     protected IrohaAsyncTask(Callback<T> callback) {
         this.callback = callback;
     }
 
-    protected abstract T onBackground() throws Exception;
-
     @Override
-    protected Void doInBackground(Void... ts) {
-        try {
-            result = onBackground();
-        } catch (Exception e) {
-            exception = e;
-        }
-        return null;
-    }
-
-    @Override
-    protected void onPostExecute(Void res) {
+    protected void onMainThread() {
         if (exception != null) {
             Log.e(TAG, "Iroha:  throw exception!", exception);
             callback.onFailure(exception);
@@ -56,16 +39,5 @@ public abstract class IrohaAsyncTask<T> extends AsyncTask<Void, Void, Void> {
         }
 
         callback.onSuccessful(result);
-        finished = true;
-    }
-
-    @Override
-    protected void onCancelled() {
-        super.onCancelled();
-        Log.d(TAG, "onCancelled: ");
-    }
-
-    public boolean isFinished() {
-        return finished;
     }
 }

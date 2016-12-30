@@ -17,69 +17,41 @@ limitations under the License.
 
 package io.soramitsu.irohaandroid.async;
 
-import android.os.AsyncTask;
-import android.util.Log;
-
 import java.util.concurrent.CountDownLatch;
 
-import io.soramitsu.irohaandroid.callback.Function;
-
-public class IrohaParallelAsyncTask<T> extends AsyncTask<Void, Void, T> {
+public abstract class IrohaParallelAsyncTask<T> extends BaseIrohaAsyncTask<T> {
     public static final String TAG = IrohaParallelAsyncTask.class.getSimpleName();
 
-    private final Function<? extends T> function;
     private final CountDownLatch countDownLatch;
 
     private DataSet target;
-    private Exception exception;
 
-
-    public IrohaParallelAsyncTask(
+    protected IrohaParallelAsyncTask(
             DataSet target,
-            Function<? extends T> function,
             CountDownLatch countDownLatch) {
 
         this.target = target;
-        this.function = function;
         this.countDownLatch = countDownLatch;
     }
 
     @Override
-    protected T doInBackground(Void... ts) {
-        try {
-            return function.call();
-        } catch (Exception e) {
-            exception = e;
-            return null;
-        }
-    }
-
-    @Override
-    protected void onPostExecute(T res) {
-        super.onPostExecute(res);
-
+    protected void onMainThread() {
         if (countDownLatch.getCount() == 3) {
-            target.setT1(res);
+            target.setT1(result);
         } else if (countDownLatch.getCount() == 2) {
             if (target.getT1() == null) {
-                target.setT1(res);
+                target.setT1(result);
             } else {
-                target.setT2(res);
+                target.setT2(result);
             }
         } else if (countDownLatch.getCount() == 1) {
             if (target.getT2() == null) {
-                target.setT2(res);
+                target.setT2(result);
             } else {
-                target.setT3(res);
+                target.setT3(result);
             }
         }
 
         countDownLatch.countDown();
-    }
-
-    @Override
-    protected void onCancelled() {
-        super.onCancelled();
-        Log.d(TAG, "onCancelled: ");
     }
 }
