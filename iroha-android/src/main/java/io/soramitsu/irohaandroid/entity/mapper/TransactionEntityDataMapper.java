@@ -43,7 +43,6 @@ public class TransactionEntityDataMapper {
             transaction.assetName = transactionEntity.assetName;
             transaction.params = operationEntityDataMapper.transform(transactionEntity.params);
             transaction.signature = transactionEntity.signature;
-            transaction.timestamp = transactionEntity.timestamp;
         }
 
         return transaction;
@@ -68,6 +67,7 @@ public class TransactionEntityDataMapper {
                 operationParameter.sender = operationParameterEntity.sender;
                 operationParameter.receiver = operationParameterEntity.receiver;
                 operationParameter.oppoent = operationParameterEntity.opponent;
+                operationParameter.timestamp = operationParameterEntity.timestamp;
             }
 
             return operationParameter;
