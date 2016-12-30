@@ -15,24 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package io.soramitsu.iroha.view;
+package io.soramitsu.irohaandroid.callback;
 
-import android.app.Activity;
-
-import io.soramitsu.iroha.model.TransactionHistory;
-
-public interface WalletView extends LoadingView {
-    Activity getActivity();
-
-    boolean isRefreshing();
-
-    void setRefreshing(boolean refreshing);
-
-    void setRefreshEnable(boolean enable);
-
-    void showError(String error);
-
-    TransactionHistory getTransaction();
-
-    void renderTransactionHistory(TransactionHistory transactionHistory);
+public interface Func3<T1, T2, T3, R> {
+    R call(T1 t1, T2 t2, T3 t3);
 }

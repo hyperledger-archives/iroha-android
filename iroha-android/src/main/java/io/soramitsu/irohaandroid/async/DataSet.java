@@ -15,24 +15,34 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package io.soramitsu.iroha.view;
+package io.soramitsu.irohaandroid.async;
 
-import android.app.Activity;
+public class DataSet<T1, T2, T3> {
+    private T1 t1;
+    private T2 t2;
+    private T3 t3;
 
-import io.soramitsu.iroha.model.TransactionHistory;
+    public T1 getT1() {
+        return t1;
+    }
 
-public interface WalletView extends LoadingView {
-    Activity getActivity();
+    public void setT1(T1 t1) {
+        this.t1 = t1;
+    }
 
-    boolean isRefreshing();
+    public T2 getT2() {
+        return t2;
+    }
 
-    void setRefreshing(boolean refreshing);
+    public void setT2(T2 t2) {
+        this.t2 = t2;
+    }
 
-    void setRefreshEnable(boolean enable);
+    public T3 getT3() {
+        return t3;
+    }
 
-    void showError(String error);
-
-    TransactionHistory getTransaction();
-
-    void renderTransactionHistory(TransactionHistory transactionHistory);
+    public void setT3(T3 t3) {
+        this.t3 = t3;
+    }
 }
