@@ -27,12 +27,14 @@ import android.widget.TextView;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import io.soramitsu.iroha.R;
+import io.soramitsu.iroha.model.QRType;
 import io.soramitsu.iroha.util.AndroidSupportUtil;
 import io.soramitsu.irohaandroid.model.Transaction;
 
 @BindingMethods({
         @BindingMethod(type = View.class, attribute = "android:drawable", method = "setBackground"),
-        @BindingMethod(type = TextView.class, attribute = "android:drawable", method = "setBackground")
+        @BindingMethod(type = TextView.class, attribute = "android:drawable", method = "setBackground"),
+        @BindingMethod(type = TextView.class, attribute = "android:text", method = "setText")
 })
 @SuppressWarnings("unused")
 public final class BindingUtils {
@@ -42,7 +44,7 @@ public final class BindingUtils {
 
         final Drawable target;
 
-        if (transaction.isSender(publicKey)) {
+        if (transaction.isSender(publicKey) && transaction.params.command.equals(QRType.TRANSFER.getType())) {
             target = AndroidSupportUtil.getDrawable(c, R.drawable.icon_send);
         } else {
             target = AndroidSupportUtil.getDrawable(c, R.drawable.icon_rec);
@@ -54,14 +56,29 @@ public final class BindingUtils {
     @BindingAdapter({"transaction", "public_key"})
     public static void setTransactionOpponentText(TextView textView, Transaction transaction, String publicKey) {
         String type;
+        String command = transaction.params.command;
 
-        if (transaction.isSender(publicKey)) {
+        if (transaction.isSender(publicKey) && command.equals(QRType.TRANSFER.getType())) {
             type = "to ";
         } else {
             type = "from ";
         }
 
-        String displayText = type + transaction.params.receiver;
+        String displayText = type;
+        if (command.equals("Add")) {
+            displayText += "Register";
+        } else {
+            displayText += transaction.params.receiver;
+        }
         textView.setText(displayText);
+    }
+
+    @BindingAdapter({"tx"})
+    public static void setTransactionValue(TextView textView, Transaction tx) {
+        if (tx.params.command.equals("Add")) {
+            textView.setText("100");
+        } else {
+            textView.setText(tx.params.value);
+        }
     }
 }

@@ -37,9 +37,9 @@
                 android:layout_centerVertical="true"
                 android:layout_marginEnd="8dp"
                 android:gravity="center"
-                android:text="@{transaction.params.value}"
                 android:textColor="@color/primary_text"
                 android:textSize="24sp"
+                app:tx="@{transaction}"
                 tools:text="100 iroha" />
 
             <de.hdodenhof.circleimageview.CircleImageView
