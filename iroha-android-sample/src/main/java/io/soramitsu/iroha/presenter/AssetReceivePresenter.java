@@ -198,8 +198,7 @@ public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
         iroha.runAsyncTask(
                 IROHA_TASK_TAG_USER_INFO_ON_RECEIVE,
                 iroha.findAccountFunction(uuid),
-                callback(),
-                false
+                callback()
         );
     }
 

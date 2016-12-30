@@ -135,8 +135,7 @@ public class AccountRegisterPresenter implements Presenter<AccountRegisterView> 
         iroha.runAsyncTask(
                 IROHA_TASK_TAG_ACCOUNT_REGISTER,
                 iroha.registerAccountFunction(keyPair.publicKey, alias),
-                callback(),
-                true
+                callback()
         );
     }
 
