@@ -29,8 +29,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import click.kobaken.rxirohaandroid.model.Transaction;
 import io.soramitsu.iroha.R;
-import io.soramitsu.irohaandroid.model.Transaction;
 
 public class TransactionListAdapter extends BaseAdapter {
     private Context context;

@@ -7,7 +7,7 @@
 
         <variable
             name="transaction"
-            type="io.soramitsu.irohaandroid.model.Transaction" />
+            type="click.kobaken.rxirohaandroid.model.Transaction" />
 
         <variable
             name="publicKey"

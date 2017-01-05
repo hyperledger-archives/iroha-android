@@ -21,10 +21,11 @@ import android.content.Context;
 
 import com.google.zxing.WriterException;
 
+import click.kobaken.rxirohaandroid.exception.AccountDuplicateException;
+import click.kobaken.rxirohaandroid.exception.HttpBadRequestException;
+import click.kobaken.rxirohaandroid.exception.UserNotFoundException;
 import io.soramitsu.iroha.R;
-import io.soramitsu.irohaandroid.exception.AccountDuplicateException;
-import io.soramitsu.irohaandroid.exception.HttpBadRequestException;
-import io.soramitsu.irohaandroid.exception.UserNotFoundException;
+
 
 public class ErrorMessageFactory {
 

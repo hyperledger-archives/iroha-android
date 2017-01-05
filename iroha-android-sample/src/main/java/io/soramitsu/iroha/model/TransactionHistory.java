@@ -23,7 +23,8 @@ import android.os.Parcelable;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.soramitsu.irohaandroid.model.Transaction;
+import click.kobaken.rxirohaandroid.model.Transaction;
+
 
 public class TransactionHistory implements Parcelable {
     public static final String TAG = TransactionHistory.class.getSimpleName();

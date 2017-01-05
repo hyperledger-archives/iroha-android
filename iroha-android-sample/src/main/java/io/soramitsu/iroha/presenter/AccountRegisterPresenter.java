@@ -31,17 +31,17 @@ import java.security.NoSuchAlgorithmException;
 
 import javax.crypto.NoSuchPaddingException;
 
+import click.kobaken.rxirohaandroid.Iroha;
+import click.kobaken.rxirohaandroid.callback.Callback;
+import click.kobaken.rxirohaandroid.model.Account;
+import click.kobaken.rxirohaandroid.model.KeyPair;
+import click.kobaken.rxirohaandroid.security.KeyGenerator;
 import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.exception.ErrorMessageFactory;
 import io.soramitsu.iroha.exception.NetworkNotConnectedException;
 import io.soramitsu.iroha.exception.RequiredArgumentException;
 import io.soramitsu.iroha.util.NetworkUtil;
 import io.soramitsu.iroha.view.AccountRegisterView;
-import io.soramitsu.irohaandroid.Iroha;
-import io.soramitsu.irohaandroid.callback.Callback;
-import io.soramitsu.irohaandroid.model.Account;
-import io.soramitsu.irohaandroid.model.KeyPair;
-import io.soramitsu.irohaandroid.security.KeyGenerator;
 
 public class AccountRegisterPresenter implements Presenter<AccountRegisterView> {
     public static final String TAG = AccountRegisterPresenter.class.getSimpleName();
