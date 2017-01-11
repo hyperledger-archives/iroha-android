@@ -34,7 +34,6 @@ import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.UnrecoverableKeyException;
@@ -53,8 +52,8 @@ public class KeyStoreManager {
 
     private static final String ANDROID_KEY_STORE = "AndroidKeyStore";
     private static final String KEY_ALIAS = "io.soramitsu.iroha.key_alias";
-    private static final String ALGORITHM = "RSA/ECB/PKCS1Padding";
-    private static final String ANDROID_OPEN_SSL = "AndroidOpenSSL";
+    private static final String CIPHER_ALGO_LEAGER_THAN_M = "RSA/ECB/OAEPwithSHA-256andMGF1Padding";
+    private static final String CIPHER_ALGO = "RSA/ECB/PKCS1Padding";
     private static final String CHARACTER_CODE_UTF8 = "UTF-8";
 
     private KeyStore keyStore;
@@ -125,28 +124,32 @@ public class KeyStoreManager {
         return spec;
     }
 
+    private Cipher getCipherInstance() throws NoSuchPaddingException, NoSuchAlgorithmException {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return Cipher.getInstance(CIPHER_ALGO_LEAGER_THAN_M);
+        } else {
+            return Cipher.getInstance(CIPHER_ALGO);
+        }
+    }
+
     public String encrypt(String plainText)
             throws KeyStoreException, NoSuchPaddingException, NoSuchAlgorithmException,
             InvalidKeyException, IOException {
 
-        String encryptedText = null;
+        String encryptedText;
         PublicKey publicKey = keyStore.getCertificate(KEY_ALIAS).getPublicKey();
 
-        try {
-            Cipher cipher = Cipher.getInstance(ALGORITHM, ANDROID_OPEN_SSL);
-            cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+        Cipher cipher = getCipherInstance();
+        cipher.init(Cipher.ENCRYPT_MODE, publicKey);
 
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            CipherOutputStream cipherOutputStream = new CipherOutputStream(
-                    outputStream, cipher);
-            cipherOutputStream.write(plainText.getBytes(CHARACTER_CODE_UTF8));
-            cipherOutputStream.close();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        CipherOutputStream cipherOutputStream = new CipherOutputStream(
+                outputStream, cipher);
+        cipherOutputStream.write(plainText.getBytes(CHARACTER_CODE_UTF8));
+        cipherOutputStream.close();
 
-            byte[] bytes = outputStream.toByteArray();
-            encryptedText = Base64.encodeToString(bytes, Base64.DEFAULT);
-        } catch (NoSuchProviderException e) {
-            e.printStackTrace();
-        }
+        byte[] bytes = outputStream.toByteArray();
+        encryptedText = Base64.encodeToString(bytes, Base64.DEFAULT);
 
         return encryptedText;
     }
@@ -155,26 +158,22 @@ public class KeyStoreManager {
             throws KeyStoreException, NoSuchPaddingException, NoSuchAlgorithmException,
             UnrecoverableKeyException, InvalidKeyException, IOException {
 
-        String plainText = null;
+        String plainText;
         PrivateKey privateKey = (PrivateKey) keyStore.getKey(KEY_ALIAS, null);
 
-        try {
-            Cipher cipher = Cipher.getInstance(ALGORITHM, ANDROID_OPEN_SSL);
-            cipher.init(Cipher.DECRYPT_MODE, privateKey);
+        Cipher cipher = getCipherInstance();
+        cipher.init(Cipher.DECRYPT_MODE, privateKey);
 
-            CipherInputStream cipherInputStream = new CipherInputStream(
-                    new ByteArrayInputStream(Base64.decode(encryptedText, Base64.DEFAULT)), cipher);
+        CipherInputStream cipherInputStream = new CipherInputStream(
+                new ByteArrayInputStream(Base64.decode(encryptedText, Base64.DEFAULT)), cipher);
 
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            int b;
-            while ((b = cipherInputStream.read()) != -1) {
-                outputStream.write(b);
-            }
-            outputStream.close();
-            plainText = outputStream.toString(CHARACTER_CODE_UTF8);
-        } catch (NoSuchProviderException e) {
-            e.printStackTrace();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        int b;
+        while ((b = cipherInputStream.read()) != -1) {
+            outputStream.write(b);
         }
+        outputStream.close();
+        plainText = outputStream.toString(CHARACTER_CODE_UTF8);
 
         return plainText;
     }
