@@ -15,9 +15,10 @@
 - [License](#license)
 
 ## Requirement
-Android Studio >=2.2.1  
-Android API Level >=v19  
-Android Build Tools >=v25  
+
+- Android Studio >=2.2.1  
+- Android API Level >=v19 (v4.4, KitKat)
+- Android Build Tools >=v25  
 
 ## Installation
 
