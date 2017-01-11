@@ -34,6 +34,7 @@ import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.UnrecoverableKeyException;
@@ -52,7 +53,9 @@ public class KeyStoreManager {
 
     private static final String ANDROID_KEY_STORE = "AndroidKeyStore";
     private static final String KEY_ALIAS = "io.soramitsu.iroha.key_alias";
-    private static final String ALGORITHM = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
+    private static final String ALGORITHM = "RSA/ECB/PKCS1Padding";
+    private static final String ANDROID_OPEN_SSL = "AndroidOpenSSL";
+    private static final String CHARACTER_CODE_UTF8 = "UTF-8";
 
     private KeyStore keyStore;
     private Context context;
@@ -126,20 +129,24 @@ public class KeyStoreManager {
             throws KeyStoreException, NoSuchPaddingException, NoSuchAlgorithmException,
             InvalidKeyException, IOException {
 
-        String encryptedText;
+        String encryptedText = null;
         PublicKey publicKey = keyStore.getCertificate(KEY_ALIAS).getPublicKey();
 
-        Cipher cipher = Cipher.getInstance(ALGORITHM);
-        cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+        try {
+            Cipher cipher = Cipher.getInstance(ALGORITHM, ANDROID_OPEN_SSL);
+            cipher.init(Cipher.ENCRYPT_MODE, publicKey);
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        CipherOutputStream cipherOutputStream = new CipherOutputStream(
-                outputStream, cipher);
-        cipherOutputStream.write(plainText.getBytes("UTF-8"));
-        cipherOutputStream.close();
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            CipherOutputStream cipherOutputStream = new CipherOutputStream(
+                    outputStream, cipher);
+            cipherOutputStream.write(plainText.getBytes(CHARACTER_CODE_UTF8));
+            cipherOutputStream.close();
 
-        byte[] bytes = outputStream.toByteArray();
-        encryptedText = Base64.encodeToString(bytes, Base64.DEFAULT);
+            byte[] bytes = outputStream.toByteArray();
+            encryptedText = Base64.encodeToString(bytes, Base64.DEFAULT);
+        } catch (NoSuchProviderException e) {
+            e.printStackTrace();
+        }
 
         return encryptedText;
     }
@@ -148,22 +155,26 @@ public class KeyStoreManager {
             throws KeyStoreException, NoSuchPaddingException, NoSuchAlgorithmException,
             UnrecoverableKeyException, InvalidKeyException, IOException {
 
-        String plainText;
+        String plainText = null;
         PrivateKey privateKey = (PrivateKey) keyStore.getKey(KEY_ALIAS, null);
 
-        Cipher cipher = Cipher.getInstance(ALGORITHM);
-        cipher.init(Cipher.DECRYPT_MODE, privateKey);
+        try {
+            Cipher cipher = Cipher.getInstance(ALGORITHM, ANDROID_OPEN_SSL);
+            cipher.init(Cipher.DECRYPT_MODE, privateKey);
 
-        CipherInputStream cipherInputStream = new CipherInputStream(
-                new ByteArrayInputStream(Base64.decode(encryptedText, Base64.DEFAULT)), cipher);
+            CipherInputStream cipherInputStream = new CipherInputStream(
+                    new ByteArrayInputStream(Base64.decode(encryptedText, Base64.DEFAULT)), cipher);
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        int b;
-        while ((b = cipherInputStream.read()) != -1) {
-            outputStream.write(b);
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            int b;
+            while ((b = cipherInputStream.read()) != -1) {
+                outputStream.write(b);
+            }
+            outputStream.close();
+            plainText = outputStream.toString(CHARACTER_CODE_UTF8);
+        } catch (NoSuchProviderException e) {
+            e.printStackTrace();
         }
-        outputStream.close();
-        plainText = outputStream.toString("UTF-8");
 
         return plainText;
     }
