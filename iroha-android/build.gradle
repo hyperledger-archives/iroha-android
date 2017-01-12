@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.novoda.bintray-release'
 
-def IROHA_LIBRARY_VERSION = "1.2.2"
+def IROHA_LIBRARY_VERSION = "1.2.3"
 
 android {
     compileSdkVersion 25
@@ -10,7 +10,7 @@ android {
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 25
-        versionCode 5
+        versionCode 6
         versionName IROHA_LIBRARY_VERSION
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
