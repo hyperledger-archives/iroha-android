@@ -104,11 +104,6 @@ public class QRReaderLowerThanApi19Activity extends QRReaderActivity {
                                     finish();
 
                                     callback.onSuccessful(text);
-//                                    Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container);
-//                                    if (fragment instanceof OnQRReaderListener) {
-//                                        OnQRReaderListener handler = (OnQRReaderListener) fragment;
-//                                        handler.setOnResult(text);
-//                                    }
                                 } catch (Exception e) {
                                     Log.e(TAG, "onPreviewFrame: " + e.getMessage());
                                     callback.onFailure(e);
@@ -120,7 +115,6 @@ public class QRReaderLowerThanApi19Activity extends QRReaderActivity {
                 autoFocusHandler.postDelayed(this, 5000);
             }
         }, 1000);
-        surfaceView.getHolder().addCallback(this);
     }
 
     @Override
