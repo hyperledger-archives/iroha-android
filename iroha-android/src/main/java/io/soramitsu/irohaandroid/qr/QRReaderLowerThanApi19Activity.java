@@ -27,7 +27,7 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
-import android.widget.RelativeLayout;
+import android.widget.FrameLayout;
 
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.MultiFormatReader;
@@ -133,7 +133,7 @@ public class QRReaderLowerThanApi19Activity extends QRReaderActivity {
 
             setParameters();
             setDisplayOrientation();
-            setSurfaceViewSize();
+//            setSurfaceViewSize();
 
             camera.setPreviewDisplay(holder);
             camera.startPreview();
@@ -222,9 +222,9 @@ public class QRReaderLowerThanApi19Activity extends QRReaderActivity {
             surfaceHeight = (int) (previewHeight * relativeWidth / previewWidth);
         }
 
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
                 surfaceWidth, surfaceHeight);
-        params.addRule(RelativeLayout.CENTER_IN_PARENT);
+//        params.addRule(RelativeLayout.CENTER_IN_PARENT);
         surfaceView.setLayoutParams(params);
     }
 }
