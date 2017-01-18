@@ -17,25 +17,38 @@ limitations under the License.
 
 package io.soramitsu.irohaandroid.async;
 
+import android.util.Log;
+
 import java.util.concurrent.CountDownLatch;
+
+import io.soramitsu.irohaandroid.callback.Callback;
 
 public abstract class IrohaParallelAsyncTask<T> extends BaseIrohaAsyncTask<T> {
     public static final String TAG = IrohaParallelAsyncTask.class.getSimpleName();
 
     private final CountDownLatch countDownLatch;
 
+    private Callback callback;
     private DataSet target;
 
     protected IrohaParallelAsyncTask(
+            Callback callback,
             DataSet target,
             CountDownLatch countDownLatch) {
 
+        this.callback = callback;
         this.target = target;
         this.countDownLatch = countDownLatch;
     }
 
     @Override
     protected void onMainThread() {
+        if (exception != null) {
+            Log.e(TAG, "Iroha:  throw exception!", exception);
+            callback.onFailure(this.exception);
+            return;
+        }
+
         if (countDownLatch.getCount() == 3) {
             target.setT1(result);
         } else if (countDownLatch.getCount() == 2) {
