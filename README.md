@@ -26,7 +26,7 @@
 In your ```app/build.gradle```   
 
 ```gradle
-compile 'org.hyperledger:iroha-android:1.2.4'
+compile 'org.hyperledger:iroha-android:1.2.5'
 ```
 
 ### Maven
@@ -36,7 +36,7 @@ Or if you use Maven, like this
 <dependency>
   <groupId>org.hyperledger</groupId>
   <artifactId>iroha-android</artifactId>
-  <version>1.2.4</version>
+  <version>1.2.5</version>
   <type>pom</type>
 </dependency>
 ```

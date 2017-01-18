@@ -75,7 +75,11 @@ public class AccountRepositoryImpl implements AccountRepository {
         Log.d(TAG, "find account: json[\n" + responseBody + "]\nresponse code: " + code);
         switch (code) {
             case 200:
-                return gson.fromJson(responseBody, new TypeToken<AccountEntity>(){}.getType());
+                AccountEntity accountEntity = gson.fromJson(responseBody, new TypeToken<AccountEntity>(){}.getType());
+                if (accountEntity.status == 400) {
+                    throw new UserNotFoundException();
+                }
+                return accountEntity;
             case 400:
                 throw new UserNotFoundException();
             default:
