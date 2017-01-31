@@ -21,24 +21,31 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import click.kobaken.rxirohaandroid.Iroha;
 import okhttp3.Headers;
 import okhttp3.Interceptor;
-import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 
 public class IrohaHttpClient {
-    private static IrohaHttpClient irohaClient  = new IrohaHttpClient();
-
-    private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    private static final IrohaHttpClient irohaClient  = new IrohaHttpClient();
 
     private final OkHttpClient client;
 
     private IrohaHttpClient() {
+        client = createOkHttpClientBuilder().build();
+    }
+
+    public static IrohaHttpClient getInstance() {
+        return irohaClient;
+    }
+
+    public OkHttpClient get() {
+        return client;
+    }
+
+    private OkHttpClient.Builder createOkHttpClientBuilder() {
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         httpClient.addInterceptor(new Interceptor() {
             @Override
@@ -64,31 +71,6 @@ public class IrohaHttpClient {
         logging.setLevel(HttpLoggingInterceptor.Level.BASIC);
         httpClient.addInterceptor(logging);
 
-        client = httpClient.build();
-    }
-
-    public static IrohaHttpClient getInstance() {
-        return irohaClient;
-    }
-
-
-
-    public Response call(Request request) throws IOException {
-        return client.newCall(request).execute();
-    }
-
-    public static Request createRequest(String path) {
-        return request(path).build();
-    }
-
-    public static Request createRequest(String path, String paramsJsonString) {
-        RequestBody body = RequestBody.create(JSON, paramsJsonString);
-        return request(path)
-                .post(body)
-                .build();
-    }
-
-    private static Request.Builder request(String path) {
-        return new Request.Builder().url(Iroha.getInstance().baseUrl + path);
+        return httpClient;
     }
 }
