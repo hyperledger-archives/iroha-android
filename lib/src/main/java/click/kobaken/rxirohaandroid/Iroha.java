@@ -21,6 +21,13 @@ import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.internal.bind.DateTypeAdapter;
+import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,12 +43,21 @@ import click.kobaken.rxirohaandroid.callback.Func3;
 import click.kobaken.rxirohaandroid.callback.Function;
 import click.kobaken.rxirohaandroid.model.Account;
 import click.kobaken.rxirohaandroid.model.Asset;
+import click.kobaken.rxirohaandroid.model.BaseModel;
 import click.kobaken.rxirohaandroid.model.Domain;
-import click.kobaken.rxirohaandroid.model.Transaction;
+import click.kobaken.rxirohaandroid.model.TransactionHistory;
+import click.kobaken.rxirohaandroid.net.IrohaHttpClient;
+import click.kobaken.rxirohaandroid.repository.AccountRepository;
+import click.kobaken.rxirohaandroid.repository.AssetRepository;
+import click.kobaken.rxirohaandroid.repository.DomainRepository;
+import click.kobaken.rxirohaandroid.repository.TransactionRepository;
 import click.kobaken.rxirohaandroid.service.AccountService;
 import click.kobaken.rxirohaandroid.service.AssetService;
 import click.kobaken.rxirohaandroid.service.DomainService;
 import click.kobaken.rxirohaandroid.service.TransactionService;
+import io.reactivex.Observable;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Iroha {
     private static final String TAG = Iroha.class.getSimpleName();
@@ -50,18 +66,32 @@ public class Iroha {
 
     private static Iroha iroha;
 
-    private final AccountService accountService = new AccountService();
-    private final DomainService domainService = new DomainService();
-    private final AssetService assetService = new AssetService();
-    private final TransactionService transactionService = new TransactionService();
+    private final AccountService accountService;
+    private final DomainService domainService;
+    private final AssetService assetService;
+    private final TransactionService transactionService;
 
     private final Map<String, BaseIrohaAsyncTask<?>> asyncTaskMap = new HashMap<>();
 
-    public String baseUrl;
-
     private Iroha(Builder builder) {
-        this.baseUrl = builder.baseUrl;
         iroha = this;
+
+        Gson gson = new GsonBuilder()
+                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                .registerTypeAdapter(Date.class, new DateTypeAdapter())
+                .create();
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(builder.baseUrl)
+                .client(IrohaHttpClient.getInstance().get())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
+
+        accountService = new AccountService(retrofit.create(AccountRepository.class));
+        domainService = new DomainService(retrofit.create(DomainRepository.class));
+        assetService = new AssetService(retrofit.create(AssetRepository.class));
+        transactionService = new TransactionService(retrofit.create(TransactionRepository.class));
     }
 
     public static class Builder {
@@ -90,102 +120,56 @@ public class Iroha {
 
     /* ============ 【Web API】 from here ============  */
 
-    public Function<Account> registerAccountFunction(final String publicKey, final String alias) {
-        return new Function<Account>() {
-            @Override
-            public Account call() throws Exception {
-                return accountService.register(publicKey, alias);
-            }
-        };
+    public Observable<Account> registerAccount(final String publicKey, final String alias) {
+        return accountService.register(publicKey, alias);
     }
 
-    public Function<Account> findAccountFunction(final String uuid) {
-        return new Function<Account>() {
-            @Override
-            public Account call() throws Exception {
-                return accountService.findAccount(uuid);
-            }
-        };
+    public Observable<Account> findAccount(final String uuid) {
+        return accountService.findAccount(uuid);
     }
 
-    public Function<Domain> registerDomainFunction(
+    public Observable<Domain> registerDomain(
             final String name, final String owner, final String signature) {
 
-        return new Function<Domain>() {
-            @Override
-            public Domain call() throws Exception {
-                return domainService.register(name, owner, signature);
-            }
-        };
+        return domainService.register(name, owner, signature);
     }
 
-    public Function<List<Domain>> findDomainsFunction(final int limit, final int offset) {
-
-        return new Function<List<Domain>>() {
-            @Override
-            public List<Domain> call() throws Exception {
-                return domainService.findDomains(limit, offset);
-            }
-        };
+    public Observable<List<Domain>> findDomains(final int limit, final int offset) {
+        return domainService.findDomains(limit, offset);
     }
 
-    public Function<Asset> createAssetFunction(
+    public Observable<Asset> createAsset(
             final String name, final String domain, final String creator,
             final String signature, final long timestamp) {
 
-        return new Function<Asset>() {
-            @Override
-            public Asset call() throws Exception {
-                return assetService.create(name, domain, creator, signature, timestamp);
-            }
-        };
+        return assetService.create(name, domain, creator, signature, timestamp);
     }
 
-    public Function<List<Asset>> findAssetsFunction(
+    public Observable<List<Asset>> findAssets(
             final String domain, final int limit, final int offset) {
 
-        return new Function<List<Asset>>() {
-            @Override
-            public List<Asset> call() throws Exception {
-                return assetService.findAssets(domain, limit, offset);
-            }
-        };
+        return assetService.findAssets(domain, limit, offset);
     }
 
-    public Function<Boolean> operateAssetFunction(
+    public Observable<BaseModel> operateAsset(
             final String assetUuid, final String command, final String value,
             final String sender, final String receiver, final String signature,
             final long timestamp) {
 
-        return new Function<Boolean>() {
-            @Override
-            public Boolean call() throws Exception {
-                return assetService.operation(assetUuid, command, value, sender, receiver, signature, timestamp);
-            }
-        };
+        return assetService.operation(assetUuid, command, value, sender, receiver, signature, timestamp);
     }
 
-    public Function<List<Transaction>> findTransactionHistoryFunction(
+    public Observable<TransactionHistory> findTransactionHistory(
             final String uuid, final int limit, final int offset) {
 
-        return new Function<List<Transaction>>() {
-            @Override
-            public List<Transaction> call() throws Exception {
-                return transactionService.findHistory(uuid, limit, offset);
-            }
-        };
+        return transactionService.findHistory(uuid, limit, offset);
     }
 
-    public Function<List<Transaction>> findTransactionHistoryFunction(
-            final String uuid, final String domain, final String asset,
+    public Observable<TransactionHistory> findTransactionHistory(
+            final String domain, final String asset, final String uuid,
             final int limit, final int offset) {
 
-        return new Function<List<Transaction>>() {
-            @Override
-            public List<Transaction> call() throws Exception {
-                return transactionService.findHistory(uuid, domain, asset, limit, offset);
-            }
-        };
+        return transactionService.findHistory(domain, asset, uuid, limit, offset);
     }
 
     /* ============ 【Web API】 to here ============  */
