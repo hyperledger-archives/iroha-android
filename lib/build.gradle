@@ -47,6 +47,7 @@ def BOUNCY_CASTLE_PACKAGE_VERSION = "1.55";
 def RX_ANDROID_PACKAGE_VERSION = "2.0.1";
 def RX_JAVA_PACKAGE_VERSION = "2.0.1";
 def RETROFIT_PACKAGE_VERSION = "2.1.0";
+def RETROFIT_RXJAVA2_ADAPTER_PACKAGE_VERSION = "1.0.0"
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -66,6 +67,8 @@ dependencies {
     compile "io.reactivex.rxjava2:rxandroid:${RX_ANDROID_PACKAGE_VERSION}"
     compile "io.reactivex.rxjava2:rxjava:${RX_JAVA_PACKAGE_VERSION}"
     compile "com.squareup.retrofit2:retrofit:${RETROFIT_PACKAGE_VERSION}"
+    compile "com.squareup.retrofit2:converter-gson:${RETROFIT_PACKAGE_VERSION}"
+    compile "com.jakewharton.retrofit:retrofit2-rxjava2-adapter:${RETROFIT_RXJAVA2_ADAPTER_PACKAGE_VERSION}"
 }
 
 publish {
