@@ -15,8 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package click.kobaken.rxirohaandroid.callback;
+package click.kobaken.rxirohaandroid.qr;
 
-public interface Func1<T, R> {
-    R call(T t) throws Exception;
+public interface ReadQRCallback {
+    void onSuccessful(String result);
+    void onFailure(Throwable throwable);
 }

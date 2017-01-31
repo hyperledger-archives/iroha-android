@@ -21,8 +21,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 
-import click.kobaken.rxirohaandroid.callback.Callback;
 import click.kobaken.rxirohaandroid.qr.QRReaderBuilder;
+import click.kobaken.rxirohaandroid.qr.ReadQRCallback;
 import io.soramitsu.iroha.view.activity.AccountRegisterActivity;
 import io.soramitsu.iroha.view.activity.MainActivity;
 
@@ -51,7 +51,7 @@ public class Navigator {
         }
     }
 
-    public void navigateToQRReaderActivity(Context context, @NonNull Callback<String> callback) {
+    public void navigateToQRReaderActivity(Context context, @NonNull ReadQRCallback callback) {
         if (context != null) {
             Intent intent = new QRReaderBuilder(context)
                     .setCallback(callback)
