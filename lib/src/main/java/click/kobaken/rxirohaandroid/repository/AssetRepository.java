@@ -17,21 +17,27 @@ limitations under the License.
 
 package click.kobaken.rxirohaandroid.repository;
 
-import java.io.IOException;
+import java.util.List;
 
-import click.kobaken.rxirohaandroid.entity.AssetEntity;
-import click.kobaken.rxirohaandroid.entity.AssetListEntity;
-import click.kobaken.rxirohaandroid.exception.HttpBadRequestException;
+import click.kobaken.rxirohaandroid.model.Asset;
+import click.kobaken.rxirohaandroid.model.BaseModel;
 import click.kobaken.rxirohaandroid.net.dataset.reqest.AssetOperationRequest;
 import click.kobaken.rxirohaandroid.net.dataset.reqest.AssetRegisterRequest;
+import io.reactivex.Observable;
+import retrofit2.http.Body;
+import retrofit2.http.GET;
+import retrofit2.http.POST;
+import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface AssetRepository {
-    AssetEntity create(AssetRegisterRequest body)
-            throws IOException, HttpBadRequestException;
+    @POST("/asset/create")
+    Observable<Asset> create(@Body AssetRegisterRequest body);
 
-    AssetListEntity findAssets(String domain, int limit, int offset)
-            throws IOException, HttpBadRequestException;
+    @GET("/{domain}/asset/list")
+    Observable<List<Asset>> findAssets(
+            @Path("domain") String domain, @Query("limit") int limit, @Query("offset") int offset);
 
-    boolean operation(AssetOperationRequest body)
-            throws IOException, HttpBadRequestException;
+    @POST("/asset/operation")
+    Observable<BaseModel> operation(@Body AssetOperationRequest body);
 }

@@ -17,19 +17,19 @@ limitations under the License.
 
 package click.kobaken.rxirohaandroid.repository;
 
-import java.io.IOException;
-
-import click.kobaken.rxirohaandroid.entity.AccountEntity;
-import click.kobaken.rxirohaandroid.exception.AccountDuplicateException;
-import click.kobaken.rxirohaandroid.exception.HttpBadRequestException;
-import click.kobaken.rxirohaandroid.exception.UserNotFoundException;
+import click.kobaken.rxirohaandroid.model.Account;
 import click.kobaken.rxirohaandroid.net.dataset.reqest.AccountRegisterRequest;
+import io.reactivex.Observable;
+import retrofit2.http.Body;
+import retrofit2.http.GET;
+import retrofit2.http.POST;
+import retrofit2.http.Query;
 
 
 public interface AccountRepository {
-    AccountEntity register(AccountRegisterRequest body)
-            throws IOException, AccountDuplicateException, HttpBadRequestException;
+    @POST("/account/register")
+    Observable<Account> register(@Body AccountRegisterRequest body);
 
-    AccountEntity findByUuid(String uuid)
-            throws IOException, UserNotFoundException, HttpBadRequestException;
+    @GET("/account")
+    Observable<Account> findByUuid(@Query("uuid") String uuid);
 }

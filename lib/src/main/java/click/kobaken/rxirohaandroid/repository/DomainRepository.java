@@ -17,18 +17,20 @@ limitations under the License.
 
 package click.kobaken.rxirohaandroid.repository;
 
-import java.io.IOException;
+import java.util.List;
 
-import click.kobaken.rxirohaandroid.entity.DomainEntity;
-import click.kobaken.rxirohaandroid.entity.DomainListEntity;
-import click.kobaken.rxirohaandroid.exception.HttpBadRequestException;
+import click.kobaken.rxirohaandroid.model.Domain;
 import click.kobaken.rxirohaandroid.net.dataset.reqest.DomainRegisterRequest;
-
+import io.reactivex.Observable;
+import retrofit2.http.Body;
+import retrofit2.http.GET;
+import retrofit2.http.POST;
+import retrofit2.http.Query;
 
 public interface DomainRepository {
-    DomainEntity register(DomainRegisterRequest body)
-            throws IOException, HttpBadRequestException;
+    @POST("/domain/register")
+    Observable<Domain> register(@Body DomainRegisterRequest body);
 
-    DomainListEntity findDomains(int limit, int offset)
-            throws IOException, HttpBadRequestException;
+    @GET("/domain/list")
+    Observable<List<Domain>> findDomains(@Query("limit") int limit, @Query("offset") int offset);
 }
