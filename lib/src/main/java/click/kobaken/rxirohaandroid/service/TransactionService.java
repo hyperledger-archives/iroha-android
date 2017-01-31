@@ -17,28 +17,24 @@ limitations under the License.
 
 package click.kobaken.rxirohaandroid.service;
 
-import java.io.IOException;
-import java.util.List;
-
-import click.kobaken.rxirohaandroid.entity.mapper.TransactionEntityDataMapper;
-import click.kobaken.rxirohaandroid.exception.HttpBadRequestException;
-import click.kobaken.rxirohaandroid.model.Transaction;
+import click.kobaken.rxirohaandroid.model.TransactionHistory;
 import click.kobaken.rxirohaandroid.repository.TransactionRepository;
-import click.kobaken.rxirohaandroid.repository.impl.TransactionRepositoryImpl;
+import io.reactivex.Observable;
 
 
 public class TransactionService {
+    private TransactionRepository transactionRepository;
 
-    private final TransactionRepository transactionRepository = new TransactionRepositoryImpl();
-    private final TransactionEntityDataMapper transactionEntityDataMapper = new TransactionEntityDataMapper();
-
-    public List<Transaction> findHistory(String uuid, int limit, int offset)
-            throws IOException, HttpBadRequestException {
-        return transactionEntityDataMapper.transform(transactionRepository.findHistory(uuid, limit, offset));
+    public TransactionService(TransactionRepository transactionRepository) {
+        this.transactionRepository = transactionRepository;
     }
 
-    public List<Transaction> findHistory(String uuid, String domain, String asset, int limit, int offset)
-            throws IOException, HttpBadRequestException {
-        return transactionEntityDataMapper.transform(transactionRepository.findHistory(uuid, domain, asset, limit, offset));
+    public Observable<TransactionHistory> findHistory(String uuid, int limit, int offset) {
+        return transactionRepository.findHistory(uuid, limit, offset);
+    }
+
+    public Observable<TransactionHistory> findHistory(
+            String domain, String asset, String uuid, int limit, int offset) {
+        return transactionRepository.findHistory(domain, asset, uuid, limit, offset);
     }
 }

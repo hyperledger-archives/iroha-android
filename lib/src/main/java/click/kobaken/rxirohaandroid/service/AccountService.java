@@ -17,36 +17,28 @@ limitations under the License.
 
 package click.kobaken.rxirohaandroid.service;
 
-import java.io.IOException;
-
-import click.kobaken.rxirohaandroid.entity.mapper.AccountEntityDataMapper;
-import click.kobaken.rxirohaandroid.exception.AccountDuplicateException;
-import click.kobaken.rxirohaandroid.exception.HttpBadRequestException;
-import click.kobaken.rxirohaandroid.exception.UserNotFoundException;
 import click.kobaken.rxirohaandroid.model.Account;
 import click.kobaken.rxirohaandroid.net.dataset.reqest.AccountRegisterRequest;
 import click.kobaken.rxirohaandroid.repository.AccountRepository;
-import click.kobaken.rxirohaandroid.repository.impl.AccountRepositoryImpl;
-
+import io.reactivex.Observable;
 
 public class AccountService {
+    private AccountRepository accountRepository;
 
-    private final AccountRepository accountRepository = new AccountRepositoryImpl();
-    private final AccountEntityDataMapper accountEntityDataMapper = new AccountEntityDataMapper();
+    public AccountService(AccountRepository accountRepository) {
+        this.accountRepository = accountRepository;
+    }
 
-    public Account register(String publicKey, String alias)
-            throws IOException, AccountDuplicateException, HttpBadRequestException {
+    public Observable<Account> register(String publicKey, String alias) {
 
         final AccountRegisterRequest body = new AccountRegisterRequest();
         body.publicKey = publicKey;
         body.alias = alias;
         body.timestamp = System.currentTimeMillis() / 1000;
-
-        return accountEntityDataMapper.transform(accountRepository.register(body));
+        return accountRepository.register(body);
     }
 
-    public Account findAccount(String uuid)
-            throws IOException, UserNotFoundException, HttpBadRequestException {
-        return accountEntityDataMapper.transform(accountRepository.findByUuid(uuid));
+    public Observable<Account> findAccount(String uuid) {
+        return accountRepository.findByUuid(uuid);
     }
 }

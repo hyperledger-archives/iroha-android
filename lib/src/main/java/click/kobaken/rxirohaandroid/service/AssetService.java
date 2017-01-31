@@ -17,26 +17,25 @@ limitations under the License.
 
 package click.kobaken.rxirohaandroid.service;
 
-import java.io.IOException;
 import java.util.List;
 
-import click.kobaken.rxirohaandroid.entity.mapper.AssetEntityDataMapper;
-import click.kobaken.rxirohaandroid.exception.HttpBadRequestException;
 import click.kobaken.rxirohaandroid.model.Asset;
+import click.kobaken.rxirohaandroid.model.BaseModel;
 import click.kobaken.rxirohaandroid.model.Transaction;
 import click.kobaken.rxirohaandroid.net.dataset.reqest.AssetOperationRequest;
 import click.kobaken.rxirohaandroid.net.dataset.reqest.AssetRegisterRequest;
 import click.kobaken.rxirohaandroid.repository.AssetRepository;
-import click.kobaken.rxirohaandroid.repository.impl.AssetRepositoryImpl;
-
+import io.reactivex.Observable;
 
 public class AssetService {
+    private AssetRepository assetRepository;
 
-    private final AssetRepository assetRepository = new AssetRepositoryImpl();
-    private final AssetEntityDataMapper assetEntityDataMapper = new AssetEntityDataMapper();
+    public AssetService(AssetRepository assetRepository) {
+        this.assetRepository = assetRepository;
+    }
 
-    public Asset create(String name, String domain, String creator, String signature, long timestamp)
-            throws IOException, HttpBadRequestException {
+    public Observable<Asset> create(
+            String name, String domain, String creator, String signature, long timestamp) {
 
         final AssetRegisterRequest body = new AssetRegisterRequest();
         body.name = name;
@@ -45,17 +44,15 @@ public class AssetService {
         body.timestamp = timestamp;
         body.signature = signature;
 
-        return assetEntityDataMapper.transform(assetRepository.create(body));
+        return assetRepository.create(body);
     }
 
-    public List<Asset> findAssets(String domain, int limit, int offset)
-            throws IOException, HttpBadRequestException {
-        return assetEntityDataMapper.transform(assetRepository.findAssets(domain, limit, offset));
+    public Observable<List<Asset>> findAssets(String domain, int limit, int offset) {
+        return assetRepository.findAssets(domain, limit, offset);
     }
 
-    public boolean operation(String assetUuid, String command, String value,
-                             String sender, String receiver, String signature, long timestamp)
-            throws IOException, HttpBadRequestException {
+    public Observable<BaseModel> operation(String assetUuid, String command, String value,
+                                           String sender, String receiver, String signature, long timestamp) {
 
         final AssetOperationRequest body = new AssetOperationRequest();
         body.uuid = assetUuid;
