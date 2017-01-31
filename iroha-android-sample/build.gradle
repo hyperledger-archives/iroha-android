@@ -30,7 +30,7 @@ def CIRCLE_IMAGE_VIEW_PACKAGE_VERSION = "2.1.0"
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile project(path: ':iroha-android')
+    compile project(path: ':lib')
     compile "com.android.support:appcompat-v7:${SUPPORT_PACKAGE_VERSION}"
     compile "com.android.support:support-v4:${SUPPORT_PACKAGE_VERSION}"
     compile "com.android.support:design:${SUPPORT_PACKAGE_VERSION}"

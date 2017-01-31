@@ -34,17 +34,17 @@ import java.util.List;
 
 import javax.crypto.NoSuchPaddingException;
 
+import click.kobaken.rxirohaandroid.Iroha;
+import click.kobaken.rxirohaandroid.callback.Callback;
+import click.kobaken.rxirohaandroid.callback.Func2;
+import click.kobaken.rxirohaandroid.model.Account;
+import click.kobaken.rxirohaandroid.model.Transaction;
 import io.soramitsu.iroha.exception.ErrorMessageFactory;
 import io.soramitsu.iroha.exception.NetworkNotConnectedException;
 import io.soramitsu.iroha.model.TransactionHistory;
 import io.soramitsu.iroha.util.NetworkUtil;
 import io.soramitsu.iroha.view.WalletView;
 import io.soramitsu.iroha.view.fragment.WalletFragment;
-import io.soramitsu.irohaandroid.Iroha;
-import io.soramitsu.irohaandroid.callback.Callback;
-import io.soramitsu.irohaandroid.callback.Func2;
-import io.soramitsu.irohaandroid.model.Account;
-import io.soramitsu.irohaandroid.model.Transaction;
 
 public class WalletPresenter implements Presenter<WalletView> {
     public static final String TAG = WalletPresenter.class.getSimpleName();

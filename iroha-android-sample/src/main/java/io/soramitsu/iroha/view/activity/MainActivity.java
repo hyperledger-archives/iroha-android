@@ -55,6 +55,7 @@ import java.security.UnrecoverableKeyException;
 
 import javax.crypto.NoSuchPaddingException;
 
+import click.kobaken.rxirohaandroid.model.Account;
 import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.databinding.ActivityMainBinding;
 import io.soramitsu.iroha.exception.ErrorMessageFactory;
@@ -62,7 +63,6 @@ import io.soramitsu.iroha.navigator.Navigator;
 import io.soramitsu.iroha.view.fragment.AssetReceiveFragment;
 import io.soramitsu.iroha.view.fragment.AssetSenderFragment;
 import io.soramitsu.iroha.view.fragment.WalletFragment;
-import io.soramitsu.irohaandroid.model.Account;
 
 public class MainActivity extends AppCompatActivity {
     public static final String TAG = MainActivity.class.getSimpleName();

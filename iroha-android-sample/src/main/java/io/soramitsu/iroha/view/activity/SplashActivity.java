@@ -22,10 +22,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 
+import click.kobaken.rxirohaandroid.model.Account;
 import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.navigator.Navigator;
 import io.soramitsu.iroha.view.fragment.SplashFragment;
-import io.soramitsu.irohaandroid.model.Account;
 
 public class SplashActivity extends AppCompatActivity {
     public static final String TAG = SplashActivity.class.getSimpleName();

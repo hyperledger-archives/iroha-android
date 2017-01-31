@@ -19,7 +19,8 @@ package io.soramitsu.iroha;
 
 import android.app.Application;
 
-import io.soramitsu.irohaandroid.Iroha;
+import click.kobaken.rxirohaandroid.Iroha;
+
 
 public class IrohaApplication extends Application {
 

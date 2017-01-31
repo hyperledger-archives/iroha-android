@@ -29,6 +29,8 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import click.kobaken.rxirohaandroid.model.KeyPair;
+import click.kobaken.rxirohaandroid.model.Transaction;
 import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.databinding.FragmentWalletBinding;
 import io.soramitsu.iroha.model.TransactionHistory;
@@ -36,8 +38,6 @@ import io.soramitsu.iroha.presenter.WalletPresenter;
 import io.soramitsu.iroha.view.WalletView;
 import io.soramitsu.iroha.view.activity.MainActivity;
 import io.soramitsu.iroha.view.adapter.TransactionListAdapter;
-import io.soramitsu.irohaandroid.model.KeyPair;
-import io.soramitsu.irohaandroid.model.Transaction;
 
 public class WalletFragment extends Fragment
         implements WalletView, MainActivity.MainActivityListener {

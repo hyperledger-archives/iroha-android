@@ -21,10 +21,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 
+import click.kobaken.rxirohaandroid.callback.Callback;
+import click.kobaken.rxirohaandroid.qr.QRReaderBuilder;
 import io.soramitsu.iroha.view.activity.AccountRegisterActivity;
 import io.soramitsu.iroha.view.activity.MainActivity;
-import io.soramitsu.irohaandroid.callback.Callback;
-import io.soramitsu.irohaandroid.qr.QRReaderBuilder;
 
 public class Navigator {
     private static Navigator navigator;

@@ -45,15 +45,15 @@ import java.security.UnrecoverableKeyException;
 
 import javax.crypto.NoSuchPaddingException;
 
+import click.kobaken.rxirohaandroid.Iroha;
+import click.kobaken.rxirohaandroid.callback.Callback;
+import click.kobaken.rxirohaandroid.model.Account;
+import click.kobaken.rxirohaandroid.model.KeyPair;
+import click.kobaken.rxirohaandroid.qr.QRCodeGenerator;
 import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.exception.ErrorMessageFactory;
 import io.soramitsu.iroha.model.TransferQRParameter;
 import io.soramitsu.iroha.view.AssetReceiveView;
-import io.soramitsu.irohaandroid.Iroha;
-import io.soramitsu.irohaandroid.callback.Callback;
-import io.soramitsu.irohaandroid.model.Account;
-import io.soramitsu.irohaandroid.model.KeyPair;
-import io.soramitsu.irohaandroid.qr.QRCodeGenerator;
 
 import static android.content.Context.CLIPBOARD_SERVICE;
 
