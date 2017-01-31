@@ -18,7 +18,7 @@ limitations under the License.
 package io.soramitsu.iroha.model;
 
 public enum QRType {
-    GIFT("gift"), TRANSFER("Transfer");
+    GIFT("gift"), TRANSFER("transfer");
 
     private String type;
 

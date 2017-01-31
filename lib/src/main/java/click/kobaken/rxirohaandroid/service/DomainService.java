@@ -17,24 +17,22 @@ limitations under the License.
 
 package click.kobaken.rxirohaandroid.service;
 
-import java.io.IOException;
 import java.util.List;
 
-import click.kobaken.rxirohaandroid.entity.mapper.DomainEntityDataMapper;
-import click.kobaken.rxirohaandroid.exception.HttpBadRequestException;
 import click.kobaken.rxirohaandroid.model.Domain;
 import click.kobaken.rxirohaandroid.net.dataset.reqest.DomainRegisterRequest;
 import click.kobaken.rxirohaandroid.repository.DomainRepository;
-import click.kobaken.rxirohaandroid.repository.impl.DomainRepositoryImpl;
+import io.reactivex.Observable;
 
 
 public class DomainService {
+    private DomainRepository domainRepository;
 
-    private final DomainRepository domainRepository = new DomainRepositoryImpl();
-    private final DomainEntityDataMapper domainEntityDataMapper = new DomainEntityDataMapper();
+    public DomainService(DomainRepository domainRepository) {
+        this.domainRepository = domainRepository;
+    }
 
-    public Domain register(String name, String owner, String signature)
-            throws IOException, HttpBadRequestException {
+    public Observable<Domain> register(String name, String owner, String signature) {
 
         final DomainRegisterRequest body = new DomainRegisterRequest();
         body.name = name;
@@ -42,11 +40,10 @@ public class DomainService {
         body.timestamp = System.currentTimeMillis() / 1000;
         body.signature = signature;
 
-        return domainEntityDataMapper.transform(domainRepository.register(body));
+        return domainRepository.register(body);
     }
 
-    public List<Domain> findDomains(final int limit, final int offset)
-            throws IOException, HttpBadRequestException {
-        return domainEntityDataMapper.transform(domainRepository.findDomains(limit, offset));
+    public Observable<List<Domain>> findDomains(final int limit, final int offset) {
+        return domainRepository.findDomains(limit, offset);
     }
 }

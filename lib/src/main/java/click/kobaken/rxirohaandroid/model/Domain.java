@@ -19,7 +19,7 @@ package click.kobaken.rxirohaandroid.model;
 
 import java.io.Serializable;
 
-public class Domain implements Serializable {
+public class Domain extends BaseModel implements Serializable {
     public String name;
     public String owner;
     public String signature;

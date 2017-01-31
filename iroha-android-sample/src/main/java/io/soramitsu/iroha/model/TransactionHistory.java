@@ -29,6 +29,8 @@ import click.kobaken.rxirohaandroid.model.Transaction;
 public class TransactionHistory implements Parcelable {
     public static final String TAG = TransactionHistory.class.getSimpleName();
 
+    public static final String TRANSFER = "Transfer";
+
     public String value;
     public List<Transaction> histories;
 

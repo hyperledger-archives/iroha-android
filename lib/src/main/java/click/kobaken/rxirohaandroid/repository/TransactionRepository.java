@@ -17,15 +17,20 @@ limitations under the License.
 
 package click.kobaken.rxirohaandroid.repository;
 
-import java.io.IOException;
-
-import click.kobaken.rxirohaandroid.entity.TransactionListEntity;
-import click.kobaken.rxirohaandroid.exception.HttpBadRequestException;
+import click.kobaken.rxirohaandroid.model.TransactionHistory;
+import io.reactivex.Observable;
+import retrofit2.http.GET;
+import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface TransactionRepository {
-    TransactionListEntity findHistory(String uuid, int limit, int offset)
-            throws IOException, HttpBadRequestException;
+    @GET("/history/transaction")
+    Observable<TransactionHistory> findHistory(
+            @Query("uuid") String uuid, @Query("limit") int limit, @Query("offset") int offset);
 
-    TransactionListEntity findHistory(String uuid, String domain, String asset, int limit, int offset)
-            throws IOException, HttpBadRequestException;
+    @GET("/history/{domain}/{asset}/transaction")
+    Observable<TransactionHistory> findHistory(
+            @Path("domain") String domain, @Path("asset") String asset,
+            @Query("uuid") String uuid, @Query("limit") int limit, @Query("offset") int offset
+    );
 }

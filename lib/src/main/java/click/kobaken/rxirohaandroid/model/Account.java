@@ -35,7 +35,7 @@ import click.kobaken.rxirohaandroid.cache.AccountCache;
 import click.kobaken.rxirohaandroid.cache.FileManager;
 import click.kobaken.rxirohaandroid.security.KeyStoreManager;
 
-public class Account implements Serializable, AccountCache {
+public class Account extends BaseModel implements Serializable, AccountCache {
     public String uuid;
     public String alias;
     public List<Asset> assets;

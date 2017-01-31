@@ -18,45 +18,59 @@ limitations under the License.
 package click.kobaken.rxirohaandroid.net;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
-import click.kobaken.rxirohaandroid.Iroha;
-import okhttp3.MediaType;
+import okhttp3.Headers;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.logging.HttpLoggingInterceptor;
 
 public class IrohaHttpClient {
     private static final IrohaHttpClient irohaClient  = new IrohaHttpClient();
 
-    private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-
     private final OkHttpClient client;
 
     private IrohaHttpClient() {
-        client = new OkHttpClient.Builder().build();
+        client = createOkHttpClientBuilder().build();
     }
 
     public static IrohaHttpClient getInstance() {
         return irohaClient;
     }
 
-    public Response call(Request request) throws IOException {
-        return client.newCall(request).execute();
+    public OkHttpClient get() {
+        return client;
     }
 
-    public static Request createRequest(String path) {
-        return request(path).build();
-    }
+    private OkHttpClient.Builder createOkHttpClientBuilder() {
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.addInterceptor(new Interceptor() {
+            @Override
+            public Response intercept(Chain chain) throws IOException {
+                Request original = chain.request();
 
-    public static Request createRequest(String path, String paramsJsonString) {
-        RequestBody body = RequestBody.create(JSON, paramsJsonString);
-        return request(path)
-                .post(body)
-                .build();
-    }
+                Map<String, String> headerMap = new HashMap<>();
+                headerMap.put("Accept", "application/json");
+                headerMap.put("Content-type", "application/json");
 
-    private static Request.Builder request(String path) {
-        return new Request.Builder().url(Iroha.getInstance().baseUrl + path);
+                //header設定
+                Request request = original.newBuilder()
+                        .headers(Headers.of(headerMap))
+                        .method(original.method(), original.body())
+                        .build();
+
+                return chain.proceed(request);
+            }
+        });
+
+        //ログ出力設定
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BASIC);
+        httpClient.addInterceptor(logging);
+
+        return httpClient;
     }
 }

@@ -38,8 +38,14 @@ import javax.crypto.NoSuchPaddingException;
 
 import click.kobaken.rxirohaandroid.Iroha;
 import click.kobaken.rxirohaandroid.callback.Callback;
+import click.kobaken.rxirohaandroid.model.BaseModel;
 import click.kobaken.rxirohaandroid.model.KeyPair;
 import click.kobaken.rxirohaandroid.security.MessageDigest;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.exception.ErrorMessageFactory;
 import io.soramitsu.iroha.exception.IllegalQRCodeException;
@@ -54,9 +60,8 @@ import io.soramitsu.iroha.view.AssetSenderView;
 public class AssetSenderPresenter implements Presenter<AssetSenderView> {
     public static final String TAG = AssetSenderPresenter.class.getSimpleName();
 
-    public static final String IROHA_TASK_TAG_SEND = "AssetSend";
-
     private AssetSenderView assetSenderView;
+    private CompositeDisposable compositeDisposable;
 
     private KeyPair keyPair;
 
@@ -67,7 +72,7 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
 
     @Override
     public void onCreate() {
-        // nothing
+        compositeDisposable = new CompositeDisposable();
     }
 
     @Override
@@ -87,12 +92,12 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
 
     @Override
     public void onStop() {
-        Iroha.getInstance().cancelAsyncTask(IROHA_TASK_TAG_SEND);
+        // nothing
     }
 
     @Override
     public void onDestroy() {
-        // nothing
+        compositeDisposable.dispose();
     }
 
     public View.OnClickListener onSubmitClicked() {
@@ -190,10 +195,10 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
             final String message = generateMessage(timestamp, amount, sender, receiver, command, assetUuid);
             final String signature = MessageDigest.digest(message, MessageDigest.Algorithm.SHA3_256);
 
-            Iroha iroha = Iroha.getInstance();
-            iroha.runAsyncTask(
-                    IROHA_TASK_TAG_SEND,
-                    iroha.operateAssetFunction(
+            assetSenderView.hideProgress();
+
+            Disposable disposable = Iroha.getInstance()
+                    .operateAsset(
                             assetUuid,
                             command,
                             amount,
@@ -201,45 +206,51 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
                             receiver,
                             signature,
                             timestamp
-                    ),
-                    callback()
-            );
+                    )
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribeWith(new DisposableObserver<BaseModel>() {
+                        Context c = assetSenderView.getContext();
+
+                        @Override
+                        public void onNext(BaseModel result) {
+                            Log.d(TAG, "onNext: " + result.message);
+                            assetSenderView.hideProgress();
+
+                            assetSenderView.showSuccess(
+                                    c.getString(R.string.successful_title_sent),
+                                    c.getString(R.string.message_send_asset_successful,
+                                            assetSenderView.getReceiver(), assetSenderView.getAmount()),
+                                    new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            assetSenderView.hideSuccess();
+                                            assetSenderView.beforeQRReadViewState();
+                                        }
+                                    });
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            assetSenderView.hideProgress();
+
+                            if (NetworkUtil.isOnline(assetSenderView.getContext())) {
+                                assetSenderView.showError(ErrorMessageFactory.create(c, e));
+                            } else {
+                                assetSenderView.showError(ErrorMessageFactory.create(c, new NetworkNotConnectedException()));
+                            }
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            Log.d(TAG, "onComplete: ");
+                        }
+                    });
+
+            compositeDisposable.add(disposable);
         } else {
             assetSenderView.hideProgress();
         }
-    }
-
-    private Callback<Boolean> callback() {
-        final Context c = assetSenderView.getContext();
-        return new Callback<Boolean>() {
-            @Override
-            public void onSuccessful(Boolean result) {
-                assetSenderView.hideProgress();
-
-                assetSenderView.showSuccess(
-                        c.getString(R.string.successful_title_sent),
-                        c.getString(R.string.message_send_asset_successful,
-                                assetSenderView.getReceiver(), assetSenderView.getAmount()),
-                        new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                assetSenderView.hideSuccess();
-                                assetSenderView.beforeQRReadViewState();
-                            }
-                        });
-            }
-
-            @Override
-            public void onFailure(Throwable throwable) {
-                assetSenderView.hideProgress();
-
-                if (NetworkUtil.isOnline(assetSenderView.getContext())) {
-                    assetSenderView.showError(ErrorMessageFactory.create(c, throwable));
-                } else {
-                    assetSenderView.showError(ErrorMessageFactory.create(c, new NetworkNotConnectedException()));
-                }
-            }
-        };
     }
 
     private String generateMessage(long timestamp, String value, String sender,

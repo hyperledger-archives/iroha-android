@@ -15,11 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package click.kobaken.rxirohaandroid.entity;
+package click.kobaken.rxirohaandroid.model;
 
-public class DomainEntity extends BaseEntity {
-    public String name;
-    public String owner;
-    public String signature;
-    public long timestamp;
+public class BaseModel {
+    public int status;
+    public String message;
 }
