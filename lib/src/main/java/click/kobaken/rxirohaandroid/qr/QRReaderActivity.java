@@ -26,14 +26,13 @@ import android.view.SurfaceView;
 import android.view.WindowManager;
 
 import click.kobaken.rxirohaandroid.R;
-import click.kobaken.rxirohaandroid.callback.Callback;
 
 public abstract class QRReaderActivity extends AppCompatActivity implements SurfaceHolder.Callback {
     public static final String TAG = QRReaderActivity.class.getSimpleName();
 
     protected static final int PERMISSION_REQUEST_CODE = 70;
 
-    protected static Callback<String> callback;
+    protected static ReadQRCallback callback;
     protected SurfaceView surfaceView;
 
     @Override
@@ -78,11 +77,11 @@ public abstract class QRReaderActivity extends AppCompatActivity implements Surf
         onSurfaceDestroyed(holder);
     }
 
-    public static Callback<String> getCallback() {
+    public static ReadQRCallback getCallback() {
         return callback;
     }
 
-    public static void setCallback(Callback<String> callback) {
+    public static void setCallback(ReadQRCallback callback) {
         QRReaderActivity.callback = callback;
     }
 }

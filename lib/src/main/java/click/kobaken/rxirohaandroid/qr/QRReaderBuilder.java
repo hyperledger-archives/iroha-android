@@ -21,9 +21,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 
-import click.kobaken.rxirohaandroid.callback.Callback;
-
-
 public class QRReaderBuilder {
     private Context context;
 
@@ -31,7 +28,7 @@ public class QRReaderBuilder {
         this.context = context;
     }
 
-    public QRReaderBuilder setCallback(Callback<String> callback) {
+    public QRReaderBuilder setCallback(ReadQRCallback callback) {
         QRReaderActivity.setCallback(callback);
         return this;
     }

@@ -37,9 +37,9 @@ import java.security.UnrecoverableKeyException;
 import javax.crypto.NoSuchPaddingException;
 
 import click.kobaken.rxirohaandroid.Iroha;
-import click.kobaken.rxirohaandroid.callback.Callback;
 import click.kobaken.rxirohaandroid.model.BaseModel;
 import click.kobaken.rxirohaandroid.model.KeyPair;
+import click.kobaken.rxirohaandroid.qr.ReadQRCallback;
 import click.kobaken.rxirohaandroid.security.MessageDigest;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -122,8 +122,8 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
         };
     }
 
-    public Callback<String> onReadQR() {
-        return new Callback<String>() {
+    public ReadQRCallback onReadQR() {
+        return new ReadQRCallback() {
             @Override
             public void onSuccessful(String result) {
                 Log.d(TAG, "onSuccessful: " + result);
