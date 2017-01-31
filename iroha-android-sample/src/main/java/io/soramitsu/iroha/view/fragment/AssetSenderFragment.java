@@ -99,6 +99,12 @@ public class AssetSenderFragment extends Fragment
     }
 
     @Override
+    public void onDestroy() {
+        assetSenderPresenter.onDestroy();
+        super.onDestroy();
+    }
+
+    @Override
     public void showError(String error) {
         errorDialog.show(getActivity(), error);
     }

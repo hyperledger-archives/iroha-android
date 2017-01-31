@@ -32,10 +32,14 @@ import java.security.NoSuchAlgorithmException;
 import javax.crypto.NoSuchPaddingException;
 
 import click.kobaken.rxirohaandroid.Iroha;
-import click.kobaken.rxirohaandroid.callback.Callback;
 import click.kobaken.rxirohaandroid.model.Account;
 import click.kobaken.rxirohaandroid.model.KeyPair;
 import click.kobaken.rxirohaandroid.security.KeyGenerator;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.exception.ErrorMessageFactory;
 import io.soramitsu.iroha.exception.NetworkNotConnectedException;
@@ -46,9 +50,8 @@ import io.soramitsu.iroha.view.AccountRegisterView;
 public class AccountRegisterPresenter implements Presenter<AccountRegisterView> {
     public static final String TAG = AccountRegisterPresenter.class.getSimpleName();
 
-    private static final String IROHA_TASK_TAG_ACCOUNT_REGISTER = "AccountRegister";
-
     private AccountRegisterView accountRegisterView;
+    private CompositeDisposable compositeDisposable;
 
     @Override
     public void setView(@NonNull AccountRegisterView view) {
@@ -57,7 +60,7 @@ public class AccountRegisterPresenter implements Presenter<AccountRegisterView> 
 
     @Override
     public void onCreate() {
-        // nothing
+        compositeDisposable = new CompositeDisposable();
     }
 
     @Override
@@ -77,13 +80,12 @@ public class AccountRegisterPresenter implements Presenter<AccountRegisterView> 
 
     @Override
     public void onStop() {
-        Iroha.getInstance().cancelAsyncTask(IROHA_TASK_TAG_ACCOUNT_REGISTER);
         accountRegisterView.hideProgress();
     }
 
     @Override
     public void onDestroy() {
-        // nothing
+        compositeDisposable.dispose();
     }
 
     public View.OnKeyListener onKeyEventOnUserName() {
@@ -131,26 +133,26 @@ public class AccountRegisterPresenter implements Presenter<AccountRegisterView> 
 
     private void register(final KeyPair keyPair, final String alias) {
         Log.d(TAG, "register: " + keyPair.publicKey);
-        Iroha iroha = Iroha.getInstance();
-        iroha.runAsyncTask(
-                IROHA_TASK_TAG_ACCOUNT_REGISTER,
-                iroha.registerAccountFunction(keyPair.publicKey, alias),
-                callback()
-        );
-    }
+        Disposable disposable = Iroha.getInstance().registerAccount(keyPair.publicKey, alias)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribeWith(new DisposableObserver<Account>() {
+                    @Override
+                    public void onNext(Account result) {
+                        registerSuccessful(result);
+                    }
 
-    private Callback<Account> callback() {
-        return new Callback<Account>() {
-            @Override
-            public void onSuccessful(Account result) {
-                registerSuccessful(result);
-            }
+                    @Override
+                    public void onError(Throwable e) {
+                        registerFailure(e);
+                    }
 
-            @Override
-            public void onFailure(Throwable throwable) {
-                registerFailure(throwable);
-            }
-        };
+                    @Override
+                    public void onComplete() {
+                        Log.d(TAG, "onComplete: ");
+                    }
+                });
+        compositeDisposable.add(disposable);
     }
 
     private void registerSuccessful(Account result) {

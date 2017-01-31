@@ -114,7 +114,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        Log.d(TAG, "dispatchTouchEvent: ");
         inputMethodManager.hideSoftInputFromWindow(
                 binding.container.getWindowToken(),
                 InputMethodManager.HIDE_NOT_ALWAYS

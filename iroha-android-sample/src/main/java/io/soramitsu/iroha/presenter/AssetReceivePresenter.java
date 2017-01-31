@@ -46,10 +46,14 @@ import java.security.UnrecoverableKeyException;
 import javax.crypto.NoSuchPaddingException;
 
 import click.kobaken.rxirohaandroid.Iroha;
-import click.kobaken.rxirohaandroid.callback.Callback;
 import click.kobaken.rxirohaandroid.model.Account;
 import click.kobaken.rxirohaandroid.model.KeyPair;
 import click.kobaken.rxirohaandroid.qr.QRCodeGenerator;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.exception.ErrorMessageFactory;
 import io.soramitsu.iroha.model.TransferQRParameter;
@@ -60,11 +64,10 @@ import static android.content.Context.CLIPBOARD_SERVICE;
 public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
     public static final String TAG = AssetReceivePresenter.class.getSimpleName();
 
-    private static final String IROHA_TASK_TAG_USER_INFO_ON_RECEIVE = "UserInfoOnReceive";
-
     private final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
 
     private AssetReceiveView assetReceiveView;
+    private CompositeDisposable compositeDisposable;
 
     private Handler refreshHandler;
     private Runnable transactionRunnable;
@@ -80,7 +83,7 @@ public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
 
     @Override
     public void onCreate() {
-        // nothing
+        compositeDisposable = new CompositeDisposable();
     }
 
     @Override
@@ -110,12 +113,12 @@ public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
 
     @Override
     public void onStop() {
-        Iroha.getInstance().cancelAsyncTask(IROHA_TASK_TAG_USER_INFO_ON_RECEIVE);
+        // nothing
     }
 
     @Override
     public void onDestroy() {
-        // nothing
+        compositeDisposable.dispose();
     }
 
     public void setUuid(String uuid) {
@@ -194,38 +197,39 @@ public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
             uuid = getUuid();
         }
 
-        Iroha iroha = Iroha.getInstance();
-        iroha.runAsyncTask(
-                IROHA_TASK_TAG_USER_INFO_ON_RECEIVE,
-                iroha.findAccountFunction(uuid),
-                callback()
-        );
-    }
+        Disposable disposable = Iroha.getInstance()
+                .findAccount(uuid)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribeWith(new DisposableObserver<Account>() {
+                    @Override
+                    public void onNext(Account result) {
+                        if (assetReceiveView.isRefreshing()) {
+                            assetReceiveView.setRefreshing(false);
+                        }
 
-    private Callback<Account> callback() {
-        return new Callback<Account>() {
-            @Override
-            public void onSuccessful(Account result) {
-                if (assetReceiveView.isRefreshing()) {
-                    assetReceiveView.setRefreshing(false);
-                }
+                        if (result != null && result.assets != null && !result.assets.isEmpty()) {
+                            assetReceiveView.setHasAssetValue(result.assets.get(0).value);
+                        }
+                    }
 
-                if (result != null && result.assets != null && !result.assets.isEmpty()) {
-                    assetReceiveView.setHasAssetValue(result.assets.get(0).value);
-                }
-            }
+                    @Override
+                    public void onError(Throwable e) {
+                        if (assetReceiveView.isRefreshing()) {
+                            assetReceiveView.setRefreshing(false);
+                        }
 
-            @Override
-            public void onFailure(Throwable throwable) {
-                if (assetReceiveView.isRefreshing()) {
-                    assetReceiveView.setRefreshing(false);
-                }
+                        assetReceiveView.showError(
+                                ErrorMessageFactory.create(assetReceiveView.getContext(), e)
+                        );
+                    }
 
-                assetReceiveView.showError(
-                        ErrorMessageFactory.create(assetReceiveView.getContext(), throwable)
-                );
-            }
-        };
+                    @Override
+                    public void onComplete() {
+                        Log.d(TAG, "onComplete: ");
+                    }
+                });
+        compositeDisposable.add(disposable);
     }
 
     private void setPublicKey() {

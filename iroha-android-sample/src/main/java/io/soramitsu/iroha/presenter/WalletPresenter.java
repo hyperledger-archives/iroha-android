@@ -30,15 +30,18 @@ import java.security.InvalidKeyException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
-import java.util.List;
 
 import javax.crypto.NoSuchPaddingException;
 
 import click.kobaken.rxirohaandroid.Iroha;
-import click.kobaken.rxirohaandroid.callback.Callback;
-import click.kobaken.rxirohaandroid.callback.Func2;
 import click.kobaken.rxirohaandroid.model.Account;
-import click.kobaken.rxirohaandroid.model.Transaction;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.BiFunction;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 import io.soramitsu.iroha.exception.ErrorMessageFactory;
 import io.soramitsu.iroha.exception.NetworkNotConnectedException;
 import io.soramitsu.iroha.model.TransactionHistory;
@@ -49,10 +52,8 @@ import io.soramitsu.iroha.view.fragment.WalletFragment;
 public class WalletPresenter implements Presenter<WalletView> {
     public static final String TAG = WalletPresenter.class.getSimpleName();
 
-    private static final String IROHA_TASK_TAG_USER_INFO_ON_WALLET = "UserInfoOnWallet";
-    private static final String IROHA_TASK_TAG_TRANSACTION = "Transaction";
-
     private WalletView walletView;
+    private CompositeDisposable compositeDisposable;
 
     private Handler refreshHandler;
     private Runnable transactionRunnable;
@@ -66,7 +67,7 @@ public class WalletPresenter implements Presenter<WalletView> {
 
     @Override
     public void onCreate() {
-        // nothing
+        compositeDisposable = new CompositeDisposable();
     }
 
     @Override
@@ -96,14 +97,12 @@ public class WalletPresenter implements Presenter<WalletView> {
 
     @Override
     public void onStop() {
-        Iroha iroha = Iroha.getInstance();
-        iroha.cancelAsyncTask(IROHA_TASK_TAG_USER_INFO_ON_WALLET);
-        iroha.cancelAsyncTask(IROHA_TASK_TAG_TRANSACTION);
+        // nothing
     }
 
     @Override
     public void onDestroy() {
-        // nothing
+        compositeDisposable.dispose();
     }
 
     public void setUuid(String uuid) {
@@ -149,49 +148,46 @@ public class WalletPresenter implements Presenter<WalletView> {
         }
 
         Iroha iroha = Iroha.getInstance();
-        iroha.runParallelAsyncTask(
-                walletView.getActivity(),
-                IROHA_TASK_TAG_USER_INFO_ON_WALLET,
-                iroha.findAccountFunction(uuid),
-                IROHA_TASK_TAG_TRANSACTION,
-                iroha.findTransactionHistoryFunction(uuid, 30, 0),
-                collectFunc(),
-                callback()
-        );
-    }
+        Disposable disposable = Observable.zip(iroha.findAccount(uuid), iroha.findTransactionHistory(uuid, 30, 0),
+                new BiFunction<Account, click.kobaken.rxirohaandroid.model.TransactionHistory, TransactionHistory>() {
+                    @Override
+                    public TransactionHistory apply(
+                            Account account,
+                            click.kobaken.rxirohaandroid.model.TransactionHistory transactionHistory
+                    ) throws Exception {
 
-    private Func2<Account, List<Transaction>, TransactionHistory> collectFunc() {
-        return new Func2<Account, List<Transaction>, TransactionHistory>() {
-            @Override
-            public TransactionHistory call(Account account, List<Transaction> transactions) {
-                TransactionHistory transactionHistory = new TransactionHistory();
-                if (account != null && account.assets != null && !account.assets.isEmpty()) {
-                    transactionHistory.value = account.assets.get(0).value;
-                }
-                transactionHistory.histories = transactions;
-                return transactionHistory;
-            }
-        };
-    }
+                        TransactionHistory history = new TransactionHistory();
+                        if (account != null && account.assets != null && !account.assets.isEmpty()) {
+                            history.value = account.assets.get(0).value;
+                        }
+                        history.histories = transactionHistory.history;
+                        return history;
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribeWith(new DisposableObserver<TransactionHistory>() {
+                    @Override
+                    public void onNext(TransactionHistory result) {
+                        if (walletView.isRefreshing()) {
+                            walletView.setRefreshing(false);
+                        }
 
-    private Callback<TransactionHistory> callback() {
-        return new Callback<TransactionHistory>() {
-            @Override
-            public void onSuccessful(TransactionHistory result) {
-                if (walletView.isRefreshing()) {
-                    walletView.setRefreshing(false);
-                }
+                        walletView.hideProgress();
+                        walletView.renderTransactionHistory(result);
+                    }
 
-                walletView.hideProgress();
+                    @Override
+                    public void onError(Throwable e) {
+                        fail(e);
+                    }
 
-                walletView.renderTransactionHistory(result);
-            }
-
-            @Override
-            public void onFailure(Throwable throwable) {
-                fail(throwable);
-            }
-        };
+                    @Override
+                    public void onComplete() {
+                        Log.d(TAG, "onComplete: ");
+                    }
+                });
+        compositeDisposable.add(disposable);
     }
 
     private void fail(Throwable throwable) {

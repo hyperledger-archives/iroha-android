@@ -88,6 +88,12 @@ public class AssetReceiveFragment extends Fragment implements AssetReceiveView, 
     }
 
     @Override
+    public void onDestroy() {
+        assetReceivePresenter.onDestroy();
+        super.onDestroy();
+    }
+
+    @Override
     public boolean isRefreshing() {
         return binding.swipeRefresh.isRefreshing();
     }
