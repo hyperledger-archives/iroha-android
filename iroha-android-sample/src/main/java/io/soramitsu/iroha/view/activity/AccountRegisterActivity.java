@@ -37,11 +37,11 @@ import java.security.UnrecoverableKeyException;
 
 import javax.crypto.NoSuchPaddingException;
 
+import click.kobaken.rxirohaandroid.model.Account;
 import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.exception.ErrorMessageFactory;
 import io.soramitsu.iroha.navigator.Navigator;
 import io.soramitsu.iroha.view.fragment.AccountRegisterFragment;
-import io.soramitsu.irohaandroid.model.Account;
 
 public class AccountRegisterActivity extends AppCompatActivity
         implements AccountRegisterFragment.AccountRegisterListener {

@@ -27,14 +27,14 @@ import android.view.ViewGroup;
 
 import java.io.File;
 
+import click.kobaken.rxirohaandroid.cache.FileManager;
+import click.kobaken.rxirohaandroid.security.KeyStoreManager;
 import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.databinding.FragmentAccountRegisterBinding;
 import io.soramitsu.iroha.presenter.AccountRegisterPresenter;
 import io.soramitsu.iroha.view.AccountRegisterView;
 import io.soramitsu.iroha.view.dialog.ProgressDialog;
 import io.soramitsu.iroha.view.dialog.SuccessDialog;
-import io.soramitsu.irohaandroid.cache.FileManager;
-import io.soramitsu.irohaandroid.security.KeyStoreManager;
 
 public class AccountRegisterFragment extends Fragment implements AccountRegisterView {
     public static final String TAG = AccountRegisterFragment.class.getSimpleName();

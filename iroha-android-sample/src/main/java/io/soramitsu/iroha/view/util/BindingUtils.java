@@ -25,11 +25,11 @@ import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.TextView;
 
+import click.kobaken.rxirohaandroid.model.Transaction;
 import de.hdodenhof.circleimageview.CircleImageView;
 import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.model.QRType;
 import io.soramitsu.iroha.util.AndroidSupportUtil;
-import io.soramitsu.irohaandroid.model.Transaction;
 
 @BindingMethods({
         @BindingMethod(type = View.class, attribute = "android:drawable", method = "setBackground"),

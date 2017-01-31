@@ -25,12 +25,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import io.soramitsu.irohaandroid.model.KeyPair;
-import io.soramitsu.irohaandroid.security.MessageDigest;
+import click.kobaken.rxirohaandroid.model.KeyPair;
+import click.kobaken.rxirohaandroid.security.MessageDigest;
 
-import static io.soramitsu.irohaandroid.security.KeyGenerator.createKeyPair;
-import static io.soramitsu.irohaandroid.security.KeyGenerator.sign;
-import static io.soramitsu.irohaandroid.security.KeyGenerator.verify;
+import static click.kobaken.rxirohaandroid.security.KeyGenerator.createKeyPair;
+import static click.kobaken.rxirohaandroid.security.KeyGenerator.sign;
+import static click.kobaken.rxirohaandroid.security.KeyGenerator.verify;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
