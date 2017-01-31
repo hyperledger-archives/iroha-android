@@ -17,10 +17,6 @@ limitations under the License.
 
 package click.kobaken.rxirohaandroid;
 
-import android.app.Activity;
-import android.support.annotation.NonNull;
-import android.util.Log;
-
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -28,19 +24,8 @@ import com.google.gson.internal.bind.DateTypeAdapter;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
 
-import click.kobaken.rxirohaandroid.async.BaseIrohaAsyncTask;
-import click.kobaken.rxirohaandroid.async.DataSet;
-import click.kobaken.rxirohaandroid.async.IrohaAsyncTask;
-import click.kobaken.rxirohaandroid.async.IrohaParallelAsyncTask;
-import click.kobaken.rxirohaandroid.callback.Callback;
-import click.kobaken.rxirohaandroid.callback.Func2;
-import click.kobaken.rxirohaandroid.callback.Func3;
-import click.kobaken.rxirohaandroid.callback.Function;
 import click.kobaken.rxirohaandroid.model.Account;
 import click.kobaken.rxirohaandroid.model.Asset;
 import click.kobaken.rxirohaandroid.model.BaseModel;
@@ -60,18 +45,12 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Iroha {
-    private static final String TAG = Iroha.class.getSimpleName();
-    private static final int COUNT_TWO_PARALLEL_TASK = 2;
-    private static final int COUNT_THREE_PARALLEL_TASK = 3;
-
     private static Iroha iroha;
 
     private final AccountService accountService;
     private final DomainService domainService;
     private final AssetService assetService;
     private final TransactionService transactionService;
-
-    private final Map<String, BaseIrohaAsyncTask<?>> asyncTaskMap = new HashMap<>();
 
     private Iroha(Builder builder) {
         iroha = this;
@@ -173,193 +152,5 @@ public class Iroha {
     }
 
     /* ============ 【Web API】 to here ============  */
-
-
-    /* ============ 【Async Task Management】 from here ============  */
-
-    public <T> void runAsyncTask(final String tag, final Function<? extends T> func,
-                                 final Callback<T> callback) {
-
-        IrohaAsyncTask<T> asyncTask = new IrohaAsyncTask<T>(callback) {
-            @Override
-            protected T onBackground() throws Exception {
-                return func.call();
-            }
-        };
-        execute(tag, asyncTask);
-    }
-
-    public <T1, T2, R> void runParallelAsyncTask(
-            final Activity activity,
-            final String tag1,
-            final Function<? extends T1> f1,
-            final String tag2,
-            final Function<? extends T2> f2,
-            final Func2<? super T1, ? super T2, ? extends R> func2,
-            final Callback<R> callback) {
-
-        new Thread(new Runnable() {
-            DataSet<T1, T2, Void> dataSet = new DataSet<>();
-
-            @Override
-            public void run() {
-                try {
-                    CountDownLatch countDownLatch = new CountDownLatch(COUNT_TWO_PARALLEL_TASK);
-
-                    IrohaParallelAsyncTask<?> firstParallelAsyncTask =
-                            new IrohaParallelAsyncTask<T1>(dataSet, countDownLatch) {
-                                @Override
-                                protected T1 onBackground() throws Exception {
-                                    return f1.call();
-                                }
-                            };
-                    execute(tag1, firstParallelAsyncTask);
-
-                    IrohaParallelAsyncTask<?> secondParallelAsyncTask =
-                            new IrohaParallelAsyncTask<T2>(dataSet, countDownLatch) {
-                                @Override
-                                protected T2 onBackground() throws Exception {
-                                    return f2.call();
-                                }
-                            };
-                    execute(tag2, secondParallelAsyncTask);
-
-                    countDownLatch.await();
-                    Log.d(TAG, "run: all async task finished.");
-
-                    if (activity == null) {
-                        Log.d(TAG, "Background Thread run: success");
-                        callback.onSuccessful(func2.call(dataSet.getT1(), dataSet.getT2()));
-                    } else {
-                        activity.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Log.d(TAG, "UI Thread run: success");
-                                callback.onSuccessful(func2.call(dataSet.getT1(), dataSet.getT2()));
-                            }
-                        });
-                    }
-                } catch (final Exception e) {
-                    if (activity == null) {
-                        Log.d(TAG, "Background Thread run: failure");
-                        callback.onFailure(e);
-                    } else {
-                        activity.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Log.d(TAG, "UI Thread run: failure");
-                                callback.onFailure(e);
-                            }
-                        });
-                    }
-                }
-            }
-        }).start();
-    }
-
-    public <T1, T2, T3, R> void runParallelAsyncTask(
-            final Activity activity,
-            final String tag1,
-            final Function<? extends T1> f1,
-            final String tag2,
-            final Function<? extends T2> f2,
-            final String tag3,
-            final Function<? extends T3> f3,
-            final Func3<? super T1, ? super T2, ? super T3, ? extends R> func3,
-            final Callback<R> callback) {
-
-        new Thread(new Runnable() {
-            DataSet<T1, T2, T3> dataSet = new DataSet<>();
-
-            @Override
-            public void run() {
-                try {
-                    CountDownLatch countDownLatch = new CountDownLatch(COUNT_THREE_PARALLEL_TASK);
-
-                    IrohaParallelAsyncTask<?> firstParallelAsyncTask =
-                            new IrohaParallelAsyncTask<T1>(dataSet, countDownLatch) {
-                                @Override
-                                protected T1 onBackground() throws Exception {
-                                    return f1.call();
-                                }
-                            };
-                    execute(tag1, firstParallelAsyncTask);
-
-                    IrohaParallelAsyncTask<?> secondParallelAsyncTask =
-                            new IrohaParallelAsyncTask<T2>(dataSet, countDownLatch) {
-                                @Override
-                                protected T2 onBackground() throws Exception {
-                                    return f2.call();
-                                }
-                            };
-                    execute(tag2, secondParallelAsyncTask);
-
-                    IrohaParallelAsyncTask<?> threeParallelAsyncTask =
-                            new IrohaParallelAsyncTask<T3>(dataSet, countDownLatch) {
-                                @Override
-                                protected T3 onBackground() throws Exception {
-                                    return f3.call();
-                                }
-                            };
-                    execute(tag3, threeParallelAsyncTask);
-
-                    countDownLatch.await();
-                    Log.d(TAG, "run: all async task finished.");
-
-                    if (activity == null) {
-                        Log.d(TAG, "Background Thread run: success");
-                        callback.onSuccessful(func3.call(dataSet.getT1(), dataSet.getT2(), dataSet.getT3()));
-                    } else {
-                        activity.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Log.d(TAG, "UI Thread run: success");
-                                callback.onSuccessful(func3.call(dataSet.getT1(), dataSet.getT2(), dataSet.getT3()));
-                            }
-                        });
-                    }
-                } catch (final Exception e) {
-                    if (activity == null) {
-                        Log.d(TAG, "Background Thread run: failure");
-                        callback.onFailure(e);
-                    } else {
-                        activity.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Log.d(TAG, "UI Thread run: failure");
-                                callback.onFailure(e);
-                            }
-                        });
-                    }
-                }
-            }
-        }).start();
-    }
-
-    public boolean cancelAsyncTask(final String tag) {
-        Log.d(TAG, "cancelAsyncTask: " + tag);
-        BaseIrohaAsyncTask asyncTask = asyncTaskMap.get(tag);
-        return asyncTask != null && asyncTask.cancel(true);
-    }
-
-    private <C extends BaseIrohaAsyncTask<?>> void execute(
-            @NonNull final String tag,
-            @NonNull C newAsyncTask) {
-
-        asyncTaskMap.put(tag, newAsyncTask);
-        execute(newAsyncTask);
-    }
-
-    private void execute(@NonNull BaseIrohaAsyncTask<?> asyncTask) {
-        if (asyncTask instanceof IrohaAsyncTask<?>) {
-            IrohaAsyncTask<?> irohaAsyncTask = (IrohaAsyncTask<?>) asyncTask;
-            irohaAsyncTask.execute();
-        } else if (asyncTask instanceof IrohaParallelAsyncTask<?>) {
-            IrohaParallelAsyncTask<?> irohaParallelAsyncTask = (IrohaParallelAsyncTask<?>) asyncTask;
-            irohaParallelAsyncTask.execute();
-        }
-    }
-
-    /* ============ 【Async Task Management】 to here ============  */
 
 }
