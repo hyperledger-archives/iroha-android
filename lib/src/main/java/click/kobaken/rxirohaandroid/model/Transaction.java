@@ -127,7 +127,6 @@ public class Transaction implements Serializable {
         public String value;
         public String sender;
         public String receiver;
-        public String oppoent;
         public long timestamp;
     }
 }

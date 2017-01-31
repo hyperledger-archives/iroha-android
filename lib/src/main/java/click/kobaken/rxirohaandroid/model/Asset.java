@@ -21,7 +21,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
-public class Asset implements Serializable {
+public class Asset extends BaseModel implements Serializable {
     @SerializedName(value = "asset-uuid")
     public String uuid;
     public String name;
