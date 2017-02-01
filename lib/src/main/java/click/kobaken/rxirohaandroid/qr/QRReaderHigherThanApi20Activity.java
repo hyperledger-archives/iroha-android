@@ -129,15 +129,12 @@ public class QRReaderHigherThanApi20Activity extends QRReaderActivity {
     private class BarcodeTracker extends Tracker<Barcode> {
         @Override
         public void onNewItem(final int id, final Barcode item) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Log.d(TAG, "onNewItem: " + item.rawValue);
+            runOnUiThread(() -> {
+                Log.d(TAG, "onNewItem: " + item.rawValue);
 
-                    finish();
+                finish();
 
-                    callback.onSuccessful(item.rawValue);
-                }
+                callback.onSuccessful(item.rawValue);
             });
         }
     }

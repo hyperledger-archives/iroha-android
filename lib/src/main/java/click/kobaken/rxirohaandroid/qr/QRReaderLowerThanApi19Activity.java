@@ -86,33 +86,25 @@ public class QRReaderLowerThanApi19Activity extends QRReaderActivity {
                 camera.autoFocus(new Camera.AutoFocusCallback() {
                     @Override
                     public void onAutoFocus(boolean b, Camera camera1) {
-                        camera1.setOneShotPreviewCallback(new Camera.PreviewCallback() {
-                            @Override
-                            public void onPreviewFrame(byte[] bytes, Camera camera2) {
-                                int previewWidth = camera.getParameters().getPreviewSize().width;
-                                int previewHeight = camera.getParameters().getPreviewSize().height;
+                        camera1.setOneShotPreviewCallback((bytes, camera2) -> {
+                            int previewWidth = camera.getParameters().getPreviewSize().width;
+                            int previewHeight = camera.getParameters().getPreviewSize().height;
 
-                                PlanarYUVLuminanceSource source = new PlanarYUVLuminanceSource(
-                                        bytes, previewWidth, previewHeight, 0, 0, previewWidth, previewHeight, false);
-                                BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
+                            PlanarYUVLuminanceSource source = new PlanarYUVLuminanceSource(
+                                    bytes, previewWidth, previewHeight, 0, 0, previewWidth, previewHeight, false);
+                            BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
 
-                                Reader reader = new MultiFormatReader();
-                                try {
-                                    Result result = reader.decode(bitmap);
-                                    String text = result.getText();
+                            Reader reader = new MultiFormatReader();
+                            try {
+                                Result result = reader.decode(bitmap);
+                                String text = result.getText();
 
-                                    finish();
+                                finish();
 
-                                    callback.onSuccessful(text);
-//                                    Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container);
-//                                    if (fragment instanceof OnQRReaderListener) {
-//                                        OnQRReaderListener handler = (OnQRReaderListener) fragment;
-//                                        handler.setOnResult(text);
-//                                    }
-                                } catch (Exception e) {
-                                    Log.e(TAG, "onPreviewFrame: " + e.getMessage());
-                                    callback.onFailure(e);
-                                }
+                                callback.onSuccessful(text);
+                            } catch (Exception e) {
+                                Log.e(TAG, "onPreviewFrame: " + e.getMessage());
+                                callback.onFailure(e);
                             }
                         });
                     }
