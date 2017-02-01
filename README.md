@@ -1,4 +1,4 @@
-# iroha-android
+# RxIrohaAndroid
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/122f8fc23361423e99b941b547ad95eb)](https://www.codacy.com/app/hyperledger/iroha-android?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=hyperledger/iroha-android&amp;utm_campaign=Badge_Grade)
 
@@ -6,7 +6,7 @@
 いろは(iroha) is [this](https://github.com/hyperledger/iroha).
 
 ## Description
-いろはAndroid(IrohaAndroid) is client library for using いろは(iroha) for Android.
+いろはAndroid(RxIrohaAndroid) is client library for using いろは(iroha) for Android.
 
 
 - [Requirements](#requirements)
@@ -26,7 +26,7 @@
 In your ```app/build.gradle```   
 
 ```gradle
-compile 'org.hyperledger:iroha-android:1.2'
+compile 'click.kobaken:rx-iroha-android:0.1.0'
 ```
 
 ### Maven
@@ -34,9 +34,9 @@ Or if you use Maven, like this
 
 ```maven
 <dependency>
-  <groupId>org.hyperledger</groupId>
-  <artifactId>iroha-android</artifactId>
-  <version>1.2</version>
+  <groupId>click.kobaken</groupId>
+  <artifactId>rx-iroha-android</artifactId>
+  <version>0.1.0</version>
   <type>pom</type>
 </dependency>
 ```
@@ -97,38 +97,38 @@ new Iroha.Builder()
 ### Web API
 #### registerAccount
 ```java
-Iroha.getInstance().registerAccountFunction("publicKey", "alias");
-// ===> return Function for register account
+Iroha.getInstance().registerAccount("publicKey", "alias");
+// ===> return Observable<Account> for register account
 ```
 
 #### findAccount
 ```java
 Iroha.getInstance().findAccount("uuid");
-// ===> return Function for find account
+// ===> return Observable<Account> for find account
 ```
 
 #### registerDomain
 ```java
 Iroha.getInstance().registerDomain("name", "owner", "signature");
-// ===> return Function for register domain
+// ===> return Observable<Doamin> for register domain
 ```
 
 #### findDomains
 ```java
 Iroha.getInstance().findDomains(/* limit */30, /* offset */0);
-// ===> return Function for find domains
+// ===> return Observable<List<Domain>> for find domains
 ```
 
 #### createAsset
 ```java
 Iroha.getInstance().createAsset("name", "owner", "creator", "signature");
-// ===> return Function for create asset
+// ===> return Observable<Asset> for create asset
 ```
 
 #### findAssets
 ```java
 Iroha.getInstance().findAssets("domain", /* limit */30, /* offset */0);
-// ===> return Function for find assets
+// ===> return Observable<List<Asset>> for find assets
 ```
 
 #### operationAsset
@@ -142,104 +142,79 @@ Iroha.getInstance().operationAsset(
             "signature",
             /* timestamp */100000
 );
-// ===> return Function for operation
+// ===> return Observable<BaseModel> for operation
 ```
 
 #### findTransactionHistory
 ```java
 // Single asset
 Iroha.getInstance().findTransactionHistory("uuid", /* limit */30, /* offset */0);
-// ===> return Function for find transaction history
+// ===> return Observable<TraqnsactionHistory> for find transaction history
 
 // Multi assets
-Iroha.getInstance().findTransactionHistory("uuid", "domain", "asset-uuid",  /* limit */30, /* offset */0);
-// ===> return Function for find transaction history
-```
-
-### Async
-#### runAsyncTask(single task)
-```java
-Iroha.getInstance().runAsyncTask(
-        "task's tag",
-        irohaWebApiFunction,
-        callback
-);
-```
-
-#### runAsyncTask(multi task)
-Now, you can 2 or 3 tasks in parallel.
-```java
-Iroha.getInstance().runParallelAsyncTask(
-        activity, // Required to run on UI thread
-        "task's tag1",
-        irohaWebApiFunction1,
-        "task's tag2",
-        irohaWebApiFunction2,
-        collectFunction, // collect the result of function 1 and 2
-        callback
-);
-```
-
-#### cancelAsyncTask
-```java
-Iroha.getInstance().cancelAsyncTask("task's tag");
+Iroha.getInstance().findTransactionHistory("domain", "asset-uuid", "uuid",  /* limit */30, /* offset */0);
+// ===> return Observable<TransactionHistory> for find transaction history
 ```
 
 ### Usage example
-If you use iroha web api, should call Iroha#runAsyncTask.
+You can use like RxJava2.
 
 ex.) registerAccount
 ```java
-Iroha iroha = Iroha.getInstance();
-iroha.runAsyncTask(
-        "AccountRegister",
-        iroha.registerAccountFunction(keyPair.publicKey, alias),
-        new Callback<Account>() {
+Iroha.getInstance().registerAccount(keyPair.publicKey, alias)
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribeOn(Schedulers.io())
+        .subscribeWith(new DisposableObserver<Account>() {
             @Override
-            public void onSuccessful(Account result) {
-                // Success!
+            public void onNext(Account result) {
+                // successful!
             }
 
             @Override
-            public void onFailure(Throwable throwable) {
-                // Error!
+            public void onError(Throwable e) {
+                // error!
             }
-        }
+
+            @Override
+            public void onComplete() {
+                // complete!
+            }
+        });
 );
 ```
 
 ex.) findAccount and findTransactionHistory
 ```java
-Iroha iroha = Iroha.getInstance();
-iroha.runParallelAsyncTask(
-        getActivity(),
-        "UserInfo",
-        iroha.findAccountFunction(uuid),
-        "Transaction",
-        iroha.findTransactionHistoryFunction(uuid, 30, 0),
-        new Func2<Account, List<Transaction>, TransactionHistory>() {
+Observable.zip(iroha.findAccount(uuid), iroha.findTransactionHistory(uuid, 30, 0),
+        new BiFunction<Account, TransactionHistory, Tx>() {
             @Override
-            public TransactionHistory call(Account account, List<Transaction> transactions) {
-                TransactionHistory transactionHistory = new TransactionHistory();
+            public Tx apply(Account account,TransactionHistory transactionHistory) throws Exception {
+                Tx history = new Tx();
                 if (account != null && account.assets != null && !account.assets.isEmpty()) {
-                    transactionHistory.value = account.assets.get(0).value;
+                    history.value = account.assets.get(0).value;
                 }
-                transactionHistory.histories = transactions;
-                return transactionHistory;
+                history.histories = transactionHistory.history;
+                return history;
             }
-        },
-        new Callback<TransactionHistory>() {
+        })
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribeOn(Schedulers.io())
+        .subscribeWith(new DisposableObserver<Tx>() {
             @Override
-            public void onSuccessful(TransactionHistory result) {
-                // Success!
+            public void onNext(Tx result) {
+                // successful!
             }
 
             @Override
-            public void onFailure(Throwable throwable) {
-                // Error!
+            public void onError(Throwable e) {
+                // error!
             }
-        }
-);
+
+            @Override
+            public void onComplete() {
+                // complete!
+            }
+        });
 ```
 
 
@@ -250,7 +225,7 @@ iroha.runParallelAsyncTask(
 
 ## License
 
-Copyright 2016 Soramitsu Co., Ltd.
+Copyright(c) 2016 kobaken0029
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
