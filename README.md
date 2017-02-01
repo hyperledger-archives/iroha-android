@@ -45,11 +45,11 @@ Or if you use Maven, like this
 ## Usage
 ### API
 
-### io.soramitsu.irohaandroid.security.KeyGenerator
+### click.kobaken.rxirohaandroid.security.KeyGenerator
 #### createKeyPair
 ```java
-import io.soramitsu.irohaandroid.security.KeyGenerator;
-import io.soramitsu.irohaandroid.model.KeyPair;
+import click.kobaken.rxirohaandroid.security.KeyGenerator;
+import click.kobaken.rxirohaandroid.model.KeyPair;
 
 KeyPair keypair = KeyGenerator.createKeyPair();
 keypair.publicKey; // Ed25519 public key encoded by base64
@@ -58,8 +58,8 @@ keypair.privateKey; // Ed25519 private key encoded by base64
 
 #### sign
 ```java
-import io.soramitsu.irohaandroid.security.KeyGenerator;
-import io.soramitsu.irohaandroid.model.KeyPair;
+import click.kobaken.rxirohaandroid.security.KeyGenerator;
+import click.kobaken.rxirohaandroid.model.KeyPair;
 
 String signature = KeyGenerator.sign(keyPair, "message")
 //===> signature // String
@@ -67,27 +67,27 @@ String signature = KeyGenerator.sign(keyPair, "message")
 
 #### verify
 ```java
-import io.soramitsu.irohaandroid.security.KeyGenerator;
-import io.soramitsu.irohaandroid.model.KeyPair;
+import click.kobaken.rxirohaandroid.security.KeyGenerator;
+import click.kobaken.rxirohaandroid.model.KeyPair;
 
 boolean verify = Iroha.verify(keyPair.publicKey, signature, "message")
 //===> true if the correct message
 ```
 
-### io.soramitsu.irohaandroid.security.MessageDigest
+### click.kobaken.rxirohaandroid.security.MessageDigest
 #### digest
 ```java
 String hashedMessage = MessageDigest.digest("message", MessageDigest.SHA3_256);
 // ===> hashed message by SHA3_256
 ```
 
-### io.soramitsu.irohaandroid.Iroha
+### click.kobaken.rxirohaandroid.Iroha
 ### Initialize
 In your app
 on 'onCreate' your class inheriting Application
 
 ``` java
-import io.soramitsu.irohaandroid.Iroha;
+import click.kobaken.rxirohaandroid.Iroha;
 
 new Iroha.Builder()
         .baseUrl("https://[input your domain(base url)]")
@@ -220,8 +220,6 @@ Observable.zip(iroha.findAccount(uuid), iroha.findTransactionHistory(uuid, 30, 0
 
 ## Author
 [kobaken0029](https://github.com/kobaken0029)
-
-[http://soramitsu.co.jp](http://soramitsu.co.jp)
 
 ## License
 
