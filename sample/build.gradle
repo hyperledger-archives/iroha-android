@@ -1,0 +1,51 @@
+apply plugin: 'com.android.application'
+apply plugin: 'me.tatarka.retrolambda'
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
+
+    defaultConfig {
+        applicationId "click.kobaken.rxirohaandroid_sample"
+        minSdkVersion 19
+        targetSdkVersion 25
+        versionCode 1
+        versionName "1.0"
+        multiDexEnabled true
+    }
+    buildTypes {
+        debug {
+            testCoverageEnabled true
+            applicationIdSuffix '.debug'
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    aaptOptions {
+        noCompress 'apk'
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    dataBinding {
+        enabled true
+    }
+}
+
+def SUPPORT_PACKAGE_VERSION = "25.1.0"
+def CIRCLE_IMAGE_VIEW_PACKAGE_VERSION = "2.1.0"
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile project(path: ':lib')
+    compile "com.android.support:appcompat-v7:${SUPPORT_PACKAGE_VERSION}"
+    compile "com.android.support:support-v4:${SUPPORT_PACKAGE_VERSION}"
+    compile "com.android.support:design:${SUPPORT_PACKAGE_VERSION}"
+    compile "com.android.support:gridlayout-v7:${SUPPORT_PACKAGE_VERSION}"
+    compile "de.hdodenhof:circleimageview:${CIRCLE_IMAGE_VIEW_PACKAGE_VERSION}"
+    compile 'com.mikepenz:aboutlibraries:5.9.1'
+    testCompile 'junit:junit:4.12'
+}

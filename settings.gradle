@@ -1,1 +1,1 @@
-include ':iroha-android-sample', ':lib'
+include ':sample', ':lib'
