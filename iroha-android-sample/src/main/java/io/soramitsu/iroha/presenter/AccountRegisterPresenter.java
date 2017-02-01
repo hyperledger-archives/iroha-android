@@ -89,45 +89,39 @@ public class AccountRegisterPresenter implements Presenter<AccountRegisterView> 
     }
 
     public View.OnKeyListener onKeyEventOnUserName() {
-        return new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View view, int keyCode, KeyEvent keyEvent) {
-                if (keyEvent.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
-                    InputMethodManager inputMethodManager =
-                            (InputMethodManager) accountRegisterView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                    inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
-                    return true;
-                }
-                return false;
+        return (view, keyCode, keyEvent) -> {
+            if (keyEvent.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+                InputMethodManager inputMethodManager =
+                        (InputMethodManager) accountRegisterView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                return true;
             }
+            return false;
         };
     }
 
     public View.OnClickListener onRegisterClicked() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                final Context context = accountRegisterView.getContext();
-                final String alias = accountRegisterView.getAlias();
+        return view -> {
+            final Context context = accountRegisterView.getContext();
+            final String alias = accountRegisterView.getAlias();
 
-                if (alias.isEmpty()) {
-                    accountRegisterView.showError(
-                            ErrorMessageFactory.create(context, new RequiredArgumentException(), context.getString(R.string.name))
-                    );
-                    return;
-                }
-
-                accountRegisterView.showProgress();
-
-                KeyPair keyPair = KeyGenerator.createKeyPair();
-                try {
-                    keyPair.save(context);
-                } catch (InvalidKeyException | NoSuchAlgorithmException | KeyStoreException
-                        | NoSuchPaddingException | IOException e) {
-                    Log.e(TAG, "onClick: ", e);
-                }
-                register(keyPair, alias);
+            if (alias.isEmpty()) {
+                accountRegisterView.showError(
+                        ErrorMessageFactory.create(context, new RequiredArgumentException(), context.getString(R.string.name))
+                );
+                return;
             }
+
+            accountRegisterView.showProgress();
+
+            KeyPair keyPair = KeyGenerator.createKeyPair();
+            try {
+                keyPair.save(context);
+            } catch (InvalidKeyException | NoSuchAlgorithmException | KeyStoreException
+                    | NoSuchPaddingException | IOException e) {
+                Log.e(TAG, "onClick: ", e);
+            }
+            register(keyPair, alias);
         };
     }
 

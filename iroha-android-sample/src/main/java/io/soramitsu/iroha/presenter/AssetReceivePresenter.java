@@ -89,12 +89,7 @@ public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
     @Override
     public void onStart() {
         refreshHandler = new Handler();
-        transactionRunnable = new Runnable() {
-            @Override
-            public void run() {
-                fetchAccountAssetFromApi();
-            }
-        };
+        transactionRunnable = this::fetchAccountAssetFromApi;
 
         generateQR();
         fetchAccountAsset();
@@ -126,34 +121,25 @@ public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
     }
 
     public SwipeRefreshLayout.OnRefreshListener onSwipeRefresh() {
-        return new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                refreshHandler.postDelayed(transactionRunnable, 1500);
-            }
-        };
+        return () -> refreshHandler.postDelayed(transactionRunnable, 1500);
     }
 
     public View.OnClickListener onPublicKeyTextClicked() {
-        return new View.OnClickListener() {
-            private static final String CLIP_DATA_LABEL_TEXT_DATA = "text_data";
+        return view -> {
+            final String CLIP_DATA_LABEL_TEXT_DATA = "text_data";
+            final Context context = assetReceiveView.getContext();
 
-            @Override
-            public void onClick(View view) {
-                final Context context = assetReceiveView.getContext();
+            ClipData.Item item = new ClipData.Item(assetReceiveView.getPublicKey());
 
-                ClipData.Item item = new ClipData.Item(assetReceiveView.getPublicKey());
+            String[] mimeType = new String[1];
+            mimeType[0] = ClipDescription.MIMETYPE_TEXT_URILIST;
 
-                String[] mimeType = new String[1];
-                mimeType[0] = ClipDescription.MIMETYPE_TEXT_URILIST;
+            ClipData cd = new ClipData(new ClipDescription(CLIP_DATA_LABEL_TEXT_DATA, mimeType), item);
 
-                ClipData cd = new ClipData(new ClipDescription(CLIP_DATA_LABEL_TEXT_DATA, mimeType), item);
+            ClipboardManager cm = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
+            cm.setPrimaryClip(cd);
 
-                ClipboardManager cm = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
-                cm.setPrimaryClip(cd);
-
-                Toast.makeText(context, R.string.message_copy_to_clipboard, Toast.LENGTH_SHORT).show();
-            }
+            Toast.makeText(context, R.string.message_copy_to_clipboard, Toast.LENGTH_SHORT).show();
         };
     }
 

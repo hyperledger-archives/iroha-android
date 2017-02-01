@@ -1,16 +1,49 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.novoda.bintray-release'
+apply plugin: 'me.tatarka.retrolambda'
 
-def RX_IROHA_LIBRARY_VERSION = "0.0.1"
+def versionMajor = 0
+def versionMinor = 1
+def versionPatch = 0
+def versionBuild = 0
+
+def RX_IROHA_LIBRARY_VERSION = "${versionMajor}.${versionMinor}.${versionPatch}"
+
+def gitSha() {
+    def p = 'git rev-parse --short HEAD'.execute([], project.rootDir)
+    p.waitFor()
+    if (p.exitValue() != 0) {
+        throw new RuntimeException(p.errorStream.text)
+    }
+
+    return p.text.trim()
+}
+
+def gitTimestamp() {
+    def p = 'git log -n 1 --format=%at'.execute([], rootDir)
+    p.waitFor()
+    if (p.exitValue() != 0) {
+        throw new RuntimeException(p.errorStream.text)
+    }
+
+    return p.text.trim()
+}
+
+def isCi = 'true'.equals(System.getenv('CI'))
+def preDexEnabled = 'true'.equals(System.getProperty('pre-dex', 'true'))
 
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
 
+    dexOptions {
+        // Skip pre-dexing when running on Travis CI or when disabled via -Dpre-dex=false.
+        preDexLibraries = preDexEnabled && !isCi
+    }
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 25
-        versionCode 1
+        versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
         versionName RX_IROHA_LIBRARY_VERSION
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
@@ -18,6 +51,8 @@ android {
                 cppFlags "-std=c++11"
             }
         }
+        buildConfigField 'String', 'GIT_SHA', "\"${gitSha()}\""
+        buildConfigField 'long', 'GIT_TIMESTAMP', "${gitTimestamp()}L"
     }
     buildTypes {
         release {
@@ -32,6 +67,13 @@ android {
     }
     lintOptions {
         abortOnError false
+    }
+    aaptOptions {
+        noCompress 'apk'
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
