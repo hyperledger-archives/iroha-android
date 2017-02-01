@@ -1,6 +1,5 @@
 /*
-Copyright Soramitsu Co., Ltd. 2016 All Rights Reserved.
-http://soramitsu.co.jp
+Copyright(c) 2016 kobaken0029 All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,7 +13,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
 package io.soramitsu.iroha.exception;
 
 public class LargeNumberOfDigitsException extends RuntimeException {
