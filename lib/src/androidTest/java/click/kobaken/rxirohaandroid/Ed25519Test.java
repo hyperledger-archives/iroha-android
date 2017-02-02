@@ -31,6 +31,8 @@ import static click.kobaken.rxirohaandroid.security.KeyGenerator.createKeyPair;
 import static click.kobaken.rxirohaandroid.security.KeyGenerator.sign;
 import static click.kobaken.rxirohaandroid.security.KeyGenerator.verify;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 
@@ -51,6 +53,14 @@ public class Ed25519Test {
 
     @After
     public void tearDown() throws Exception {
+    }
+
+    @Test
+    public void test_createKeyPair_Successful() throws Exception {
+        assertNotNull(keyPair.privateKey);
+        assertFalse(keyPair.privateKey.equals(""));
+        assertNotNull(keyPair.publicKey);
+        assertFalse(keyPair.publicKey.equals(""));
     }
 
     @Test
