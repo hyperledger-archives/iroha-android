@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package io.soramitsu.irohaandroid;
+package click.kobaken.rxirohaandroid;
 
 import android.support.test.filters.SmallTest;
 import android.support.test.runner.AndroidJUnit4;
@@ -40,7 +40,7 @@ import static org.junit.Assert.assertThat;
  */
 @RunWith(AndroidJUnit4.class)
 @SmallTest
-public class IrohaTest {
+public class Ed25519Test {
 
     private KeyPair keyPair;
 
