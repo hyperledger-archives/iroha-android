@@ -30,7 +30,6 @@ import click.kobaken.rxirohaandroid.model.Asset;
 import click.kobaken.rxirohaandroid.model.BaseModel;
 import click.kobaken.rxirohaandroid.model.Domain;
 import click.kobaken.rxirohaandroid.model.TransactionHistory;
-import click.kobaken.rxirohaandroid.net.IrohaHttpClient;
 import click.kobaken.rxirohaandroid.repository.AccountRepository;
 import click.kobaken.rxirohaandroid.repository.AssetRepository;
 import click.kobaken.rxirohaandroid.repository.DomainRepository;
@@ -40,6 +39,7 @@ import click.kobaken.rxirohaandroid.service.AssetService;
 import click.kobaken.rxirohaandroid.service.DomainService;
 import click.kobaken.rxirohaandroid.service.TransactionService;
 import io.reactivex.Observable;
+import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -51,7 +51,7 @@ public class Iroha {
     private final AssetService assetService;
     private final TransactionService transactionService;
 
-    private Iroha(Builder builder) {
+    private Iroha(Builder builder, OkHttpClient client) {
         iroha = this;
 
         Gson gson = new GsonBuilder()
@@ -61,7 +61,7 @@ public class Iroha {
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(builder.baseUrl)
-                .client(IrohaHttpClient.getInstance().get())
+                .client(client)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
@@ -74,17 +74,23 @@ public class Iroha {
 
     public static class Builder {
         private String baseUrl;
+        private OkHttpClient client;
 
         public Builder baseUrl(String baseUrl) {
             this.baseUrl = baseUrl;
             return this;
         }
 
+        public Builder client(OkHttpClient client) {
+            this.client = client;
+            return this;
+        }
+
         public Iroha build() {
-            if (baseUrl == null) {
+            if (baseUrl == null || client == null) {
                 throw new NullPointerException();
             }
-            return new Iroha(this);
+            return new Iroha(this, client);
         }
     }
 
