@@ -51,7 +51,7 @@ public class Iroha {
     private final AssetService assetService;
     private final TransactionService transactionService;
 
-    private Iroha(Builder builder, OkHttpClient client) {
+    private Iroha(Builder builder) {
         iroha = this;
 
         Gson gson = new GsonBuilder()
@@ -61,7 +61,7 @@ public class Iroha {
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(builder.baseUrl)
-                .client(client)
+                .client(builder.client)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
@@ -90,7 +90,7 @@ public class Iroha {
             if (baseUrl == null || client == null) {
                 throw new NullPointerException();
             }
-            return new Iroha(this, client);
+            return new Iroha(this);
         }
     }
 
