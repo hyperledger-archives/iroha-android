@@ -29,7 +29,6 @@ public class AccountService {
     }
 
     public Observable<Account> register(String publicKey, String alias) {
-
         final AccountRegisterRequest body = new AccountRegisterRequest();
         body.publicKey = publicKey;
         body.alias = alias;
