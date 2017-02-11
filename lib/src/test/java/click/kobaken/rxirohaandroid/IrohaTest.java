@@ -16,757 +16,894 @@ limitations under the License.
 
 package click.kobaken.rxirohaandroid;
 
+import com.jakewharton.retrofit2.adapter.rxjava2.HttpException;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 import click.kobaken.rxirohaandroid.model.Account;
 import click.kobaken.rxirohaandroid.model.Asset;
 import click.kobaken.rxirohaandroid.model.BaseModel;
 import click.kobaken.rxirohaandroid.model.Domain;
-import click.kobaken.rxirohaandroid.model.Transaction;
 import click.kobaken.rxirohaandroid.model.TransactionHistory;
-import click.kobaken.rxirohaandroid.net.IrohaHttpClient;
+import click.kobaken.rxirohaandroid.service.AccountService;
+import click.kobaken.rxirohaandroid.service.AssetService;
+import click.kobaken.rxirohaandroid.service.DomainService;
+import click.kobaken.rxirohaandroid.service.TransactionService;
 import io.reactivex.Observable;
 import io.reactivex.observers.DisposableObserver;
-import io.reactivex.schedulers.Schedulers;
-import okhttp3.Headers;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.ResponseBody;
+import retrofit2.Response;
 
-import static click.kobaken.rxirohaandroid.util.ParserUtil.serialize;
+import static click.kobaken.rxirohaandroid.util.DummyCreator.newAccount;
+import static click.kobaken.rxirohaandroid.util.DummyCreator.newAsset;
+import static click.kobaken.rxirohaandroid.util.DummyCreator.newAssets;
+import static click.kobaken.rxirohaandroid.util.DummyCreator.newDomain;
+import static click.kobaken.rxirohaandroid.util.DummyCreator.newDomains;
+import static click.kobaken.rxirohaandroid.util.DummyCreator.newTransactionHistory;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertNull;
+import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 public class IrohaTest {
 
-    private MockWebServer mockWebServer;
-    private MockResponse mockResponse;
+    private Iroha iroha;
 
-    private Iroha.Builder irohaBuilder;
+    private CountDownLatch latch = new CountDownLatch(1);
+    private Exception actualException;
+    private Account actualAccount;
+    private Domain actualDomain;
+    private List<Domain> actualDomains;
+    private Asset actualAsset;
+    private List<Asset> actualAssets;
+    private TransactionHistory actualTx;
+
+    @Mock
+    OkHttpClient okHttpClient;
+
+    @Mock
+    AccountService accountService;
+
+    @Mock
+    DomainService domainService;
+
+    @Mock
+    AssetService assetService;
+
+    @Mock
+    TransactionService transactionService;
 
     @Before
     public void setUp() throws Exception {
-        initMockServer();
-        irohaBuilder = new Iroha.Builder().client(IrohaHttpClient.getInstance().get());
+        MockitoAnnotations.initMocks(this);
+        iroha = new Iroha.Builder()
+                .baseUrl("http://localhost")
+                .accountService(accountService)
+                .domainService(domainService)
+                .client(okHttpClient)
+                .assetService(assetService)
+                .transactionService(transactionService)
+                .build();
     }
 
     @After
     public void tearDown() throws Exception {
-        mockWebServer.shutdown();
+        actualException = null;
+        actualAccount = null;
+        actualDomain = null;
+        actualDomains = null;
+        actualAsset = null;
+        actualAssets = null;
+        actualTx = null;
     }
 
     @Test
-    public void registerAccount_201() throws Exception {
+    public void testRegisterAccount_Successful() throws Exception {
         final String publicKey = "pubkey";
         final String alias = "alias";
 
-        Account account = createAccount(Arrays.asList(createAsset(), createAsset(), createAsset()));
-        mockWebServer.enqueue(mockResponse.setResponseCode(201).setBody(serialize(account)));
+        Account account = newAccount(10);
+        when(accountService.register(publicKey, alias)).thenReturn(Observable.just(account));
 
-        Iroha iroha = buildIroha();
+        execute(iroha.registerAccount(publicKey, alias),
+                new DisposableObserver<Account>() {
+                    @Override
+                    public void onNext(Account value) {
+                        actualAccount = value;
+                    }
 
-        final CountDownLatch latch = new CountDownLatch(1);
-        execute(iroha.registerAccount(publicKey, alias), new DisposableObserver<Account>() {
-            @Override
-            public void onNext(Account value) {
-                assertThat(value.uuid, is("uuid"));
-                assertThat(value.alias, is("alias"));
-            }
+                    @Override
+                    public void onError(Throwable e) {
+                        fail();
+                    }
 
-            @Override
-            public void onError(Throwable e) {
-                fail();
-            }
-
-            @Override
-            public void onComplete() {
-                latch.countDown();
-            }
-        });
+                    @Override
+                    public void onComplete() {
+                        latch.countDown();
+                    }
+                });
         latch.await();
+
+        assertNotNull(actualAccount);
+        assertThat(actualAccount.uuid, is("10"));
+        assertThat(actualAccount.alias, is("10"));
+
+        verify(accountService).register(publicKey, alias);
+        verifyNoMoreInteractions(accountService);
     }
 
     @Test
-    public void registerAccount_200_account_duplicated() throws Exception {
+    public void testRegisterAccount_AccountDuplicated() throws Exception {
         final String publicKey = "pubkey";
         final String alias = "alias";
 
-        BaseModel response = new BaseModel();
-        response.status = 400;
-        response.message = "duplicate user";
-        mockWebServer.enqueue(mockResponse.setResponseCode(200).setBody(serialize(response)));
+        Account account = newAccount(10);
+        account.status = 400;
+        account.message = "duplicate user";
+        when(accountService.register(publicKey, alias)).thenReturn(Observable.just(account));
 
-        Iroha iroha = buildIroha();
+        execute(iroha.registerAccount(publicKey, alias),
+                new DisposableObserver<Account>() {
+                    @Override
+                    public void onNext(Account value) {
+                        actualAccount = value;
+                    }
 
-        final CountDownLatch latch = new CountDownLatch(1);
-        execute(iroha.registerAccount(publicKey, alias), new DisposableObserver<Account>() {
-            @Override
-            public void onNext(Account value) {
-                assertThat(value.status, is(400));
-                assertThat(value.message, is("duplicate user"));
-            }
+                    @Override
+                    public void onError(Throwable e) {
+                        fail();
+                    }
 
-            @Override
-            public void onError(Throwable e) {
-                fail();
-            }
-
-            @Override
-            public void onComplete() {
-                latch.countDown();
-            }
-        });
+                    @Override
+                    public void onComplete() {
+                        latch.countDown();
+                    }
+                });
         latch.await();
+
+        assertNotNull(actualAccount);
+        assertThat(actualAccount.status, is(400));
+        assertThat(actualAccount.message, is("duplicate user"));
+
+        verify(accountService).register(publicKey, alias);
+        verifyNoMoreInteractions(accountService);
     }
 
     @Test
-    public void registerAccount_404() throws Exception {
+    public void testRegisterAccount_Failure() throws Exception {
         final String publicKey = "pubkey";
         final String alias = "alias";
 
-        mockWebServer.enqueue(mockResponse.setResponseCode(404));
+        when(accountService.register(publicKey, alias)).thenReturn(mockErrorResponse(404));
 
-        Iroha iroha = buildIroha();
+        execute(iroha.registerAccount(publicKey, alias),
+                new DisposableObserver<Account>() {
+                    @Override
+                    public void onNext(Account value) {
+                        fail();
+                    }
 
-        final CountDownLatch latch = new CountDownLatch(1);
-        execute(iroha.registerAccount(publicKey, alias), new DisposableObserver<Account>() {
-            @Override
-            public void onNext(Account value) {
-                fail();
-            }
+                    @Override
+                    public void onError(Throwable e) {
+                        actualException = (Exception) e;
+                        latch.countDown();
+                    }
 
-            @Override
-            public void onError(Throwable e) {
-                latch.countDown();
-            }
-
-            @Override
-            public void onComplete() {
-            }
-        });
+                    @Override
+                    public void onComplete() {
+                        latch.countDown();
+                    }
+                });
         latch.await();
+
+        assertNull(actualAccount);
+        assertNotNull(actualException);
+        assertTrue(actualException instanceof HttpException);
+
+        verify(accountService).register(publicKey, alias);
+        verifyNoMoreInteractions(accountService);
     }
 
     @Test
-    public void findAccount_200() throws Exception {
-        final String publicKey = "pubkey";
-        final String alias = "alias";
-
-        Account account = createAccount(Arrays.asList(createAsset(), createAsset(), createAsset()));
-        mockWebServer.enqueue(mockResponse.setResponseCode(200).setBody(serialize(account)));
-
-        Iroha iroha = buildIroha();
-
-        final CountDownLatch latch = new CountDownLatch(1);
-        execute(iroha.registerAccount(publicKey, alias), new DisposableObserver<Account>() {
-            @Override
-            public void onNext(Account value) {
-                assertThat(value.uuid, is("uuid"));
-                assertThat(value.alias, is("alias"));
-                assertThat(value.assets.get(0).uuid, is(account.assets.get(0).uuid));
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                fail();
-            }
-
-            @Override
-            public void onComplete() {
-                latch.countDown();
-            }
-        });
-        latch.await();
-    }
-
-    @Test
-    public void findAccount_200_account_not_found() throws Exception {
-        final String publicKey = "pubkey";
-        final String alias = "alias";
-
-        BaseModel response = new BaseModel();
-        response.status = 400;
-        response.message = "User not found";
-        mockWebServer.enqueue(mockResponse.setResponseCode(200).setBody(serialize(response)));
-
-        Iroha iroha = buildIroha();
-
-        final CountDownLatch latch = new CountDownLatch(1);
-        execute(iroha.registerAccount(publicKey, alias), new DisposableObserver<Account>() {
-            @Override
-            public void onNext(Account value) {
-                assertThat(value.status, is(400));
-                assertThat(value.message, is("User not found"));
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                fail();
-            }
-
-            @Override
-            public void onComplete() {
-                latch.countDown();
-            }
-        });
-        latch.await();
-    }
-
-    @Test
-    public void findAccount_404() throws Exception {
-        final String publicKey = "pubkey";
-        final String alias = "alias";
-
-        mockWebServer.enqueue(mockResponse.setResponseCode(404));
-
-        Iroha iroha = buildIroha();
-
-        final CountDownLatch latch = new CountDownLatch(1);
-        execute(iroha.registerAccount(publicKey, alias), new DisposableObserver<Account>() {
-            @Override
-            public void onNext(Account value) {
-                fail();
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                latch.countDown();
-            }
-
-            @Override
-            public void onComplete() {
-            }
-        });
-        latch.await();
-    }
-
-    @Test
-    public void registerDomain_201() throws Exception {
-        final String name = "name";
-        final String owner = "owner";
-        final String signature = "signature";
-
-        Domain domain = createDomain(name, owner, signature);
-        mockWebServer.enqueue(mockResponse.setResponseCode(201).setBody(serialize(domain)));
-
-        Iroha iroha = buildIroha();
-
-        final CountDownLatch latch = new CountDownLatch(1);
-        execute(iroha.registerDomain(name, owner, signature), new DisposableObserver<Domain>() {
-            @Override
-            public void onNext(Domain value) {
-                assertThat(value.name, is(name));
-                assertThat(value.owner, is(owner));
-                assertThat(value.signature, is(signature));
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                fail();
-            }
-
-            @Override
-            public void onComplete() {
-                latch.countDown();
-            }
-        });
-        latch.await();
-    }
-
-    @Test
-    public void registerDomain_404() throws Exception {
-        final String name = "name";
-        final String owner = "owner";
-        final String signature = "signature";
-
-        mockWebServer.enqueue(mockResponse.setResponseCode(404));
-
-        Iroha iroha = buildIroha();
-
-        final CountDownLatch latch = new CountDownLatch(1);
-        execute(iroha.registerDomain(name, owner, signature), new DisposableObserver<Domain>() {
-            @Override
-            public void onNext(Domain value) {
-                fail();
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                latch.countDown();
-            }
-
-            @Override
-            public void onComplete() {
-            }
-        });
-        latch.await();
-    }
-
-    @Test
-    public void findDomains_200() throws Exception {
-        final int limit = 30;
-        final int offset = 0;
-
-        List<Domain> domains = Arrays.asList(createDomain(), createDomain(), createDomain());
-        mockWebServer.enqueue(mockResponse.setResponseCode(200).setBody(serialize(domains)));
-
-        Iroha iroha = buildIroha();
-
-        final CountDownLatch latch = new CountDownLatch(1);
-        execute(iroha.findDomains(limit, offset), new DisposableObserver<List<Domain>>() {
-            @Override
-            public void onNext(List<Domain> value) {
-                assertThat(value.size(), is(3));
-                assertThat(value.get(0).name, is("name"));
-                assertThat(value.get(0).owner, is("owner"));
-                assertThat(value.get(0).signature, is("signature"));
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                fail();
-            }
-
-            @Override
-            public void onComplete() {
-                latch.countDown();
-            }
-        });
-        latch.await();
-    }
-
-    @Test
-    public void findDomains_404() throws Exception {
-        final int limit = 30;
-        final int offset = 0;
-
-        mockWebServer.enqueue(mockResponse.setResponseCode(404));
-
-        Iroha iroha = buildIroha();
-
-        final CountDownLatch latch = new CountDownLatch(1);
-        execute(iroha.findDomains(limit, offset), new DisposableObserver<List<Domain>>() {
-            @Override
-            public void onNext(List<Domain> value) {
-                fail();
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                latch.countDown();
-            }
-
-            @Override
-            public void onComplete() {
-            }
-        });
-        latch.await();
-    }
-
-    @Test
-    public void createAsset_201() throws Exception {
+    public void testFindAccount_Successful() throws Exception {
         final String uuid = "uuid";
+
+        Account account = newAccount(10);
+        when(accountService.findAccount(uuid)).thenReturn(Observable.just(account));
+
+        execute(iroha.findAccount(uuid),
+                new DisposableObserver<Account>() {
+                    @Override
+                    public void onNext(Account value) {
+                        actualAccount = value;
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        fail();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        latch.countDown();
+                    }
+                });
+        latch.await();
+
+        assertNotNull(actualAccount);
+        assertThat(actualAccount.uuid, is("10"));
+        assertThat(actualAccount.alias, is("10"));
+        assertThat(actualAccount.assets.size(), is(10));
+        Observable.range(0, 10).subscribe(i -> {
+            String expected = String.valueOf(i);
+            assertThat(actualAccount.assets.get(i).uuid, is(expected));
+            assertThat(actualAccount.assets.get(i).name, is(expected));
+            assertThat(actualAccount.assets.get(i).domain, is(expected));
+            assertThat(actualAccount.assets.get(i).creator, is(expected));
+            assertThat(actualAccount.assets.get(i).signature, is(expected));
+            assertThat(actualAccount.assets.get(i).value, is(expected));
+            assertThat(actualAccount.assets.get(i).timestamp, is((long) i));
+        });
+
+        verify(accountService).findAccount(uuid);
+        verifyNoMoreInteractions(accountService);
+    }
+
+    @Test
+    public void testFindAccount_NotFound() throws Exception {
+        final String uuid = "uuid";
+
+        Account account = newAccount(10);
+        account.status = 400;
+        account.message = "User not found";
+        when(accountService.findAccount(uuid)).thenReturn(Observable.just(account));
+
+        execute(iroha.findAccount(uuid),
+                new DisposableObserver<Account>() {
+                    @Override
+                    public void onNext(Account value) {
+                        actualAccount = value;
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        fail();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        latch.countDown();
+                    }
+                });
+        latch.await();
+
+        assertNotNull(actualAccount);
+        assertThat(actualAccount.status, is(400));
+        assertThat(actualAccount.message, is("User not found"));
+
+        verify(accountService).findAccount(uuid);
+        verifyNoMoreInteractions(accountService);
+    }
+
+    @Test
+    public void testFindAccount_Failure() throws Exception {
+        final String uuid = "uuid";
+
+        when(accountService.findAccount(uuid)).thenReturn(mockErrorResponse(404));
+
+        execute(iroha.findAccount(uuid),
+                new DisposableObserver<Account>() {
+                    @Override
+                    public void onNext(Account value) {
+                        fail();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        actualException = (Exception) e;
+                        latch.countDown();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        latch.countDown();
+                    }
+                });
+        latch.await();
+
+        assertNull(actualAccount);
+        assertNotNull(actualException);
+        assertTrue(actualException instanceof HttpException);
+
+        verify(accountService).findAccount(uuid);
+        verifyNoMoreInteractions(accountService);
+    }
+
+    @Test
+    public void testRegisterDomain_Successful() throws Exception {
+        final String name = "name";
+        final String owner = "owner";
+        final String signature = "signature";
+
+        Domain domain = newDomain(10);
+        when(domainService.register(name, owner, signature)).thenReturn(Observable.just(domain));
+
+        execute(iroha.registerDomain(name, owner, signature),
+                new DisposableObserver<Domain>() {
+                    @Override
+                    public void onNext(Domain value) {
+                        actualDomain = value;
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        fail();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        latch.countDown();
+                    }
+                });
+        latch.await();
+
+        assertNotNull(actualDomain);
+        assertThat(actualDomain.name, is("10"));
+        assertThat(actualDomain.owner, is("10"));
+        assertThat(actualDomain.signature, is("10"));
+
+        verify(domainService).register(name, owner, signature);
+        verifyNoMoreInteractions(domainService);
+    }
+
+    @Test
+    public void testRegisterDomain_Failure() throws Exception {
+        final String name = "name";
+        final String owner = "owner";
+        final String signature = "signature";
+
+        when(domainService.register(name, owner, signature)).thenReturn(mockErrorResponse(404));
+
+        execute(iroha.registerDomain(name, owner, signature),
+                new DisposableObserver<Domain>() {
+                    @Override
+                    public void onNext(Domain value) {
+                        fail();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        actualException = (Exception) e;
+                        latch.countDown();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        latch.countDown();
+                    }
+                });
+        latch.await();
+
+        assertNull(actualDomain);
+        assertNotNull(actualException);
+        assertTrue(actualException instanceof HttpException);
+
+        verify(domainService).register(name, owner, signature);
+        verifyNoMoreInteractions(domainService);
+    }
+
+    @Test
+    public void testFindDomains_Successful() throws Exception {
+        final int limit = 30;
+        final int offset = 0;
+
+        List<Domain> domains = newDomains(10);
+        when(domainService.findDomains(limit, offset)).thenReturn(Observable.just(domains));
+
+        execute(iroha.findDomains(limit, offset),
+                new DisposableObserver<List<Domain>>() {
+                    @Override
+                    public void onNext(List<Domain> value) {
+                        actualDomains = value;
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        fail();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        latch.countDown();
+                    }
+                });
+        latch.await();
+
+        assertThat(actualDomains.size(), is(10));
+        Observable.range(0, 10).subscribe(i -> {
+            String expected = String.valueOf(i);
+            assertThat(actualDomains.get(i).name, is(expected));
+            assertThat(actualDomains.get(i).owner, is(expected));
+            assertThat(actualDomains.get(i).signature, is(expected));
+        });
+
+        verify(domainService).findDomains(limit, offset);
+        verifyNoMoreInteractions(domainService);
+    }
+
+    @Test
+    public void testFindDomains_Failure() throws Exception {
+        final int limit = 30;
+        final int offset = 0;
+
+        when(domainService.findDomains(limit, offset)).thenReturn(mockErrorResponse(404));
+
+        execute(iroha.findDomains(limit, offset),
+                new DisposableObserver<List<Domain>>() {
+                    @Override
+                    public void onNext(List<Domain> value) {
+                        fail();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        actualException = (Exception) e;
+                        latch.countDown();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        latch.countDown();
+                    }
+                });
+        latch.await();
+
+        assertNull(actualDomains);
+        assertNotNull(actualException);
+        assertTrue(actualException instanceof HttpException);
+
+        verify(domainService).findDomains(limit, offset);
+        verifyNoMoreInteractions(domainService);
+    }
+
+    @Test
+    public void testCreateAsset_Successful() throws Exception {
         final String name = "name";
         final String domain = "domain";
         final String creator = "creator";
         final String signature = "signature";
+        final long timestamp = 10L;
 
-        Asset asset = createAsset(uuid, name, domain, creator, signature);
-        mockWebServer.enqueue(mockResponse.setResponseCode(201).setBody(serialize(asset)));
+        Asset asset = newAsset(10);
+        when(assetService.create(name, domain, creator, signature, timestamp))
+                .thenReturn(Observable.just(asset));
 
-        Iroha iroha = buildIroha();
+        execute(iroha.createAsset(name, domain, creator, signature, asset.timestamp),
+                new DisposableObserver<Asset>() {
+                    @Override
+                    public void onNext(Asset value) {
+                        actualAsset = value;
+                    }
 
-        final CountDownLatch latch = new CountDownLatch(1);
-        execute(iroha.createAsset(name, domain, creator, signature, asset.timestamp), new DisposableObserver<Asset>() {
-            @Override
-            public void onNext(Asset value) {
-                assertThat(value.uuid, is(uuid));
-                assertThat(value.name, is(name));
-                assertThat(value.domain, is(domain));
-                assertThat(value.creator, is(creator));
-                assertThat(value.signature, is(signature));
-            }
+                    @Override
+                    public void onError(Throwable e) {
+                        fail();
+                    }
 
-            @Override
-            public void onError(Throwable e) {
-                fail();
-            }
-
-            @Override
-            public void onComplete() {
-                latch.countDown();
-            }
-        });
+                    @Override
+                    public void onComplete() {
+                        latch.countDown();
+                    }
+                });
         latch.await();
+
+        assertNotNull(actualAsset);
+        assertThat(actualAsset.uuid, is("10"));
+        assertThat(actualAsset.name, is("10"));
+        assertThat(actualAsset.domain, is("10"));
+        assertThat(actualAsset.creator, is("10"));
+        assertThat(actualAsset.signature, is("10"));
+        assertThat(actualAsset.timestamp, is(10L));
+
+        verify(assetService).create(name, domain, creator, signature, timestamp);
+        verifyNoMoreInteractions(assetService);
     }
 
     @Test
-    public void createAsset_404() throws Exception {
+    public void testCreateAsset_Failure() throws Exception {
         final String name = "name";
         final String domain = "domain";
         final String creator = "creator";
         final String signature = "signature";
+        final long timestamp = 10L;
 
-        mockWebServer.enqueue(mockResponse.setResponseCode(404));
+        when(assetService.create(name, domain, creator, signature, timestamp))
+                .thenReturn(mockErrorResponse(404));
 
-        Iroha iroha = buildIroha();
+        execute(iroha.createAsset(name, domain, creator, signature, timestamp),
+                new DisposableObserver<Asset>() {
+                    @Override
+                    public void onNext(Asset value) {
+                        fail();
+                    }
 
-        final CountDownLatch latch = new CountDownLatch(1);
-        execute(iroha.createAsset(name, domain, creator, signature, 0L), new DisposableObserver<Asset>() {
-            @Override
-            public void onNext(Asset value) {
-                fail();
-            }
+                    @Override
+                    public void onError(Throwable e) {
+                        actualException = (Exception) e;
+                        latch.countDown();
+                    }
 
-            @Override
-            public void onError(Throwable e) {
-                latch.countDown();
-            }
-
-            @Override
-            public void onComplete() {
-            }
-        });
+                    @Override
+                    public void onComplete() {
+                        latch.countDown();
+                    }
+                });
         latch.await();
+
+        assertNull(actualAsset);
+        assertNotNull(actualException);
+        assertTrue(actualException instanceof HttpException);
+
+        verify(assetService).create(name, domain, creator, signature, timestamp);
+        verifyNoMoreInteractions(assetService);
     }
 
     @Test
-    public void findAssets_200() throws Exception {
+    public void testFindAssets_Successful() throws Exception {
         final String domain = "domain";
         final int limit = 30;
         final int offset = 0;
 
-        List<Asset> assets = Arrays.asList(createAsset(), createAsset(), createAsset());
-        mockWebServer.enqueue(mockResponse.setResponseCode(200).setBody(serialize(assets)));
+        List<Asset> assets = newAssets(10);
+        when(assetService.findAssets(domain, limit, offset)).thenReturn(Observable.just(assets));
 
-        Iroha iroha = buildIroha();
+        execute(iroha.findAssets(domain, limit, offset),
+                new DisposableObserver<List<Asset>>() {
+                    @Override
+                    public void onNext(List<Asset> value) {
+                        actualAssets = value;
+                    }
 
-        final CountDownLatch latch = new CountDownLatch(1);
-        execute(iroha.findAssets(domain, limit, offset), new DisposableObserver<List<Asset>>() {
-            @Override
-            public void onNext(List<Asset> value) {
-                assertThat(value.size(), is(3));
-                assertThat(value.get(0).uuid, is("uuid"));
-                assertThat(value.get(0).name, is("name"));
-                assertThat(value.get(0).domain, is(domain));
-                assertThat(value.get(0).signature, is("signature"));
-            }
+                    @Override
+                    public void onError(Throwable e) {
+                        fail();
+                    }
 
-            @Override
-            public void onError(Throwable e) {
-                fail();
-            }
-
-            @Override
-            public void onComplete() {
-                latch.countDown();
-            }
-        });
+                    @Override
+                    public void onComplete() {
+                        latch.countDown();
+                    }
+                });
         latch.await();
+
+        assertThat(actualAssets.size(), is(10));
+        Observable.range(0, 10).subscribe(i -> {
+            String expected = String.valueOf(i);
+            assertThat(actualAssets.get(i).uuid, is(expected));
+            assertThat(actualAssets.get(i).name, is(expected));
+            assertThat(actualAssets.get(i).domain, is(expected));
+            assertThat(actualAssets.get(i).signature, is(expected));
+        });
+
+        verify(assetService).findAssets(domain, limit, offset);
+        verifyNoMoreInteractions(assetService);
     }
 
     @Test
-    public void findAssets_404() throws Exception {
+    public void testFindAssets_Failure() throws Exception {
         final String domain = "domain";
         final int limit = 30;
         final int offset = 0;
 
-        mockWebServer.enqueue(mockResponse.setResponseCode(404));
+        when(assetService.findAssets(domain, limit, offset)).thenReturn(mockErrorResponse(404));
 
-        Iroha iroha = buildIroha();
+        execute(iroha.findAssets(domain, limit, offset),
+                new DisposableObserver<List<Asset>>() {
+                    @Override
+                    public void onNext(List<Asset> value) {
+                        fail();
+                    }
 
-        final CountDownLatch latch = new CountDownLatch(1);
-        execute(iroha.findAssets(domain, limit, offset), new DisposableObserver<List<Asset>>() {
-            @Override
-            public void onNext(List<Asset> value) {
-                fail();
-            }
+                    @Override
+                    public void onError(Throwable e) {
+                        actualException = (Exception) e;
+                        latch.countDown();
+                    }
 
-            @Override
-            public void onError(Throwable e) {
-                latch.countDown();
-            }
-
-            @Override
-            public void onComplete() {
-            }
-        });
+                    @Override
+                    public void onComplete() {
+                        latch.countDown();
+                    }
+                });
         latch.await();
+
+        assertNull(actualAssets);
+        assertNotNull(actualException);
+        assertTrue(actualException instanceof HttpException);
+
+        verify(assetService).findAssets(domain, limit, offset);
+        verifyNoMoreInteractions(assetService);
     }
 
     @Test
-    public void operateAsset_201() throws Exception {
+    public void testOperateAsset_Successful() throws Exception {
         final String assetUuid = "asset-uuid";
         final String command = "command";
         final String value = "value";
         final String sender = "sender";
         final String receiver = "receiver";
         final String signature = "signature";
+        final long timestamp = 10L;
 
-        BaseModel response = new BaseModel();
-        response.status = 201;
-        response.message = "Asset transfered successfully";
-        mockWebServer.enqueue(mockResponse.setResponseCode(201).setBody(serialize(response)));
+        Asset asset = newAsset(10);
+        asset.status = 201;
+        asset.message = "Asset transfered successfully";
+        when(assetService.operation(assetUuid, command, value, sender, receiver, signature, timestamp))
+                .thenReturn(Observable.just(asset));
 
-        Iroha iroha = buildIroha();
+        execute(iroha.operateAsset(assetUuid, command, value, sender, receiver, signature, timestamp),
+                new DisposableObserver<BaseModel>() {
+                    @Override
+                    public void onNext(BaseModel value) {
+                        actualAsset = (Asset) value;
+                    }
 
-        final CountDownLatch latch = new CountDownLatch(1);
-        execute(iroha.operateAsset(assetUuid, command, value, sender, receiver, signature, 0L), new DisposableObserver<BaseModel>() {
-            @Override
-            public void onNext(BaseModel value) {
-                assertThat(value.status, is(201));
-                assertThat(value.message, is("Asset transfered successfully"));
-            }
+                    @Override
+                    public void onError(Throwable e) {
+                        fail();
+                        latch.countDown();
+                    }
 
-            @Override
-            public void onError(Throwable e) {
-                fail();
-            }
-
-            @Override
-            public void onComplete() {
-                latch.countDown();
-            }
-        });
+                    @Override
+                    public void onComplete() {
+                        latch.countDown();
+                    }
+                });
         latch.await();
+
+        assertNotNull(actualAsset);
+        assertThat(actualAsset.status, is(201));
+        assertThat(actualAsset.message, is("Asset transfered successfully"));
+
+        verify(assetService).operation(assetUuid, command, value, sender, receiver, signature, timestamp);
+        verifyNoMoreInteractions(assetService);
     }
 
     @Test
-    public void operateAsset_404() throws Exception {
+    public void testOperateAsset_Failure() throws Exception {
         final String assetUuid = "asset-uuid";
         final String command = "command";
         final String value = "value";
         final String sender = "sender";
         final String receiver = "receiver";
         final String signature = "signature";
+        final long timestamp = 10L;
 
-        mockWebServer.enqueue(mockResponse.setResponseCode(404));
+        when(assetService.operation(assetUuid, command, value, sender, receiver, signature, timestamp))
+                .thenReturn(mockErrorResponse(404));
 
-        Iroha iroha = buildIroha();
+        execute(iroha.operateAsset(assetUuid, command, value, sender, receiver, signature, timestamp),
+                new DisposableObserver<BaseModel>() {
+                    @Override
+                    public void onNext(BaseModel value) {
+                        fail();
+                    }
 
-        final CountDownLatch latch = new CountDownLatch(1);
-        execute(iroha.operateAsset(assetUuid, command, value, sender, receiver, signature, 0L), new DisposableObserver<BaseModel>() {
-            @Override
-            public void onNext(BaseModel value) {
-                fail();
-            }
+                    @Override
+                    public void onError(Throwable e) {
+                        actualException = (Exception) e;
+                        latch.countDown();
+                    }
 
-            @Override
-            public void onError(Throwable e) {
-                latch.countDown();
-            }
-
-            @Override
-            public void onComplete() {
-            }
-        });
+                    @Override
+                    public void onComplete() {
+                        latch.countDown();
+                    }
+                });
         latch.await();
+
+        assertNull(actualAsset);
+        assertNotNull(actualException);
+        assertTrue(actualException instanceof HttpException);
+
+        verify(assetService).operation(assetUuid, command, value, sender, receiver, signature, timestamp);
+        verifyNoMoreInteractions(assetService);
     }
 
     @Test
-    public void findTransactionHistory_200() throws Exception {
+    public void testFindTransactionHistory_Successful() throws Exception {
         final String uuid = "uuid";
         final int limit = 30;
         final int offset = 0;
 
-        TransactionHistory history = createTransactionHistory(Arrays.asList(createTransaction(), createTransaction()));
-        mockWebServer.enqueue(mockResponse.setResponseCode(200).setBody(serialize(history)));
+        TransactionHistory history = newTransactionHistory(10);
+        when(transactionService.findHistory(uuid, limit, offset)).thenReturn(Observable.just(history));
 
-        Iroha iroha = buildIroha();
+        execute(iroha.findTransactionHistory(uuid, limit, offset),
+                new DisposableObserver<TransactionHistory>() {
+                    @Override
+                    public void onNext(TransactionHistory value) {
+                        actualTx = value;
+                        assertThat(value.history.size(), is(10));
+                        assertThat(value.history.get(0).assetUuid, is("0"));
+                        assertThat(value.history.get(0).assetName, is("0"));
+                        assertThat(value.history.get(0).signature, is("0"));
+                    }
 
-        final CountDownLatch latch = new CountDownLatch(1);
-        execute(iroha.findTransactionHistory(uuid, limit, offset), new DisposableObserver<TransactionHistory>() {
-            @Override
-            public void onNext(TransactionHistory value) {
-                assertThat(value.history.size(), is(2));
-            }
+                    @Override
+                    public void onError(Throwable e) {
+                        fail();
+                    }
 
-            @Override
-            public void onError(Throwable e) {
-                fail();
-            }
-
-            @Override
-            public void onComplete() {
-                latch.countDown();
-            }
-        });
+                    @Override
+                    public void onComplete() {
+                        latch.countDown();
+                    }
+                });
         latch.await();
+
+        assertNotNull(actualTx);
+        assertThat(actualTx.history.size(), is(10));
+        Observable.range(0, 10).subscribe(i -> {
+            String expected = String.valueOf(i);
+            assertThat(actualTx.history.get(i).assetUuid, is(expected));
+            assertThat(actualTx.history.get(i).assetName, is(expected));
+            assertThat(actualTx.history.get(i).signature, is(expected));
+            assertThat(actualTx.history.get(i).params.command, is(expected));
+            assertThat(actualTx.history.get(i).params.value, is(expected));
+            assertThat(actualTx.history.get(i).params.sender, is(expected));
+            assertThat(actualTx.history.get(i).params.receiver, is(expected));
+        });
+
+        verify(transactionService).findHistory(uuid, limit, offset);
+        verifyNoMoreInteractions(transactionService);
     }
 
     @Test
-    public void findTransactionHistory_404() throws Exception {
+    public void testFindTransactionHistory_Failure() throws Exception {
         final String uuid = "uuid";
         final int limit = 30;
         final int offset = 0;
 
-        mockWebServer.enqueue(mockResponse.setResponseCode(404));
+        when(transactionService.findHistory(uuid, limit, offset)).thenReturn(mockErrorResponse(404));
 
-        Iroha iroha = buildIroha();
+        execute(iroha.findTransactionHistory(uuid, limit, offset),
+                new DisposableObserver<TransactionHistory>() {
+                    @Override
+                    public void onNext(TransactionHistory value) {
+                        fail();
+                    }
 
-        final CountDownLatch latch = new CountDownLatch(1);
-        execute(iroha.findTransactionHistory(uuid, limit, offset), new DisposableObserver<TransactionHistory>() {
-            @Override
-            public void onNext(TransactionHistory value) {
-                fail();
-            }
+                    @Override
+                    public void onError(Throwable e) {
+                        actualException = (Exception) e;
+                        latch.countDown();
+                    }
 
-            @Override
-            public void onError(Throwable e) {
-                latch.countDown();
-            }
-
-            @Override
-            public void onComplete() {
-            }
-        });
+                    @Override
+                    public void onComplete() {
+                        latch.countDown();
+                    }
+                });
         latch.await();
+
+        assertNull(actualTx);
+        assertNotNull(actualException);
+        assertTrue(actualException instanceof HttpException);
+
+        verify(transactionService).findHistory(uuid, limit, offset);
+        verifyNoMoreInteractions(transactionService);
     }
 
     @Test
-    public void findTransactionHistory_multi_asset_200() throws Exception {
+    public void testFindTransactionHistory_MultiAsset_Successful() throws Exception {
         final String domain = "domain";
         final String asset = "asset";
         final String uuid = "uuid";
         final int limit = 30;
         final int offset = 0;
 
-        TransactionHistory history = createTransactionHistory(Arrays.asList(createTransaction(), createTransaction()));
-        mockWebServer.enqueue(mockResponse.setResponseCode(200).setBody(serialize(history)));
+        TransactionHistory history = newTransactionHistory(10);
+        when(transactionService.findHistory(domain, asset, uuid, limit, offset))
+                .thenReturn(Observable.just(history));
 
-        Iroha iroha = buildIroha();
+        execute(iroha.findTransactionHistory(domain, asset, uuid, limit, offset),
+                new DisposableObserver<TransactionHistory>() {
+                    @Override
+                    public void onNext(TransactionHistory value) {
+                        actualTx = value;
+                    }
 
-        final CountDownLatch latch = new CountDownLatch(1);
-        execute(iroha.findTransactionHistory(domain, asset, uuid, limit, offset), new DisposableObserver<TransactionHistory>() {
-            @Override
-            public void onNext(TransactionHistory value) {
-                assertThat(value.history.size(), is(2));
-            }
+                    @Override
+                    public void onError(Throwable e) {
+                        fail();
+                    }
 
-            @Override
-            public void onError(Throwable e) {
-                fail();
-            }
-
-            @Override
-            public void onComplete() {
-                latch.countDown();
-            }
-        });
+                    @Override
+                    public void onComplete() {
+                        latch.countDown();
+                    }
+                });
         latch.await();
+
+        assertNotNull(actualTx);
+        assertThat(actualTx.history.size(), is(10));
+        Observable.range(0, 10).subscribe(i -> {
+            String expected = String.valueOf(i);
+            assertThat(actualTx.history.get(i).assetUuid, is(expected));
+            assertThat(actualTx.history.get(i).assetName, is(expected));
+            assertThat(actualTx.history.get(i).signature, is(expected));
+            assertThat(actualTx.history.get(i).params.command, is(expected));
+            assertThat(actualTx.history.get(i).params.value, is(expected));
+            assertThat(actualTx.history.get(i).params.sender, is(expected));
+            assertThat(actualTx.history.get(i).params.receiver, is(expected));
+        });
+
+        verify(transactionService).findHistory(domain, asset, uuid, limit, offset);
+        verifyNoMoreInteractions(transactionService);
     }
 
     @Test
-    public void findTransactionHistory_multi_asset_404() throws Exception {
+    public void testFindTransactionHistory_MultiAsset_Failure() throws Exception {
         final String domain = "domain";
         final String asset = "asset";
         final String uuid = "uuid";
         final int limit = 30;
         final int offset = 0;
 
-        mockWebServer.enqueue(mockResponse.setResponseCode(404));
+        when(transactionService.findHistory(domain, asset, uuid, limit, offset))
+                .thenReturn(mockErrorResponse(404));
 
-        Iroha iroha = buildIroha();
+        execute(iroha.findTransactionHistory(domain, asset, uuid, limit, offset),
+                new DisposableObserver<TransactionHistory>() {
+                    @Override
+                    public void onNext(TransactionHistory value) {
+                        fail();
+                    }
 
-        final CountDownLatch latch = new CountDownLatch(1);
-        execute(iroha.findTransactionHistory(domain, asset, uuid, limit, offset), new DisposableObserver<TransactionHistory>() {
-            @Override
-            public void onNext(TransactionHistory value) {
-                fail();
-            }
+                    @Override
+                    public void onError(Throwable e) {
+                        actualException = (Exception) e;
+                        latch.countDown();
+                    }
 
-            @Override
-            public void onError(Throwable e) {
-                latch.countDown();
-            }
-
-            @Override
-            public void onComplete() {
-            }
-        });
+                    @Override
+                    public void onComplete() {
+                        latch.countDown();
+                    }
+                });
         latch.await();
-    }
 
-    private void initMockServer() throws Exception {
-        mockWebServer = new MockWebServer();
-        mockWebServer.start(11262);
+        assertNull(actualTx);
+        assertNotNull(actualException);
+        assertTrue(actualException instanceof HttpException);
 
-        Map<String, String> headerMap = new HashMap<>();
-        headerMap.put("Accept", "application/json");
-        headerMap.put("Content-type", "application/json");
-        mockResponse = new MockResponse().setHeaders(Headers.of(headerMap));
-    }
-
-    private Account createAccount(List<Asset> assets, String... params) {
-        int length = params.length;
-        Account account = new Account();
-        account.uuid = length > 0 ? params[0] : "uuid";
-        account.alias = length > 1 ? params[1] : "alias";
-        account.assets = assets;
-        return account;
-    }
-
-    private Asset createAsset(String... params) {
-        int length = params.length;
-        Asset asset = new Asset();
-        asset.uuid = length > 0 ? params[0] : "uuid";
-        asset.name = length > 1 ? params[1] : "name";
-        asset.domain = length > 2 ? params[2] : "domain";
-        asset.creator = length > 3 ? params[3] : "creator";
-        asset.signature = length > 4 ? params[4] : "signature";
-        asset.value = length > 5 ? params[5] : "value";
-        asset.timestamp = System.currentTimeMillis() / 1000;
-        return asset;
-    }
-
-    private Domain createDomain(String... params) {
-        int length = params.length;
-        Domain domain = new Domain();
-        domain.name = length > 0 ? params[0] : "name";
-        domain.owner = length > 1 ? params[1] : "owner";
-        domain.signature = length > 2 ? params[2] : "signature";
-        domain.timestamp = System.currentTimeMillis() / 1000;
-        return domain;
-    }
-
-    private Transaction createTransaction(String... params) {
-        int length = params.length;
-        Transaction transaction = new Transaction();
-        transaction.assetUuid = length > 0 ? params[0] : "asset-uuid";
-        transaction.assetName = length > 1 ? params[1] : "assetName";
-        transaction.params = new Transaction.OperationParameter();
-        transaction.params.command = length > 2 ? params[2] : "command";
-        transaction.params.value = length > 3 ? params[3] : "value";
-        transaction.params.sender = length > 4 ? params[4] : "sender";
-        transaction.params.receiver = length > 5 ? params[5] : "receiver";
-        transaction.params.timestamp = System.currentTimeMillis() / 1000;
-        transaction.signature = length > 6 ? params[6] : "signature";
-        return transaction;
-    }
-
-    private TransactionHistory createTransactionHistory(List<Transaction> tx) {
-        TransactionHistory history = new TransactionHistory();
-        history.history = tx;
-        return history;
-    }
-
-    private Iroha buildIroha() {
-        return irohaBuilder
-                .baseUrl(mockWebServer.url("/").toString())
-                .build();
+        verify(transactionService).findHistory(domain, asset, uuid, limit, offset);
+        verifyNoMoreInteractions(transactionService);
     }
 
     private <T> void execute(Observable<T> observer, DisposableObserver<T> disposer) {
-        observer.observeOn(Schedulers.io())
-                .subscribeOn(Schedulers.io())
-                .subscribe(disposer);
+        observer.subscribe(disposer);
+    }
+
+    private <T> Observable<T> mockErrorResponse(int code) {
+        return Observable.create(e -> {
+            ResponseBody body = ResponseBody.create(MediaType.parse("application/json"), "");
+            e.onError(new HttpException(Response.error(code, body)));
+        });
     }
 }

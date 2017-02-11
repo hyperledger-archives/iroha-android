@@ -66,15 +66,19 @@ public class Iroha {
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
 
-        accountService = new AccountService(retrofit.create(AccountRepository.class));
-        domainService = new DomainService(retrofit.create(DomainRepository.class));
-        assetService = new AssetService(retrofit.create(AssetRepository.class));
-        transactionService = new TransactionService(retrofit.create(TransactionRepository.class));
+        accountService = builder.accountService == null ? new AccountService(retrofit.create(AccountRepository.class)) : builder.accountService;
+        domainService = builder.domainService == null ? new DomainService(retrofit.create(DomainRepository.class)) : builder.domainService;
+        assetService = builder.assetService == null ? new AssetService(retrofit.create(AssetRepository.class)) : builder.assetService;
+        transactionService = builder.transactionService == null ? new TransactionService(retrofit.create(TransactionRepository.class)) : builder.transactionService;
     }
 
     public static class Builder {
         private String baseUrl;
         private OkHttpClient client;
+        private AccountService accountService;
+        private DomainService domainService;
+        private AssetService assetService;
+        private TransactionService transactionService;
 
         public Builder baseUrl(String baseUrl) {
             this.baseUrl = baseUrl;
@@ -83,6 +87,26 @@ public class Iroha {
 
         public Builder client(OkHttpClient client) {
             this.client = client;
+            return this;
+        }
+
+        public Builder accountService(AccountService accountService) {
+            this.accountService = accountService;
+            return this;
+        }
+
+        public Builder domainService(DomainService domainService) {
+            this.domainService = domainService;
+            return this;
+        }
+
+        public Builder assetService(AssetService assetService) {
+            this.assetService = assetService;
+            return this;
+        }
+
+        public Builder transactionService(TransactionService transactionService) {
+            this.transactionService = transactionService;
             return this;
         }
 
