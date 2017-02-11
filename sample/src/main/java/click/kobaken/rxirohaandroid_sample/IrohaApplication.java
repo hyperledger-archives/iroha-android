@@ -19,6 +19,7 @@ package click.kobaken.rxirohaandroid_sample;
 import android.app.Application;
 
 import click.kobaken.rxirohaandroid.Iroha;
+import click.kobaken.rxirohaandroid.net.IrohaHttpClient;
 
 
 public class IrohaApplication extends Application {
@@ -28,6 +29,7 @@ public class IrohaApplication extends Application {
         super.onCreate();
         new Iroha.Builder()
                 .baseUrl("https://point-demo.iroha.tech")
+                .client(IrohaHttpClient.getInstance().get())
                 .build();
     }
 }

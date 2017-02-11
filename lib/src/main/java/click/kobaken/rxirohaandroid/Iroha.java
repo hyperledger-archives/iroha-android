@@ -30,7 +30,6 @@ import click.kobaken.rxirohaandroid.model.Asset;
 import click.kobaken.rxirohaandroid.model.BaseModel;
 import click.kobaken.rxirohaandroid.model.Domain;
 import click.kobaken.rxirohaandroid.model.TransactionHistory;
-import click.kobaken.rxirohaandroid.net.IrohaHttpClient;
 import click.kobaken.rxirohaandroid.repository.AccountRepository;
 import click.kobaken.rxirohaandroid.repository.AssetRepository;
 import click.kobaken.rxirohaandroid.repository.DomainRepository;
@@ -40,6 +39,7 @@ import click.kobaken.rxirohaandroid.service.AssetService;
 import click.kobaken.rxirohaandroid.service.DomainService;
 import click.kobaken.rxirohaandroid.service.TransactionService;
 import io.reactivex.Observable;
+import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -61,27 +61,57 @@ public class Iroha {
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(builder.baseUrl)
-                .client(IrohaHttpClient.getInstance().get())
+                .client(builder.client)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
 
-        accountService = new AccountService(retrofit.create(AccountRepository.class));
-        domainService = new DomainService(retrofit.create(DomainRepository.class));
-        assetService = new AssetService(retrofit.create(AssetRepository.class));
-        transactionService = new TransactionService(retrofit.create(TransactionRepository.class));
+        accountService = builder.accountService == null ? new AccountService(retrofit.create(AccountRepository.class)) : builder.accountService;
+        domainService = builder.domainService == null ? new DomainService(retrofit.create(DomainRepository.class)) : builder.domainService;
+        assetService = builder.assetService == null ? new AssetService(retrofit.create(AssetRepository.class)) : builder.assetService;
+        transactionService = builder.transactionService == null ? new TransactionService(retrofit.create(TransactionRepository.class)) : builder.transactionService;
     }
 
     public static class Builder {
         private String baseUrl;
+        private OkHttpClient client;
+        private AccountService accountService;
+        private DomainService domainService;
+        private AssetService assetService;
+        private TransactionService transactionService;
 
         public Builder baseUrl(String baseUrl) {
             this.baseUrl = baseUrl;
             return this;
         }
 
+        public Builder client(OkHttpClient client) {
+            this.client = client;
+            return this;
+        }
+
+        public Builder accountService(AccountService accountService) {
+            this.accountService = accountService;
+            return this;
+        }
+
+        public Builder domainService(DomainService domainService) {
+            this.domainService = domainService;
+            return this;
+        }
+
+        public Builder assetService(AssetService assetService) {
+            this.assetService = assetService;
+            return this;
+        }
+
+        public Builder transactionService(TransactionService transactionService) {
+            this.transactionService = transactionService;
+            return this;
+        }
+
         public Iroha build() {
-            if (baseUrl == null) {
+            if (baseUrl == null || client == null) {
                 throw new NullPointerException();
             }
             return new Iroha(this);

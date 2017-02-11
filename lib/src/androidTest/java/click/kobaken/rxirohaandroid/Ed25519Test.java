@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package io.soramitsu.irohaandroid;
+package click.kobaken.rxirohaandroid;
 
 import android.support.test.filters.SmallTest;
 import android.support.test.runner.AndroidJUnit4;
@@ -31,6 +31,8 @@ import static click.kobaken.rxirohaandroid.security.KeyGenerator.createKeyPair;
 import static click.kobaken.rxirohaandroid.security.KeyGenerator.sign;
 import static click.kobaken.rxirohaandroid.security.KeyGenerator.verify;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 
@@ -40,7 +42,7 @@ import static org.junit.Assert.assertThat;
  */
 @RunWith(AndroidJUnit4.class)
 @SmallTest
-public class IrohaTest {
+public class Ed25519Test {
 
     private KeyPair keyPair;
 
@@ -51,6 +53,14 @@ public class IrohaTest {
 
     @After
     public void tearDown() throws Exception {
+    }
+
+    @Test
+    public void test_createKeyPair_Successful() throws Exception {
+        assertNotNull(keyPair.privateKey);
+        assertFalse(keyPair.privateKey.equals(""));
+        assertNotNull(keyPair.publicKey);
+        assertFalse(keyPair.publicKey.equals(""));
     }
 
     @Test
