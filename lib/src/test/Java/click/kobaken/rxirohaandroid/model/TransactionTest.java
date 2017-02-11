@@ -26,6 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
+import static click.kobaken.rxirohaandroid.util.DummyCreator.newTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertFalse;
@@ -40,7 +41,7 @@ public class TransactionTest {
 
     @Before
     public void setUp() throws Exception {
-        transaction = createStub("value", "sender", Calendar.getInstance().getTimeInMillis() / 1000);
+        transaction = newTransaction((int) (System.currentTimeMillis() / 1000));
     }
 
     @Test
@@ -111,7 +112,8 @@ public class TransactionTest {
 
     @Test
     public void isSender_when_sender_is_mine() throws Exception {
-        boolean result = transaction.isSender("sender");
+        final String sender = String.valueOf(System.currentTimeMillis() / 1000);
+        boolean result = transaction.isSender(sender);
         assertTrue(result);
     }
 
@@ -144,14 +146,5 @@ public class TransactionTest {
     public void isSender_when_args_is_null() throws Exception {
         boolean result = transaction.isSender(null);
         assertFalse(result);
-    }
-
-    private Transaction createStub(String value, String sender, long timestamp) {
-        return new Transaction() {{
-            this.params = new OperationParameter();
-            this.params.value = value;
-            this.params.sender = sender;
-            this.params.timestamp = timestamp;
-        }};
     }
 }
