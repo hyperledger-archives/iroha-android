@@ -26,7 +26,7 @@
 In your ```app/build.gradle```   
 
 ```gradle
-compile 'click.kobaken:rx-iroha-android:0.1.0'
+compile 'click.kobaken:rx-iroha-android:0.2.0'
 ```
 
 ### Maven
@@ -36,7 +36,7 @@ Or if you use Maven, like this
 <dependency>
   <groupId>click.kobaken</groupId>
   <artifactId>rx-iroha-android</artifactId>
-  <version>0.1.0</version>
+  <version>0.2.0</version>
   <type>pom</type>
 </dependency>
 ```
@@ -70,7 +70,7 @@ String signature = KeyGenerator.sign(keyPair, "message")
 import click.kobaken.rxirohaandroid.security.KeyGenerator;
 import click.kobaken.rxirohaandroid.model.KeyPair;
 
-boolean verify = Iroha.verify(keyPair.publicKey, signature, "message")
+boolean verify = KeyGenerator.verify(keyPair.publicKey, signature, "message")
 //===> true if the correct message
 ```
 
@@ -91,6 +91,7 @@ import click.kobaken.rxirohaandroid.Iroha;
 
 new Iroha.Builder()
         .baseUrl("https://[input your domain(base url)]")
+        .client(IrohaHttpClient.getInstance().get())
         .build();
 ```
 
