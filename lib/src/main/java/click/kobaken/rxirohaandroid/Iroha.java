@@ -16,69 +16,56 @@ limitations under the License.
 
 package click.kobaken.rxirohaandroid;
 
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.internal.bind.DateTypeAdapter;
-import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-
-import java.util.Date;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import click.kobaken.rxirohaandroid.di.DaggerIrohaComponent;
+import click.kobaken.rxirohaandroid.di.IrohaModule;
 import click.kobaken.rxirohaandroid.model.Account;
 import click.kobaken.rxirohaandroid.model.Asset;
 import click.kobaken.rxirohaandroid.model.BaseModel;
 import click.kobaken.rxirohaandroid.model.Domain;
 import click.kobaken.rxirohaandroid.model.TransactionHistory;
-import click.kobaken.rxirohaandroid.repository.AccountRepository;
-import click.kobaken.rxirohaandroid.repository.AssetRepository;
-import click.kobaken.rxirohaandroid.repository.DomainRepository;
-import click.kobaken.rxirohaandroid.repository.TransactionRepository;
 import click.kobaken.rxirohaandroid.service.AccountService;
 import click.kobaken.rxirohaandroid.service.AssetService;
 import click.kobaken.rxirohaandroid.service.DomainService;
 import click.kobaken.rxirohaandroid.service.TransactionService;
 import io.reactivex.Observable;
 import okhttp3.OkHttpClient;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Iroha {
     private static Iroha iroha;
 
-    private final AccountService accountService;
-    private final DomainService domainService;
-    private final AssetService assetService;
-    private final TransactionService transactionService;
+    @Inject
+    AccountService accountService;
+
+    @Inject
+    DomainService domainService;
+
+    @Inject
+    AssetService assetService;
+
+    @Inject
+    TransactionService transactionService;
 
     private Iroha(Builder builder) {
         iroha = this;
 
-        Gson gson = new GsonBuilder()
-                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-                .registerTypeAdapter(Date.class, new DateTypeAdapter())
-                .create();
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(builder.baseUrl)
-                .client(builder.client)
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
-
-        accountService = builder.accountService == null ? new AccountService(retrofit.create(AccountRepository.class)) : builder.accountService;
-        domainService = builder.domainService == null ? new DomainService(retrofit.create(DomainRepository.class)) : builder.domainService;
-        assetService = builder.assetService == null ? new AssetService(retrofit.create(AssetRepository.class)) : builder.assetService;
-        transactionService = builder.transactionService == null ? new TransactionService(retrofit.create(TransactionRepository.class)) : builder.transactionService;
+        // UnitTest時に、自動生成されたDaggerTestComponentへのReferenceが解決出来ないため
+        // Test以外の場合のみInjectするようにしてある
+        if (!builder.isTest) {
+            DaggerIrohaComponent.builder()
+                    .irohaModule(new IrohaModule(builder))
+                    .build()
+                    .inject(this);
+        }
     }
 
     public static class Builder {
-        private String baseUrl;
-        private OkHttpClient client;
-        private AccountService accountService;
-        private DomainService domainService;
-        private AssetService assetService;
-        private TransactionService transactionService;
+        public String baseUrl;
+        public OkHttpClient client;
+        public boolean isTest; // true when running unit test
 
         public Builder baseUrl(String baseUrl) {
             this.baseUrl = baseUrl;
@@ -90,23 +77,8 @@ public class Iroha {
             return this;
         }
 
-        public Builder accountService(AccountService accountService) {
-            this.accountService = accountService;
-            return this;
-        }
-
-        public Builder domainService(DomainService domainService) {
-            this.domainService = domainService;
-            return this;
-        }
-
-        public Builder assetService(AssetService assetService) {
-            this.assetService = assetService;
-            return this;
-        }
-
-        public Builder transactionService(TransactionService transactionService) {
-            this.transactionService = transactionService;
+        public Builder test(boolean isTest) {
+            this.isTest = isTest;
             return this;
         }
 

@@ -55,13 +55,12 @@ import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 public class IrohaTest {
-
-    private Iroha iroha;
 
     private CountDownLatch latch = new CountDownLatch(1);
     private Exception actualException;
@@ -72,32 +71,33 @@ public class IrohaTest {
     private List<Asset> actualAssets;
     private TransactionHistory actualTx;
 
-    @Mock
-    OkHttpClient okHttpClient;
+    Iroha iroha;
 
-    @Mock
     AccountService accountService;
 
-    @Mock
     DomainService domainService;
 
-    @Mock
     AssetService assetService;
 
-    @Mock
     TransactionService transactionService;
+
+    @Mock
+    OkHttpClient okHttpClient;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         iroha = new Iroha.Builder()
                 .baseUrl("http://localhost")
-                .accountService(accountService)
-                .domainService(domainService)
                 .client(okHttpClient)
-                .assetService(assetService)
-                .transactionService(transactionService)
+                .test(true)
                 .build();
+
+        // DaggerTestComponentのReferenceが解決できないため無理やりmock化
+        iroha.accountService = accountService = mock(AccountService.class);
+        iroha.domainService = domainService = mock(DomainService.class);
+        iroha.assetService = assetService = mock(AssetService.class);
+        iroha.transactionService = transactionService = mock(TransactionService.class);
     }
 
     @After

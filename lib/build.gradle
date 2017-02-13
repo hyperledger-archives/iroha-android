@@ -77,18 +77,19 @@ android {
     }
 }
 
-def SUPPORT_PACKAGE_VERSION = "25.1.0"
+def SUPPORT_PACKAGE_VERSION = "25.1.1"
 def ESPRESSO_PACKAGE_VERSION = "2.2.2"
 def JUNIT_PACKAGE_VERSION = "4.12"
-def OKHTTP_PACKAGE_VERSION = "3.5.0";
-def GSON_PACKAGE_VERSION = "2.4";
-def PLAY_SERVICES_VISION_PACKAGE_VERSION = "10.0.1";
-def ZXING_PACKAGE_VERSION = "3.2.1";
-def BOUNCY_CASTLE_PACKAGE_VERSION = "1.55";
+def OKHTTP_PACKAGE_VERSION = "3.5.0"
+def GSON_PACKAGE_VERSION = "2.4"
+def PLAY_SERVICES_VISION_PACKAGE_VERSION = "10.0.1"
+def ZXING_PACKAGE_VERSION = "3.2.1"
+def BOUNCY_CASTLE_PACKAGE_VERSION = "1.55"
 
-def RX_ANDROID_PACKAGE_VERSION = "2.0.1";
-def RX_JAVA_PACKAGE_VERSION = "2.0.1";
-def RETROFIT_PACKAGE_VERSION = "2.1.0";
+def DAGGER_PACKAGE_VERSION = "2.9"
+def RX_ANDROID_PACKAGE_VERSION = "2.0.1"
+def RX_JAVA_PACKAGE_VERSION = "2.0.1"
+def RETROFIT_PACKAGE_VERSION = "2.1.0"
 def RETROFIT_RXJAVA2_ADAPTER_PACKAGE_VERSION = "1.0.0"
 
 dependencies {
@@ -111,6 +112,8 @@ dependencies {
     compile "com.google.zxing:core:${ZXING_PACKAGE_VERSION}"
     compile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: "${BOUNCY_CASTLE_PACKAGE_VERSION}"
 
+    compile "com.google.dagger:dagger:${DAGGER_PACKAGE_VERSION}"
+    annotationProcessor "com.google.dagger:dagger-compiler:${DAGGER_PACKAGE_VERSION}"
     compile "io.reactivex.rxjava2:rxandroid:${RX_ANDROID_PACKAGE_VERSION}"
     compile "io.reactivex.rxjava2:rxjava:${RX_JAVA_PACKAGE_VERSION}"
     compile "com.squareup.retrofit2:retrofit:${RETROFIT_PACKAGE_VERSION}"
