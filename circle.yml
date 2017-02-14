@@ -29,7 +29,7 @@ test:
   override:
     - ./gradlew iroha-android:test
   post:
-      - cp -r iroha-android/build/test-results/* $CIRCLE_TEST_REPORTS
+      - if [ -d iroha-android/build/test-results ]; then cp -r iroha-android/build/test-results/* $CIRCLE_TEST_REPORTS; fi
 deployment:
   master:
     branch: master
