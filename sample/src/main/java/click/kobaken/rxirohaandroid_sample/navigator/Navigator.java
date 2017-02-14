@@ -22,6 +22,7 @@ import android.support.annotation.NonNull;
 
 import click.kobaken.rxirohaandroid.qr.QRReaderBuilder;
 import click.kobaken.rxirohaandroid.qr.ReadQRCallback;
+import click.kobaken.rxirohaandroid_sample.R;
 import click.kobaken.rxirohaandroid_sample.view.activity.AccountRegisterActivity;
 import click.kobaken.rxirohaandroid_sample.view.activity.MainActivity;
 
@@ -54,6 +55,7 @@ public class Navigator {
         if (context != null) {
             Intent intent = new QRReaderBuilder(context)
                     .setCallback(callback)
+                    .setLayoutId(R.layout.activity_qr_reader)
                     .build();
             context.startActivity(intent);
         }

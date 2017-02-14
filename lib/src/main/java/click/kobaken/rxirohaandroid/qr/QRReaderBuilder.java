@@ -18,29 +18,35 @@ package click.kobaken.rxirohaandroid.qr;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
+import android.support.annotation.LayoutRes;
 
 public class QRReaderBuilder {
     private Context context;
+    private ReadQRCallback callback;
+
+    @LayoutRes
+    private int layoutId;
 
     public QRReaderBuilder(Context context) {
         this.context = context;
     }
 
     public QRReaderBuilder setCallback(ReadQRCallback callback) {
-        QRReaderActivity.setCallback(callback);
+        this.callback = callback;
+        return this;
+    }
+
+    public QRReaderBuilder setLayoutId(@LayoutRes int layoutId) {
+        this.layoutId = layoutId;
         return this;
     }
 
     public Intent build() {
-        if (context == null || QRReaderActivity.getCallback() == null) {
+        if (context == null || callback == null) {
             throw new NullPointerException();
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            return QRReaderHigherThanApi20Activity.getCallingIntent(context);
-        } else {
-            return QRReaderLowerThanApi19Activity.getCallingIntent(context);
-        }
+        QRReaderActivity.setCallback(callback);
+        return QRReaderActivity.getCallingIntent(context, layoutId);
     }
 }
