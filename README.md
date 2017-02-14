@@ -1,6 +1,9 @@
 # RxIrohaAndroid
 
+
+![build status](https://circleci.com/gh/kobaken0029/RxIrohaAndroid.svg?style=shield&circle-token=c3977114ce208efbb8bddd378d974b97e942662)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/122f8fc23361423e99b941b547ad95eb)](https://www.codacy.com/app/hyperledger/iroha-android?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=hyperledger/iroha-android&amp;utm_campaign=Badge_Grade)
+
 
 ## What is いろは(iroha)?
 いろは(iroha) is [this](https://github.com/hyperledger/iroha).
