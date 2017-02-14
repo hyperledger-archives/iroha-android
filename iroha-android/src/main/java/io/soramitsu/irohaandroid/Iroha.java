@@ -223,7 +223,7 @@ public class Iroha {
                     CountDownLatch countDownLatch = new CountDownLatch(COUNT_TWO_PARALLEL_TASK);
 
                     IrohaParallelAsyncTask<?> firstParallelAsyncTask =
-                            new IrohaParallelAsyncTask<T1>(dataSet, countDownLatch) {
+                            new IrohaParallelAsyncTask<T1>(callback, dataSet, countDownLatch) {
                                 @Override
                                 protected T1 onBackground() throws Exception {
                                     return f1.call();
@@ -232,7 +232,7 @@ public class Iroha {
                     execute(tag1, firstParallelAsyncTask);
 
                     IrohaParallelAsyncTask<?> secondParallelAsyncTask =
-                            new IrohaParallelAsyncTask<T2>(dataSet, countDownLatch) {
+                            new IrohaParallelAsyncTask<T2>(callback, dataSet, countDownLatch) {
                                 @Override
                                 protected T2 onBackground() throws Exception {
                                     return f2.call();
@@ -293,7 +293,7 @@ public class Iroha {
                     CountDownLatch countDownLatch = new CountDownLatch(COUNT_THREE_PARALLEL_TASK);
 
                     IrohaParallelAsyncTask<?> firstParallelAsyncTask =
-                            new IrohaParallelAsyncTask<T1>(dataSet, countDownLatch) {
+                            new IrohaParallelAsyncTask<T1>(callback, dataSet, countDownLatch) {
                                 @Override
                                 protected T1 onBackground() throws Exception {
                                     return f1.call();
@@ -302,7 +302,7 @@ public class Iroha {
                     execute(tag1, firstParallelAsyncTask);
 
                     IrohaParallelAsyncTask<?> secondParallelAsyncTask =
-                            new IrohaParallelAsyncTask<T2>(dataSet, countDownLatch) {
+                            new IrohaParallelAsyncTask<T2>(callback, dataSet, countDownLatch) {
                                 @Override
                                 protected T2 onBackground() throws Exception {
                                     return f2.call();
@@ -311,7 +311,7 @@ public class Iroha {
                     execute(tag2, secondParallelAsyncTask);
 
                     IrohaParallelAsyncTask<?> threeParallelAsyncTask =
-                            new IrohaParallelAsyncTask<T3>(dataSet, countDownLatch) {
+                            new IrohaParallelAsyncTask<T3>(callback, dataSet, countDownLatch) {
                                 @Override
                                 protected T3 onBackground() throws Exception {
                                     return f3.call();
