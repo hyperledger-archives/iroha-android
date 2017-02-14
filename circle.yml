@@ -27,9 +27,9 @@ dependencies:
     - echo d975f751698a77b662f1254ddbeed3901e976f5a > $ANDROID_HOME/licenses/intel-android-extra-license
 test:
   override:
-    - ./gradlew lib:test
+    - ./gradlew iroha-android:test
   post:
-      - cp -r lib/build/test-results/* $CIRCLE_TEST_REPORTS
+      - cp -r iroha-android/build/test-results/* $CIRCLE_TEST_REPORTS
 deployment:
   master:
     branch: master
