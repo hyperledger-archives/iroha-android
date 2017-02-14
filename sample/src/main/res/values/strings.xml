@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">IrohaAndroid</string>
+    <string name="app_name">RxIrohaAndroid</string>
 
     <string name="register">Register</string>
     <string name="validation_message_required">%1$s is required.</string>
