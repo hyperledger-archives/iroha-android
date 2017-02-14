@@ -49,9 +49,11 @@ public class QRReaderHelperHigherThanApi20 implements QRReaderHelper {
     }
 
     public static QRReaderHelperHigherThanApi20 newInstance(@NonNull Activity activity,
+                                                            @NonNull ReadQRCallback callback,
                                                             @NonNull SurfaceView surfaceView) {
         QRReaderHelperHigherThanApi20 helper = new QRReaderHelperHigherThanApi20();
         helper.activity = activity;
+        helper.callback = callback;
         helper.surfaceView = surfaceView;
         return helper;
     }
@@ -129,6 +131,8 @@ public class QRReaderHelperHigherThanApi20 implements QRReaderHelper {
         cameraSourceBuilder.setFacing(CameraSource.CAMERA_FACING_BACK).setRequestedFps(30f)
                 .setAutoFocusEnabled(true);
         cameraSource = cameraSourceBuilder.build();
+
+        surfaceView.getHolder().addCallback(this);
     }
 
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
