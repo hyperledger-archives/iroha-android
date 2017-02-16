@@ -55,7 +55,6 @@ import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -73,12 +72,16 @@ public class IrohaTest {
 
     Iroha iroha;
 
+    @Mock
     AccountService accountService;
 
+    @Mock
     DomainService domainService;
 
+    @Mock
     AssetService assetService;
 
+    @Mock
     TransactionService transactionService;
 
     @Mock
@@ -94,10 +97,10 @@ public class IrohaTest {
                 .build();
 
         // DaggerTestComponentのReferenceが解決できないため無理やりmock化
-        iroha.accountService = accountService = mock(AccountService.class);
-        iroha.domainService = domainService = mock(DomainService.class);
-        iroha.assetService = assetService = mock(AssetService.class);
-        iroha.transactionService = transactionService = mock(TransactionService.class);
+        iroha.accountService = accountService;
+        iroha.domainService = domainService;
+        iroha.assetService = assetService;
+        iroha.transactionService = transactionService;
     }
 
     @After
