@@ -25,13 +25,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
 
 import click.kobaken.rxirohaandroid.R;
 
-public class QRReaderActivity extends AppCompatActivity implements SurfaceHolder.Callback {
+public class QRReaderActivity extends AppCompatActivity {
     public static final String TAG = QRReaderActivity.class.getSimpleName();
 
     protected static final int PERMISSION_REQUEST_CODE = 70;
@@ -118,20 +117,5 @@ public class QRReaderActivity extends AppCompatActivity implements SurfaceHolder
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         qrReaderHelper.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
-
-    @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-        qrReaderHelper.surfaceCreated(holder);
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-        qrReaderHelper.surfaceChanged(holder, format, width, height);
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-        qrReaderHelper.surfaceDestroyed(holder);
     }
 }
