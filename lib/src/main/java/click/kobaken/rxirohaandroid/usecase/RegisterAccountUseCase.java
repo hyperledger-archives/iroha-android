@@ -14,29 +14,28 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package click.kobaken.rxirohaandroid.service;
+package click.kobaken.rxirohaandroid.usecase;
+
+import javax.inject.Inject;
 
 import click.kobaken.rxirohaandroid.model.Account;
 import click.kobaken.rxirohaandroid.net.dataset.reqest.AccountRegisterRequest;
 import click.kobaken.rxirohaandroid.repository.AccountRepository;
 import io.reactivex.Observable;
 
-public class AccountService {
-    private AccountRepository accountRepository;
+public class RegisterAccountUseCase {
+    private final AccountRepository accountRepository;
 
-    public AccountService(AccountRepository accountRepository) {
+    @Inject
+    public RegisterAccountUseCase(AccountRepository accountRepository) {
         this.accountRepository = accountRepository;
     }
 
-    public Observable<Account> register(String publicKey, String alias) {
-        final AccountRegisterRequest body = new AccountRegisterRequest();
-        body.publicKey = publicKey;
-        body.alias = alias;
-        body.timestamp = System.currentTimeMillis() / 1000;
-        return accountRepository.register(body);
-    }
-
-    public Observable<Account> findAccount(String uuid) {
-        return accountRepository.findByUuid(uuid);
+    public Observable<Account> run(String pubKey, String accountAlias) {
+        return accountRepository.register(new AccountRegisterRequest(){{
+            publicKey = pubKey;
+            alias = accountAlias;
+            timestamp = System.currentTimeMillis() / 1000;
+        }});
     }
 }

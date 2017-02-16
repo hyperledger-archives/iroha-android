@@ -27,10 +27,14 @@ import click.kobaken.rxirohaandroid.model.Asset;
 import click.kobaken.rxirohaandroid.model.BaseModel;
 import click.kobaken.rxirohaandroid.model.Domain;
 import click.kobaken.rxirohaandroid.model.TransactionHistory;
-import click.kobaken.rxirohaandroid.service.AccountService;
-import click.kobaken.rxirohaandroid.service.AssetService;
-import click.kobaken.rxirohaandroid.service.DomainService;
-import click.kobaken.rxirohaandroid.service.TransactionService;
+import click.kobaken.rxirohaandroid.usecase.CreateAssetUseCase;
+import click.kobaken.rxirohaandroid.usecase.GetAccountUseCase;
+import click.kobaken.rxirohaandroid.usecase.GetAssetsUseCase;
+import click.kobaken.rxirohaandroid.usecase.GetDomainsUseCase;
+import click.kobaken.rxirohaandroid.usecase.GetTransactionUseCase;
+import click.kobaken.rxirohaandroid.usecase.OperateAssetUseCase;
+import click.kobaken.rxirohaandroid.usecase.RegisterAccountUseCase;
+import click.kobaken.rxirohaandroid.usecase.RegisterDomainUseCase;
 import io.reactivex.Observable;
 import okhttp3.OkHttpClient;
 
@@ -38,16 +42,28 @@ public class Iroha {
     private static Iroha iroha;
 
     @Inject
-    AccountService accountService;
+    RegisterAccountUseCase registerAccountUseCase;
 
     @Inject
-    DomainService domainService;
+    GetAccountUseCase getAccountUseCase;
 
     @Inject
-    AssetService assetService;
+    RegisterDomainUseCase registerDomainUseCase;
 
     @Inject
-    TransactionService transactionService;
+    GetDomainsUseCase getDomainsUseCase;
+
+    @Inject
+    CreateAssetUseCase createAssetUseCase;
+
+    @Inject
+    GetAssetsUseCase getAssetsUseCase;
+
+    @Inject
+    OperateAssetUseCase operateAssetUseCase;
+
+    @Inject
+    GetTransactionUseCase getTransactionUseCase;
 
     private Iroha(Builder builder) {
         iroha = this;
@@ -101,34 +117,34 @@ public class Iroha {
     /* ============ 【Web API】 from here ============  */
 
     public Observable<Account> registerAccount(final String publicKey, final String alias) {
-        return accountService.register(publicKey, alias);
+        return registerAccountUseCase.run(publicKey, alias);
     }
 
     public Observable<Account> findAccount(final String uuid) {
-        return accountService.findAccount(uuid);
+        return getAccountUseCase.run(uuid);
     }
 
     public Observable<Domain> registerDomain(
             final String name, final String owner, final String signature) {
 
-        return domainService.register(name, owner, signature);
+        return registerDomainUseCase.run(name, owner, signature);
     }
 
     public Observable<List<Domain>> findDomains(final int limit, final int offset) {
-        return domainService.findDomains(limit, offset);
+        return getDomainsUseCase.run(limit, offset);
     }
 
     public Observable<Asset> createAsset(
             final String name, final String domain, final String creator,
             final String signature, final long timestamp) {
 
-        return assetService.create(name, domain, creator, signature, timestamp);
+        return createAssetUseCase.run(name, domain, creator, signature, timestamp);
     }
 
     public Observable<List<Asset>> findAssets(
             final String domain, final int limit, final int offset) {
 
-        return assetService.findAssets(domain, limit, offset);
+        return getAssetsUseCase.run(domain, limit, offset);
     }
 
     public Observable<BaseModel> operateAsset(
@@ -136,20 +152,20 @@ public class Iroha {
             final String sender, final String receiver, final String signature,
             final long timestamp) {
 
-        return assetService.operation(assetUuid, command, value, sender, receiver, signature, timestamp);
+        return operateAssetUseCase.run(assetUuid, command, value, sender, receiver, signature, timestamp);
     }
 
     public Observable<TransactionHistory> findTransactionHistory(
             final String uuid, final int limit, final int offset) {
 
-        return transactionService.findHistory(uuid, limit, offset);
+        return getTransactionUseCase.run(uuid, limit, offset);
     }
 
     public Observable<TransactionHistory> findTransactionHistory(
             final String domain, final String asset, final String uuid,
             final int limit, final int offset) {
 
-        return transactionService.findHistory(domain, asset, uuid, limit, offset);
+        return getTransactionUseCase.run(domain, asset, uuid, limit, offset);
     }
 
     /* ============ 【Web API】 to here ============  */

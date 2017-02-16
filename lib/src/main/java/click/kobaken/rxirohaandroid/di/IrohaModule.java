@@ -31,10 +31,14 @@ import click.kobaken.rxirohaandroid.repository.AccountRepository;
 import click.kobaken.rxirohaandroid.repository.AssetRepository;
 import click.kobaken.rxirohaandroid.repository.DomainRepository;
 import click.kobaken.rxirohaandroid.repository.TransactionRepository;
-import click.kobaken.rxirohaandroid.service.AccountService;
-import click.kobaken.rxirohaandroid.service.AssetService;
-import click.kobaken.rxirohaandroid.service.DomainService;
-import click.kobaken.rxirohaandroid.service.TransactionService;
+import click.kobaken.rxirohaandroid.usecase.CreateAssetUseCase;
+import click.kobaken.rxirohaandroid.usecase.GetAccountUseCase;
+import click.kobaken.rxirohaandroid.usecase.GetAssetsUseCase;
+import click.kobaken.rxirohaandroid.usecase.GetDomainsUseCase;
+import click.kobaken.rxirohaandroid.usecase.GetTransactionUseCase;
+import click.kobaken.rxirohaandroid.usecase.OperateAssetUseCase;
+import click.kobaken.rxirohaandroid.usecase.RegisterAccountUseCase;
+import click.kobaken.rxirohaandroid.usecase.RegisterDomainUseCase;
 import dagger.Module;
 import dagger.Provides;
 import retrofit2.Retrofit;
@@ -50,50 +54,98 @@ public class IrohaModule {
 
     @Singleton
     @Provides
-    public AccountService provideAccountService() {
-        return new AccountService(new Retrofit.Builder()
+    public AccountRepository provideAccountRepository() {
+        return new Retrofit.Builder()
                 .baseUrl(builder.baseUrl)
                 .client(builder.client)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(createGson()))
                 .build()
-                .create(AccountRepository.class));
+                .create(AccountRepository.class);
     }
 
     @Singleton
     @Provides
-    public DomainService provideDomainService() {
-        return new DomainService(new Retrofit.Builder()
+    public DomainRepository provideDomainRepository() {
+        return new Retrofit.Builder()
                 .baseUrl(builder.baseUrl)
                 .client(builder.client)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(createGson()))
                 .build()
-                .create(DomainRepository.class));
+                .create(DomainRepository.class);
     }
 
     @Singleton
     @Provides
-    public AssetService provideAssetService() {
-        return new AssetService(new Retrofit.Builder()
+    public AssetRepository provideAssetRepository() {
+        return new Retrofit.Builder()
                 .baseUrl(builder.baseUrl)
                 .client(builder.client)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(createGson()))
                 .build()
-                .create(AssetRepository.class));
+                .create(AssetRepository.class);
     }
 
     @Singleton
     @Provides
-    public TransactionService provideTransactionService() {
-        return new TransactionService(new Retrofit.Builder()
+    public TransactionRepository provideTransactionRepository() {
+        return new Retrofit.Builder()
                 .baseUrl(builder.baseUrl)
                 .client(builder.client)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(createGson()))
                 .build()
-                .create(TransactionRepository.class));
+                .create(TransactionRepository.class);
+    }
+
+    @Singleton
+    @Provides
+    public RegisterAccountUseCase provideRegisterAccountUseCase(AccountRepository accountRepository) {
+        return new RegisterAccountUseCase(accountRepository);
+    }
+
+    @Singleton
+    @Provides
+    public GetAccountUseCase provideGetAccountUseCase(AccountRepository accountRepository) {
+        return new GetAccountUseCase(accountRepository);
+    }
+
+    @Singleton
+    @Provides
+    public RegisterDomainUseCase provideRegisterDomainUseCase(DomainRepository domainRepository) {
+        return new RegisterDomainUseCase(domainRepository);
+    }
+
+    @Singleton
+    @Provides
+    public GetDomainsUseCase provideGetDomainsUseCase(DomainRepository domainRepository) {
+        return new GetDomainsUseCase(domainRepository);
+    }
+
+    @Singleton
+    @Provides
+    public CreateAssetUseCase provideCreateAssetUseCase(AssetRepository assetRepository) {
+        return new CreateAssetUseCase(assetRepository);
+    }
+
+    @Singleton
+    @Provides
+    public GetAssetsUseCase provideGetAssetsUseCase(AssetRepository assetRepository) {
+        return new GetAssetsUseCase(assetRepository);
+    }
+
+    @Singleton
+    @Provides
+    public OperateAssetUseCase provideOperateAssetUseCase(AssetRepository assetRepository) {
+        return new OperateAssetUseCase(assetRepository);
+    }
+
+    @Singleton
+    @Provides
+    public GetTransactionUseCase provideGetTransactionUseCase(TransactionRepository transactionRepository) {
+        return new GetTransactionUseCase(transactionRepository);
     }
 
     private Gson createGson() {

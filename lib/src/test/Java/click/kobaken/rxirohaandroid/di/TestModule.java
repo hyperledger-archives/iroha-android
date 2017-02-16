@@ -18,10 +18,18 @@ package click.kobaken.rxirohaandroid.di;
 
 import javax.inject.Singleton;
 
-import click.kobaken.rxirohaandroid.service.AccountService;
-import click.kobaken.rxirohaandroid.service.AssetService;
-import click.kobaken.rxirohaandroid.service.DomainService;
-import click.kobaken.rxirohaandroid.service.TransactionService;
+import click.kobaken.rxirohaandroid.repository.AccountRepository;
+import click.kobaken.rxirohaandroid.repository.AssetRepository;
+import click.kobaken.rxirohaandroid.repository.DomainRepository;
+import click.kobaken.rxirohaandroid.repository.TransactionRepository;
+import click.kobaken.rxirohaandroid.usecase.CreateAssetUseCase;
+import click.kobaken.rxirohaandroid.usecase.GetAccountUseCase;
+import click.kobaken.rxirohaandroid.usecase.GetAssetsUseCase;
+import click.kobaken.rxirohaandroid.usecase.GetDomainsUseCase;
+import click.kobaken.rxirohaandroid.usecase.GetTransactionUseCase;
+import click.kobaken.rxirohaandroid.usecase.OperateAssetUseCase;
+import click.kobaken.rxirohaandroid.usecase.RegisterAccountUseCase;
+import click.kobaken.rxirohaandroid.usecase.RegisterDomainUseCase;
 import dagger.Module;
 import dagger.Provides;
 
@@ -32,25 +40,73 @@ public class TestModule {
 
     @Singleton
     @Provides
-    public AccountService provideMockAccountService() {
-        return mock(AccountService.class);
+    public AccountRepository provideAccountRepository() {
+        return mock(AccountRepository.class);
     }
 
     @Singleton
     @Provides
-    public DomainService provideMockDomainService() {
-        return mock(DomainService.class);
+    public DomainRepository provideDomainRepository() {
+        return mock(DomainRepository.class);
     }
 
     @Singleton
     @Provides
-    public AssetService provideMockAssetService() {
-        return mock(AssetService.class);
+    public AssetRepository provideAssetRepository() {
+        return mock(AssetRepository.class);
     }
 
     @Singleton
     @Provides
-    public TransactionService provideMockTransactionService() {
-        return mock(TransactionService.class);
+    public TransactionRepository provideTransactionRepository() {
+        return mock(TransactionRepository.class);
+    }
+
+    @Singleton
+    @Provides
+    public RegisterAccountUseCase provideRegisterAccountUseCase(AccountRepository accountRepository) {
+        return mock(RegisterAccountUseCase.class);
+    }
+
+    @Singleton
+    @Provides
+    public GetAccountUseCase provideGetAccountUseCase(AccountRepository accountRepository) {
+        return mock(GetAccountUseCase.class);
+    }
+
+    @Singleton
+    @Provides
+    public RegisterDomainUseCase provideRegisterDomainUseCase(DomainRepository domainRepository) {
+        return mock(RegisterDomainUseCase.class);
+    }
+
+    @Singleton
+    @Provides
+    public GetDomainsUseCase provideGetDomainsUseCase(DomainRepository domainRepository) {
+        return mock(GetDomainsUseCase.class);
+    }
+
+    @Singleton
+    @Provides
+    public CreateAssetUseCase provideCreateAssetUseCase(AssetRepository assetRepository) {
+        return mock(CreateAssetUseCase.class);
+    }
+
+    @Singleton
+    @Provides
+    public GetAssetsUseCase provideGetAssetsUseCase(AssetRepository assetRepository) {
+        return mock(GetAssetsUseCase.class);
+    }
+
+    @Singleton
+    @Provides
+    public OperateAssetUseCase provideOperateAssetUseCase(AssetRepository assetRepository) {
+        return mock(OperateAssetUseCase.class);
+    }
+
+    @Singleton
+    @Provides
+    public GetTransactionUseCase provideGetTransactionUseCase(TransactionRepository transactionRepository) {
+        return mock(GetTransactionUseCase.class);
     }
 }

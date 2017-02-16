@@ -14,25 +14,27 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package click.kobaken.rxirohaandroid.service;
+package click.kobaken.rxirohaandroid.usecase;
+
+import javax.inject.Inject;
 
 import click.kobaken.rxirohaandroid.model.TransactionHistory;
 import click.kobaken.rxirohaandroid.repository.TransactionRepository;
 import io.reactivex.Observable;
 
+public class GetTransactionUseCase {
+    private final TransactionRepository transactionRepository;
 
-public class TransactionService {
-    private TransactionRepository transactionRepository;
-
-    public TransactionService(TransactionRepository transactionRepository) {
+    @Inject
+    public GetTransactionUseCase(TransactionRepository transactionRepository) {
         this.transactionRepository = transactionRepository;
     }
 
-    public Observable<TransactionHistory> findHistory(String uuid, int limit, int offset) {
+    public Observable<TransactionHistory> run(String uuid, int limit, int offset) {
         return transactionRepository.findHistory(uuid, limit, offset);
     }
 
-    public Observable<TransactionHistory> findHistory(
+    public Observable<TransactionHistory> run(
             String domain, String asset, String uuid, int limit, int offset) {
         return transactionRepository.findHistory(domain, asset, uuid, limit, offset);
     }
