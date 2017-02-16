@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package click.kobaken.rxirohaandroid.qr;
+package click.kobaken.rxirohaandroid.qr.view;
 
 import android.content.Context;
 import android.content.Intent;
@@ -29,11 +29,14 @@ import android.view.SurfaceView;
 import android.view.WindowManager;
 
 import click.kobaken.rxirohaandroid.R;
+import click.kobaken.rxirohaandroid.qr.helper.QRReaderHelper;
+import click.kobaken.rxirohaandroid.qr.helper.QRReaderHelperHigherThanApi20;
+import click.kobaken.rxirohaandroid.qr.helper.QRReaderHelperLowerThanApi19;
+import click.kobaken.rxirohaandroid.qr.ReadQRCallback;
 
 public class QRReaderActivity extends AppCompatActivity {
     public static final String TAG = QRReaderActivity.class.getSimpleName();
-
-    protected static final int PERMISSION_REQUEST_CODE = 70;
+    public static final int PERMISSION_REQUEST_CODE = 70;
 
     protected static final String ARG_LAYOUT_ID = "layout_id";
 

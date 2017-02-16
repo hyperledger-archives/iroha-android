@@ -20,6 +20,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.LayoutRes;
 
+import click.kobaken.rxirohaandroid.qr.view.QRReaderActivity;
+
 public class QRReaderBuilder {
     private Context context;
     private ReadQRCallback callback;
