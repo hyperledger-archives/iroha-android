@@ -31,7 +31,11 @@ public class CreateAssetUseCase {
         this.assetRepository = assetRepository;
     }
 
-    public Observable<Asset> run(String assetName, String domainName, String assetCreator, String assetSignature, long assetTimestamp) {
+    public Observable<Asset> run(String assetName,
+                                 String domainName,
+                                 String assetCreator,
+                                 String assetSignature,
+                                 long assetTimestamp) {
         return assetRepository.create(new AssetRegisterRequest() {{
             name = assetName;
             domain = domainName;

@@ -32,7 +32,7 @@ public class RegisterAccountUseCase {
     }
 
     public Observable<Account> run(String pubKey, String accountAlias) {
-        return accountRepository.register(new AccountRegisterRequest(){{
+        return accountRepository.register(new AccountRegisterRequest() {{
             publicKey = pubKey;
             alias = accountAlias;
             timestamp = System.currentTimeMillis() / 1000;
