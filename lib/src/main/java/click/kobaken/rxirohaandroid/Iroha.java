@@ -70,7 +70,7 @@ public class Iroha {
 
         // UnitTest時に、自動生成されたDaggerTestComponentへのReferenceが解決出来ないため
         // Test以外の場合のみInjectするようにしてある
-        if (!builder.isTest) {
+        if (!builder.isUnitTest) {
             DaggerIrohaComponent.builder()
                     .irohaModule(new IrohaModule(builder))
                     .build()
@@ -81,7 +81,7 @@ public class Iroha {
     public static class Builder {
         public String baseUrl;
         public OkHttpClient client;
-        public boolean isTest; // true when running unit test
+        public boolean isUnitTest; // true when running unit test
 
         public Builder baseUrl(String baseUrl) {
             this.baseUrl = baseUrl;
@@ -94,7 +94,7 @@ public class Iroha {
         }
 
         public Builder test(boolean isTest) {
-            this.isTest = isTest;
+            this.isUnitTest = isTest;
             return this;
         }
 
