@@ -74,34 +74,34 @@ public class IrohaTest {
     private List<Asset> actualAssets;
     private TransactionHistory actualTx;
 
-    Iroha iroha;
+    private Iroha iroha;
 
     @Mock
-    RegisterAccountUseCase registerAccountUseCase;
+    private RegisterAccountUseCase registerAccountUseCase;
 
     @Mock
-    GetAccountUseCase getAccountUseCase;
+    private GetAccountUseCase getAccountUseCase;
 
     @Mock
-    RegisterDomainUseCase registerDomainUseCase;
+    private RegisterDomainUseCase registerDomainUseCase;
 
     @Mock
-    GetDomainsUseCase getDomainsUseCase;
+    private GetDomainsUseCase getDomainsUseCase;
 
     @Mock
-    CreateAssetUseCase createAssetUseCase;
+    private CreateAssetUseCase createAssetUseCase;
 
     @Mock
-    GetAssetsUseCase getAssetsUseCase;
+    private GetAssetsUseCase getAssetsUseCase;
 
     @Mock
-    OperateAssetUseCase operateAssetUseCase;
+    private OperateAssetUseCase operateAssetUseCase;
 
     @Mock
-    GetTransactionUseCase getTransactionUseCase;
+    private GetTransactionUseCase getTransactionUseCase;
 
     @Mock
-    OkHttpClient okHttpClient;
+    private OkHttpClient okHttpClient;
 
     @Before
     public void setUp() throws Exception {
@@ -112,7 +112,7 @@ public class IrohaTest {
                 .test(true)
                 .build();
 
-        // DaggerTestComponentのReferenceが解決できないため無理やりmock化
+        // DaggerTestComponentのReferenceが解決できないため、self @InjectMocks
         iroha.registerAccountUseCase = registerAccountUseCase;
         iroha.getAccountUseCase = getAccountUseCase;
         iroha.registerDomainUseCase = registerDomainUseCase;
