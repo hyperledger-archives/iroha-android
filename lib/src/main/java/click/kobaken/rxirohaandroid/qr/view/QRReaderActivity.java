@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package click.kobaken.rxirohaandroid.qr;
+package click.kobaken.rxirohaandroid.qr.view;
 
 import android.content.Context;
 import android.content.Intent;
@@ -25,16 +25,18 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
 
 import click.kobaken.rxirohaandroid.R;
+import click.kobaken.rxirohaandroid.qr.helper.QRReaderHelper;
+import click.kobaken.rxirohaandroid.qr.helper.QRReaderHelperHigherThanApi20;
+import click.kobaken.rxirohaandroid.qr.helper.QRReaderHelperLowerThanApi19;
+import click.kobaken.rxirohaandroid.qr.ReadQRCallback;
 
-public class QRReaderActivity extends AppCompatActivity implements SurfaceHolder.Callback {
+public class QRReaderActivity extends AppCompatActivity {
     public static final String TAG = QRReaderActivity.class.getSimpleName();
-
-    protected static final int PERMISSION_REQUEST_CODE = 70;
+    public static final int PERMISSION_REQUEST_CODE = 70;
 
     protected static final String ARG_LAYOUT_ID = "layout_id";
 
@@ -118,20 +120,5 @@ public class QRReaderActivity extends AppCompatActivity implements SurfaceHolder
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         qrReaderHelper.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
-
-    @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-        qrReaderHelper.surfaceCreated(holder);
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-        qrReaderHelper.surfaceChanged(holder, format, width, height);
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-        qrReaderHelper.surfaceDestroyed(holder);
     }
 }

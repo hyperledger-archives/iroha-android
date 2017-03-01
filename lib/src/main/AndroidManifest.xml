@@ -12,7 +12,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true">
         <activity
-            android:name=".qr.QRReaderActivity"
+            android:name=".qr.view.QRReaderActivity"
             android:screenOrientation="portrait" />
 
     </application>

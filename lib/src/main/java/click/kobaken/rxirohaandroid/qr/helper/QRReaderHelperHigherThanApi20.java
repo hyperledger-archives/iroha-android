@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package click.kobaken.rxirohaandroid.qr;
+package click.kobaken.rxirohaandroid.qr.helper;
 
 import android.Manifest;
 import android.app.Activity;
@@ -34,8 +34,9 @@ import com.google.android.gms.vision.barcode.BarcodeDetector;
 import java.io.IOException;
 
 import click.kobaken.rxirohaandroid.exception.RuntimePermissionException;
+import click.kobaken.rxirohaandroid.qr.ReadQRCallback;
 
-import static click.kobaken.rxirohaandroid.qr.QRReaderActivity.PERMISSION_REQUEST_CODE;
+import static click.kobaken.rxirohaandroid.qr.view.QRReaderActivity.PERMISSION_REQUEST_CODE;
 import static click.kobaken.rxirohaandroid.security.KeyStoreManager.TAG;
 
 public class QRReaderHelperHigherThanApi20 implements QRReaderHelper {

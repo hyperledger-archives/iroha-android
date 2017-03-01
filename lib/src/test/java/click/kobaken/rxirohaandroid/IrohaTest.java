@@ -32,10 +32,14 @@ import click.kobaken.rxirohaandroid.model.Asset;
 import click.kobaken.rxirohaandroid.model.BaseModel;
 import click.kobaken.rxirohaandroid.model.Domain;
 import click.kobaken.rxirohaandroid.model.TransactionHistory;
-import click.kobaken.rxirohaandroid.service.AccountService;
-import click.kobaken.rxirohaandroid.service.AssetService;
-import click.kobaken.rxirohaandroid.service.DomainService;
-import click.kobaken.rxirohaandroid.service.TransactionService;
+import click.kobaken.rxirohaandroid.usecase.CreateAssetUseCase;
+import click.kobaken.rxirohaandroid.usecase.GetAccountUseCase;
+import click.kobaken.rxirohaandroid.usecase.GetAssetsUseCase;
+import click.kobaken.rxirohaandroid.usecase.GetDomainsUseCase;
+import click.kobaken.rxirohaandroid.usecase.GetTransactionUseCase;
+import click.kobaken.rxirohaandroid.usecase.OperateAssetUseCase;
+import click.kobaken.rxirohaandroid.usecase.RegisterAccountUseCase;
+import click.kobaken.rxirohaandroid.usecase.RegisterDomainUseCase;
 import io.reactivex.Observable;
 import io.reactivex.observers.DisposableObserver;
 import okhttp3.MediaType;
@@ -55,7 +59,6 @@ import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -71,18 +74,34 @@ public class IrohaTest {
     private List<Asset> actualAssets;
     private TransactionHistory actualTx;
 
-    Iroha iroha;
-
-    AccountService accountService;
-
-    DomainService domainService;
-
-    AssetService assetService;
-
-    TransactionService transactionService;
+    private Iroha iroha;
 
     @Mock
-    OkHttpClient okHttpClient;
+    private RegisterAccountUseCase registerAccountUseCase;
+
+    @Mock
+    private GetAccountUseCase getAccountUseCase;
+
+    @Mock
+    private RegisterDomainUseCase registerDomainUseCase;
+
+    @Mock
+    private GetDomainsUseCase getDomainsUseCase;
+
+    @Mock
+    private CreateAssetUseCase createAssetUseCase;
+
+    @Mock
+    private GetAssetsUseCase getAssetsUseCase;
+
+    @Mock
+    private OperateAssetUseCase operateAssetUseCase;
+
+    @Mock
+    private GetTransactionUseCase getTransactionUseCase;
+
+    @Mock
+    private OkHttpClient okHttpClient;
 
     @Before
     public void setUp() throws Exception {
@@ -93,11 +112,15 @@ public class IrohaTest {
                 .test(true)
                 .build();
 
-        // DaggerTestComponentのReferenceが解決できないため無理やりmock化
-        iroha.accountService = accountService = mock(AccountService.class);
-        iroha.domainService = domainService = mock(DomainService.class);
-        iroha.assetService = assetService = mock(AssetService.class);
-        iroha.transactionService = transactionService = mock(TransactionService.class);
+        // DaggerTestComponentのReferenceが解決できないため、self @InjectMocks
+        iroha.registerAccountUseCase = registerAccountUseCase;
+        iroha.getAccountUseCase = getAccountUseCase;
+        iroha.registerDomainUseCase = registerDomainUseCase;
+        iroha.getDomainsUseCase = getDomainsUseCase;
+        iroha.createAssetUseCase = createAssetUseCase;
+        iroha.getAssetsUseCase = getAssetsUseCase;
+        iroha.operateAssetUseCase = operateAssetUseCase;
+        iroha.getTransactionUseCase = getTransactionUseCase;
     }
 
     @After
@@ -117,7 +140,7 @@ public class IrohaTest {
         final String alias = "alias";
 
         Account account = newAccount(10);
-        when(accountService.register(publicKey, alias)).thenReturn(Observable.just(account));
+        when(registerAccountUseCase.run(publicKey, alias)).thenReturn(Observable.just(account));
 
         execute(iroha.registerAccount(publicKey, alias),
                 new DisposableObserver<Account>() {
@@ -142,8 +165,8 @@ public class IrohaTest {
         assertThat(actualAccount.uuid, is("10"));
         assertThat(actualAccount.alias, is("10"));
 
-        verify(accountService).register(publicKey, alias);
-        verifyNoMoreInteractions(accountService);
+        verify(registerAccountUseCase).run(publicKey, alias);
+        verifyNoMoreInteractions(registerAccountUseCase);
     }
 
     @Test
@@ -154,7 +177,7 @@ public class IrohaTest {
         Account account = newAccount(10);
         account.status = 400;
         account.message = "duplicate user";
-        when(accountService.register(publicKey, alias)).thenReturn(Observable.just(account));
+        when(registerAccountUseCase.run(publicKey, alias)).thenReturn(Observable.just(account));
 
         execute(iroha.registerAccount(publicKey, alias),
                 new DisposableObserver<Account>() {
@@ -179,8 +202,8 @@ public class IrohaTest {
         assertThat(actualAccount.status, is(400));
         assertThat(actualAccount.message, is("duplicate user"));
 
-        verify(accountService).register(publicKey, alias);
-        verifyNoMoreInteractions(accountService);
+        verify(registerAccountUseCase).run(publicKey, alias);
+        verifyNoMoreInteractions(registerAccountUseCase);
     }
 
     @Test
@@ -188,7 +211,7 @@ public class IrohaTest {
         final String publicKey = "pubkey";
         final String alias = "alias";
 
-        when(accountService.register(publicKey, alias)).thenReturn(mockErrorResponse(404));
+        when(registerAccountUseCase.run(publicKey, alias)).thenReturn(mockErrorResponse(404));
 
         execute(iroha.registerAccount(publicKey, alias),
                 new DisposableObserver<Account>() {
@@ -214,8 +237,8 @@ public class IrohaTest {
         assertNotNull(actualException);
         assertTrue(actualException instanceof HttpException);
 
-        verify(accountService).register(publicKey, alias);
-        verifyNoMoreInteractions(accountService);
+        verify(registerAccountUseCase).run(publicKey, alias);
+        verifyNoMoreInteractions(registerAccountUseCase);
     }
 
     @Test
@@ -223,7 +246,7 @@ public class IrohaTest {
         final String uuid = "uuid";
 
         Account account = newAccount(10);
-        when(accountService.findAccount(uuid)).thenReturn(Observable.just(account));
+        when(getAccountUseCase.run(uuid)).thenReturn(Observable.just(account));
 
         execute(iroha.findAccount(uuid),
                 new DisposableObserver<Account>() {
@@ -259,8 +282,8 @@ public class IrohaTest {
             assertThat(actualAccount.assets.get(i).timestamp, is((long) i));
         });
 
-        verify(accountService).findAccount(uuid);
-        verifyNoMoreInteractions(accountService);
+        verify(getAccountUseCase).run(uuid);
+        verifyNoMoreInteractions(getAccountUseCase);
     }
 
     @Test
@@ -270,7 +293,7 @@ public class IrohaTest {
         Account account = newAccount(10);
         account.status = 400;
         account.message = "User not found";
-        when(accountService.findAccount(uuid)).thenReturn(Observable.just(account));
+        when(getAccountUseCase.run(uuid)).thenReturn(Observable.just(account));
 
         execute(iroha.findAccount(uuid),
                 new DisposableObserver<Account>() {
@@ -295,15 +318,15 @@ public class IrohaTest {
         assertThat(actualAccount.status, is(400));
         assertThat(actualAccount.message, is("User not found"));
 
-        verify(accountService).findAccount(uuid);
-        verifyNoMoreInteractions(accountService);
+        verify(getAccountUseCase).run(uuid);
+        verifyNoMoreInteractions(getAccountUseCase);
     }
 
     @Test
     public void testFindAccount_Failure() throws Exception {
         final String uuid = "uuid";
 
-        when(accountService.findAccount(uuid)).thenReturn(mockErrorResponse(404));
+        when(getAccountUseCase.run(uuid)).thenReturn(mockErrorResponse(404));
 
         execute(iroha.findAccount(uuid),
                 new DisposableObserver<Account>() {
@@ -329,8 +352,8 @@ public class IrohaTest {
         assertNotNull(actualException);
         assertTrue(actualException instanceof HttpException);
 
-        verify(accountService).findAccount(uuid);
-        verifyNoMoreInteractions(accountService);
+        verify(getAccountUseCase).run(uuid);
+        verifyNoMoreInteractions(getAccountUseCase);
     }
 
     @Test
@@ -340,7 +363,7 @@ public class IrohaTest {
         final String signature = "signature";
 
         Domain domain = newDomain(10);
-        when(domainService.register(name, owner, signature)).thenReturn(Observable.just(domain));
+        when(registerDomainUseCase.run(name, owner, signature)).thenReturn(Observable.just(domain));
 
         execute(iroha.registerDomain(name, owner, signature),
                 new DisposableObserver<Domain>() {
@@ -366,8 +389,8 @@ public class IrohaTest {
         assertThat(actualDomain.owner, is("10"));
         assertThat(actualDomain.signature, is("10"));
 
-        verify(domainService).register(name, owner, signature);
-        verifyNoMoreInteractions(domainService);
+        verify(registerDomainUseCase).run(name, owner, signature);
+        verifyNoMoreInteractions(registerDomainUseCase);
     }
 
     @Test
@@ -376,7 +399,7 @@ public class IrohaTest {
         final String owner = "owner";
         final String signature = "signature";
 
-        when(domainService.register(name, owner, signature)).thenReturn(mockErrorResponse(404));
+        when(registerDomainUseCase.run(name, owner, signature)).thenReturn(mockErrorResponse(404));
 
         execute(iroha.registerDomain(name, owner, signature),
                 new DisposableObserver<Domain>() {
@@ -402,8 +425,8 @@ public class IrohaTest {
         assertNotNull(actualException);
         assertTrue(actualException instanceof HttpException);
 
-        verify(domainService).register(name, owner, signature);
-        verifyNoMoreInteractions(domainService);
+        verify(registerDomainUseCase).run(name, owner, signature);
+        verifyNoMoreInteractions(registerDomainUseCase);
     }
 
     @Test
@@ -412,7 +435,7 @@ public class IrohaTest {
         final int offset = 0;
 
         List<Domain> domains = newDomains(10);
-        when(domainService.findDomains(limit, offset)).thenReturn(Observable.just(domains));
+        when(getDomainsUseCase.run(limit, offset)).thenReturn(Observable.just(domains));
 
         execute(iroha.findDomains(limit, offset),
                 new DisposableObserver<List<Domain>>() {
@@ -441,8 +464,8 @@ public class IrohaTest {
             assertThat(actualDomains.get(i).signature, is(expected));
         });
 
-        verify(domainService).findDomains(limit, offset);
-        verifyNoMoreInteractions(domainService);
+        verify(getDomainsUseCase).run(limit, offset);
+        verifyNoMoreInteractions(getDomainsUseCase);
     }
 
     @Test
@@ -450,7 +473,7 @@ public class IrohaTest {
         final int limit = 30;
         final int offset = 0;
 
-        when(domainService.findDomains(limit, offset)).thenReturn(mockErrorResponse(404));
+        when(getDomainsUseCase.run(limit, offset)).thenReturn(mockErrorResponse(404));
 
         execute(iroha.findDomains(limit, offset),
                 new DisposableObserver<List<Domain>>() {
@@ -476,8 +499,8 @@ public class IrohaTest {
         assertNotNull(actualException);
         assertTrue(actualException instanceof HttpException);
 
-        verify(domainService).findDomains(limit, offset);
-        verifyNoMoreInteractions(domainService);
+        verify(getDomainsUseCase).run(limit, offset);
+        verifyNoMoreInteractions(getDomainsUseCase);
     }
 
     @Test
@@ -489,7 +512,7 @@ public class IrohaTest {
         final long timestamp = 10L;
 
         Asset asset = newAsset(10);
-        when(assetService.create(name, domain, creator, signature, timestamp))
+        when(createAssetUseCase.run(name, domain, creator, signature, timestamp))
                 .thenReturn(Observable.just(asset));
 
         execute(iroha.createAsset(name, domain, creator, signature, asset.timestamp),
@@ -519,8 +542,8 @@ public class IrohaTest {
         assertThat(actualAsset.signature, is("10"));
         assertThat(actualAsset.timestamp, is(10L));
 
-        verify(assetService).create(name, domain, creator, signature, timestamp);
-        verifyNoMoreInteractions(assetService);
+        verify(createAssetUseCase).run(name, domain, creator, signature, timestamp);
+        verifyNoMoreInteractions(createAssetUseCase);
     }
 
     @Test
@@ -531,7 +554,7 @@ public class IrohaTest {
         final String signature = "signature";
         final long timestamp = 10L;
 
-        when(assetService.create(name, domain, creator, signature, timestamp))
+        when(createAssetUseCase.run(name, domain, creator, signature, timestamp))
                 .thenReturn(mockErrorResponse(404));
 
         execute(iroha.createAsset(name, domain, creator, signature, timestamp),
@@ -558,8 +581,8 @@ public class IrohaTest {
         assertNotNull(actualException);
         assertTrue(actualException instanceof HttpException);
 
-        verify(assetService).create(name, domain, creator, signature, timestamp);
-        verifyNoMoreInteractions(assetService);
+        verify(createAssetUseCase).run(name, domain, creator, signature, timestamp);
+        verifyNoMoreInteractions(createAssetUseCase);
     }
 
     @Test
@@ -569,7 +592,7 @@ public class IrohaTest {
         final int offset = 0;
 
         List<Asset> assets = newAssets(10);
-        when(assetService.findAssets(domain, limit, offset)).thenReturn(Observable.just(assets));
+        when(getAssetsUseCase.run(domain, limit, offset)).thenReturn(Observable.just(assets));
 
         execute(iroha.findAssets(domain, limit, offset),
                 new DisposableObserver<List<Asset>>() {
@@ -599,8 +622,8 @@ public class IrohaTest {
             assertThat(actualAssets.get(i).signature, is(expected));
         });
 
-        verify(assetService).findAssets(domain, limit, offset);
-        verifyNoMoreInteractions(assetService);
+        verify(getAssetsUseCase).run(domain, limit, offset);
+        verifyNoMoreInteractions(getAssetsUseCase);
     }
 
     @Test
@@ -609,7 +632,7 @@ public class IrohaTest {
         final int limit = 30;
         final int offset = 0;
 
-        when(assetService.findAssets(domain, limit, offset)).thenReturn(mockErrorResponse(404));
+        when(getAssetsUseCase.run(domain, limit, offset)).thenReturn(mockErrorResponse(404));
 
         execute(iroha.findAssets(domain, limit, offset),
                 new DisposableObserver<List<Asset>>() {
@@ -635,8 +658,8 @@ public class IrohaTest {
         assertNotNull(actualException);
         assertTrue(actualException instanceof HttpException);
 
-        verify(assetService).findAssets(domain, limit, offset);
-        verifyNoMoreInteractions(assetService);
+        verify(getAssetsUseCase).run(domain, limit, offset);
+        verifyNoMoreInteractions(getAssetsUseCase);
     }
 
     @Test
@@ -652,7 +675,7 @@ public class IrohaTest {
         Asset asset = newAsset(10);
         asset.status = 201;
         asset.message = "Asset transfered successfully";
-        when(assetService.operation(assetUuid, command, value, sender, receiver, signature, timestamp))
+        when(operateAssetUseCase.run(assetUuid, command, value, sender, receiver, signature, timestamp))
                 .thenReturn(Observable.just(asset));
 
         execute(iroha.operateAsset(assetUuid, command, value, sender, receiver, signature, timestamp),
@@ -679,8 +702,8 @@ public class IrohaTest {
         assertThat(actualAsset.status, is(201));
         assertThat(actualAsset.message, is("Asset transfered successfully"));
 
-        verify(assetService).operation(assetUuid, command, value, sender, receiver, signature, timestamp);
-        verifyNoMoreInteractions(assetService);
+        verify(operateAssetUseCase).run(assetUuid, command, value, sender, receiver, signature, timestamp);
+        verifyNoMoreInteractions(operateAssetUseCase);
     }
 
     @Test
@@ -693,7 +716,7 @@ public class IrohaTest {
         final String signature = "signature";
         final long timestamp = 10L;
 
-        when(assetService.operation(assetUuid, command, value, sender, receiver, signature, timestamp))
+        when(operateAssetUseCase.run(assetUuid, command, value, sender, receiver, signature, timestamp))
                 .thenReturn(mockErrorResponse(404));
 
         execute(iroha.operateAsset(assetUuid, command, value, sender, receiver, signature, timestamp),
@@ -720,8 +743,8 @@ public class IrohaTest {
         assertNotNull(actualException);
         assertTrue(actualException instanceof HttpException);
 
-        verify(assetService).operation(assetUuid, command, value, sender, receiver, signature, timestamp);
-        verifyNoMoreInteractions(assetService);
+        verify(operateAssetUseCase).run(assetUuid, command, value, sender, receiver, signature, timestamp);
+        verifyNoMoreInteractions(operateAssetUseCase);
     }
 
     @Test
@@ -731,7 +754,7 @@ public class IrohaTest {
         final int offset = 0;
 
         TransactionHistory history = newTransactionHistory(10);
-        when(transactionService.findHistory(uuid, limit, offset)).thenReturn(Observable.just(history));
+        when(getTransactionUseCase.run(uuid, limit, offset)).thenReturn(Observable.just(history));
 
         execute(iroha.findTransactionHistory(uuid, limit, offset),
                 new DisposableObserver<TransactionHistory>() {
@@ -769,8 +792,8 @@ public class IrohaTest {
             assertThat(actualTx.history.get(i).params.receiver, is(expected));
         });
 
-        verify(transactionService).findHistory(uuid, limit, offset);
-        verifyNoMoreInteractions(transactionService);
+        verify(getTransactionUseCase).run(uuid, limit, offset);
+        verifyNoMoreInteractions(getTransactionUseCase);
     }
 
     @Test
@@ -779,7 +802,7 @@ public class IrohaTest {
         final int limit = 30;
         final int offset = 0;
 
-        when(transactionService.findHistory(uuid, limit, offset)).thenReturn(mockErrorResponse(404));
+        when(getTransactionUseCase.run(uuid, limit, offset)).thenReturn(mockErrorResponse(404));
 
         execute(iroha.findTransactionHistory(uuid, limit, offset),
                 new DisposableObserver<TransactionHistory>() {
@@ -805,8 +828,8 @@ public class IrohaTest {
         assertNotNull(actualException);
         assertTrue(actualException instanceof HttpException);
 
-        verify(transactionService).findHistory(uuid, limit, offset);
-        verifyNoMoreInteractions(transactionService);
+        verify(getTransactionUseCase).run(uuid, limit, offset);
+        verifyNoMoreInteractions(getTransactionUseCase);
     }
 
     @Test
@@ -818,7 +841,7 @@ public class IrohaTest {
         final int offset = 0;
 
         TransactionHistory history = newTransactionHistory(10);
-        when(transactionService.findHistory(domain, asset, uuid, limit, offset))
+        when(getTransactionUseCase.run(domain, asset, uuid, limit, offset))
                 .thenReturn(Observable.just(history));
 
         execute(iroha.findTransactionHistory(domain, asset, uuid, limit, offset),
@@ -853,8 +876,8 @@ public class IrohaTest {
             assertThat(actualTx.history.get(i).params.receiver, is(expected));
         });
 
-        verify(transactionService).findHistory(domain, asset, uuid, limit, offset);
-        verifyNoMoreInteractions(transactionService);
+        verify(getTransactionUseCase).run(domain, asset, uuid, limit, offset);
+        verifyNoMoreInteractions(getTransactionUseCase);
     }
 
     @Test
@@ -865,7 +888,7 @@ public class IrohaTest {
         final int limit = 30;
         final int offset = 0;
 
-        when(transactionService.findHistory(domain, asset, uuid, limit, offset))
+        when(getTransactionUseCase.run(domain, asset, uuid, limit, offset))
                 .thenReturn(mockErrorResponse(404));
 
         execute(iroha.findTransactionHistory(domain, asset, uuid, limit, offset),
@@ -892,8 +915,8 @@ public class IrohaTest {
         assertNotNull(actualException);
         assertTrue(actualException instanceof HttpException);
 
-        verify(transactionService).findHistory(domain, asset, uuid, limit, offset);
-        verifyNoMoreInteractions(transactionService);
+        verify(getTransactionUseCase).run(domain, asset, uuid, limit, offset);
+        verifyNoMoreInteractions(getTransactionUseCase);
     }
 
     private <T> void execute(Observable<T> observer, DisposableObserver<T> disposer) {

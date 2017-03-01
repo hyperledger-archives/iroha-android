@@ -14,35 +14,29 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package click.kobaken.rxirohaandroid.service;
+package click.kobaken.rxirohaandroid.usecase;
 
-import java.util.List;
+import javax.inject.Inject;
 
 import click.kobaken.rxirohaandroid.model.Domain;
 import click.kobaken.rxirohaandroid.net.dataset.reqest.DomainRegisterRequest;
 import click.kobaken.rxirohaandroid.repository.DomainRepository;
 import io.reactivex.Observable;
 
+public class RegisterDomainUseCase {
+    private final DomainRepository domainRepository;
 
-public class DomainService {
-    private DomainRepository domainRepository;
-
-    public DomainService(DomainRepository domainRepository) {
+    @Inject
+    public RegisterDomainUseCase(DomainRepository domainRepository) {
         this.domainRepository = domainRepository;
     }
 
-    public Observable<Domain> register(String name, String owner, String signature) {
-
-        final DomainRegisterRequest body = new DomainRegisterRequest();
-        body.name = name;
-        body.owner = owner;
-        body.timestamp = System.currentTimeMillis() / 1000;
-        body.signature = signature;
-
-        return domainRepository.register(body);
-    }
-
-    public Observable<List<Domain>> findDomains(final int limit, final int offset) {
-        return domainRepository.findDomains(limit, offset);
+    public Observable<Domain> run(String domainName, String domainOwner, String domainSignature) {
+        return domainRepository.register(new DomainRegisterRequest() {{
+            name = domainName;
+            owner = domainOwner;
+            timestamp = System.currentTimeMillis() / 1000;
+            signature = domainSignature;
+        }});
     }
 }

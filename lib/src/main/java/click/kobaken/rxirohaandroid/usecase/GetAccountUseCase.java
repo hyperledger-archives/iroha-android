@@ -14,17 +14,23 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package click.kobaken.rxirohaandroid.qr;
+package click.kobaken.rxirohaandroid.usecase;
 
-import android.support.annotation.NonNull;
-import android.view.SurfaceHolder;
+import javax.inject.Inject;
 
-public interface QRReaderHelper extends SurfaceHolder.Callback {
-    void onCreate();
-    void onStart();
-    void onResume();
-    void onPause();
-    void onStop();
-    void onDestroy();
-    void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults);
+import click.kobaken.rxirohaandroid.model.Account;
+import click.kobaken.rxirohaandroid.repository.AccountRepository;
+import io.reactivex.Observable;
+
+public class GetAccountUseCase {
+    private final AccountRepository accountRepository;
+
+    @Inject
+    public GetAccountUseCase(AccountRepository accountRepository) {
+        this.accountRepository = accountRepository;
+    }
+
+    public Observable<Account> run(String uuid) {
+        return accountRepository.findByUuid(uuid);
+    }
 }
