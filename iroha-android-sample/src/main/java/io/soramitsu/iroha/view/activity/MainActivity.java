@@ -131,12 +131,12 @@ public class MainActivity extends AppCompatActivity {
         initNavigationView();
         initBottomNavigationView();
         initFragments(savedInstanceState);
-        setKeyboardListener(new OnKeyboardVisibilityListener() {
-            @Override
-            public void onVisibilityChanged(boolean isVisible) {
-                binding.bottomNavigation.setVisibility(isVisible ? View.GONE : View.VISIBLE);
-            }
-        });
+//        setKeyboardListener(new OnKeyboardVisibilityListener() {
+//            @Override
+//            public void onVisibilityChanged(boolean isVisible) {
+//                binding.bottomNavigation.setVisibility(isVisible ? View.GONE : View.VISIBLE);
+//            }
+//        });
     }
 
     private void initToolbar() {
