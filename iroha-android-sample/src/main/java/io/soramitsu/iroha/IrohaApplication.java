@@ -18,10 +18,14 @@ limitations under the License.
 package io.soramitsu.iroha;
 
 import android.app.Application;
+import android.content.Context;
+import android.content.SharedPreferences;
 
 import io.soramitsu.irohaandroid.Iroha;
 
 public class IrohaApplication extends Application {
+    public static final String SHARED_PREF_FILE = "preferences";
+    public static final String SHARED_PREF_REGISTERED_KEY = "registered";
 
     @Override
     public void onCreate() {
@@ -29,5 +33,17 @@ public class IrohaApplication extends Application {
         new Iroha.Builder()
                 .baseUrl("https://point-demo.iroha.tech")
                 .build();
+    }
+
+    public static SharedPreferences getSharedPreferences(Context context) {
+        return context.getSharedPreferences(SHARED_PREF_FILE, MODE_PRIVATE);
+    }
+
+    public static boolean isRegistered(Context context) {
+        return getSharedPreferences(context).getBoolean(SHARED_PREF_REGISTERED_KEY, false);
+    }
+
+    public static void applyRegistered(Context context, boolean isRegistered) {
+        getSharedPreferences(context).edit().putBoolean(SHARED_PREF_REGISTERED_KEY, isRegistered).apply();
     }
 }
