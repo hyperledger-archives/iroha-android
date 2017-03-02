@@ -37,4 +37,6 @@
     <string name="open_source_license">Open Source License</string>
     <string name="library_description">IrohaAndroid is client library for using iroha for Android.</string>
     <string name="message_copy_to_clipboard">Copy to clipboard!</string>
+    <string name="successful">Successful</string>
+    <string name="message_account_deleted">Account deleted</string>
 </resources>

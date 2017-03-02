@@ -37,5 +37,7 @@ dependencies {
     compile "com.android.support:gridlayout-v7:${SUPPORT_PACKAGE_VERSION}"
     compile "de.hdodenhof:circleimageview:${CIRCLE_IMAGE_VIEW_PACKAGE_VERSION}"
     compile 'com.mikepenz:aboutlibraries:5.9.1'
+    compile 'cn.pedant.sweetalert:library:1.3'
+    compile 'com.pnikosis:materialish-progress:1.1'
     testCompile 'junit:junit:4.12'
 }

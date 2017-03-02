@@ -18,11 +18,11 @@ limitations under the License.
 package io.soramitsu.iroha.view.activity;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
@@ -31,7 +31,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -55,6 +54,7 @@ import java.security.UnrecoverableKeyException;
 
 import javax.crypto.NoSuchPaddingException;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.databinding.ActivityMainBinding;
 import io.soramitsu.iroha.exception.ErrorMessageFactory;
@@ -189,25 +189,39 @@ public class MainActivity extends AppCompatActivity {
                                 binding.bottomNavigation.getMenu().getItem(0).setChecked(true);
                                 break;
                             case R.id.action_unregister:
-                                new AlertDialog.Builder(MainActivity.this)
-                                        .setMessage("Are you sure you want to delete your account info?")
-                                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                                SweetAlertDialog dialog = new SweetAlertDialog(MainActivity.this, SweetAlertDialog.WARNING_TYPE)
+                                        .setTitleText("Account Delete")
+                                        .setContentText("Are you sure you want to delete your account info?")
+                                        .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                                             @Override
-                                            public void onClick(DialogInterface dialogInterface, int i) {
-                                                dialogInterface.dismiss();
-                                            }
-                                        })
-                                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialogInterface, int i) {
-                                                dialogInterface.dismiss();
+                                            public void onClick(final SweetAlertDialog sweetAlertDialog) {
+                                                sweetAlertDialog
+                                                        .setTitleText("Deleting…")
+                                                        .setContentText(null)
+                                                        .changeAlertType(SweetAlertDialog.PROGRESS_TYPE);
+
                                                 Account.delete(getApplicationContext());
-                                                navigator.navigateToRegisterActivity(getApplicationContext());
-                                                finish();
+
+                                                new Handler().postDelayed(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        sweetAlertDialog
+                                                                .setTitleText(getString(R.string.successful))
+                                                                .setContentText(getString(R.string.message_account_deleted))
+                                                                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                                                                    @Override
+                                                                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+                                                                        navigator.navigateToRegisterActivity(getApplicationContext());
+                                                                        finish();
+                                                                    }
+                                                                })
+                                                                .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
+                                                    }
+                                                }, 1000);
                                             }
-                                        })
-                                        .setCancelable(true)
-                                        .create().show();
+                                        });
+                                dialog.setCancelable(true);
+                                dialog.show();
                                 break;
                             case R.id.action_oss:
                                 if (isChecked) break;

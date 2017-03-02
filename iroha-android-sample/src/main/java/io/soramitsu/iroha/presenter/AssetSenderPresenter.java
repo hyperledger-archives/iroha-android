@@ -102,7 +102,7 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
                 try {
                     send();
                 } catch (ReceiverNotFoundException e) {
-                    assetSenderView.showError(ErrorMessageFactory.create(assetSenderView.getContext(), e));
+                    assetSenderView.showWarning(ErrorMessageFactory.create(assetSenderView.getContext(), e));
                 }
             }
         };
