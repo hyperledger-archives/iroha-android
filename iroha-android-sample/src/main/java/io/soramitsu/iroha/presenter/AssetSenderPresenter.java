@@ -101,7 +101,7 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
             public void onClick(View view) {
                 try {
                     send();
-                } catch (ReceiverNotFoundException e) {
+                } catch (ReceiverNotFoundException | SelfSendCanNotException e) {
                     assetSenderView.showWarning(ErrorMessageFactory.create(assetSenderView.getContext(), e));
                 }
             }
@@ -172,17 +172,17 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
         };
     }
 
-    private void send() throws ReceiverNotFoundException {
+    private void send() throws ReceiverNotFoundException, SelfSendCanNotException {
         final String receiver = assetSenderView.getReceiver();
         final String amount = assetSenderView.getAmount();
 
         if (receiver.isEmpty() || amount.isEmpty()) {
             throw new ReceiverNotFoundException();
-        }
+        } else if (isQRMine()) {
+            throw new SelfSendCanNotException();
+        } else {
+            assetSenderView.showProgress();
 
-        assetSenderView.showProgress();
-
-        if (validation()) {
             final String assetUuid = "60f4a396b520d6c54e33634d060751814e0c4bf103a81c58da704bba82461c32";
             final String command = QRType.TRANSFER.getType();
             final String sender = keyPair.publicKey;
@@ -204,8 +204,6 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
                     ),
                     callback()
             );
-        } else {
-            assetSenderView.hideProgress();
         }
     }
 
@@ -268,17 +266,7 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
         return keyPair;
     }
 
-    private boolean validation() {
-        if (assetSenderView.getReceiver().equals(keyPair.publicKey)) {
-            Log.e(TAG, "setOnResult: This QR is mine!");
-            assetSenderView.showError(
-                    ErrorMessageFactory.create(
-                            assetSenderView.getContext(),
-                            new SelfSendCanNotException()
-                    )
-            );
-            return false;
-        }
-        return true;
+    private boolean isQRMine() throws SelfSendCanNotException {
+        return assetSenderView.getReceiver().equals(keyPair.publicKey);
     }
 }
