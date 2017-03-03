@@ -20,6 +20,8 @@ package io.soramitsu.iroha.view;
 public interface AccountRegisterView extends LoadingView {
     void showError(String error);
 
+    void showWarning(String warning);
+
     void registerSuccessful();
 
     String getAlias();

@@ -20,6 +20,7 @@ package io.soramitsu.iroha;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
 
 import io.soramitsu.irohaandroid.Iroha;
 
@@ -35,15 +36,15 @@ public class IrohaApplication extends Application {
                 .build();
     }
 
-    public static SharedPreferences getSharedPreferences(Context context) {
+    public static SharedPreferences getSharedPreferences(@NonNull final Context context) {
         return context.getSharedPreferences(SHARED_PREF_FILE, MODE_PRIVATE);
     }
 
-    public static boolean isRegistered(Context context) {
+    public static boolean isRegistered(@NonNull final Context context) {
         return getSharedPreferences(context).getBoolean(SHARED_PREF_REGISTERED_KEY, false);
     }
 
-    public static void applyRegistered(Context context, boolean isRegistered) {
+    public static void applyRegistered(@NonNull final Context context, final boolean isRegistered) {
         getSharedPreferences(context).edit().putBoolean(SHARED_PREF_REGISTERED_KEY, isRegistered).apply();
     }
 }

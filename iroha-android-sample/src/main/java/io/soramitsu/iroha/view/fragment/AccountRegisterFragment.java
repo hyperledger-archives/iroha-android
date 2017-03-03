@@ -100,7 +100,15 @@ public class AccountRegisterFragment extends Fragment implements AccountRegister
 
     @Override
     public void showError(final String error) {
-        binding.userNameContainer.setError(error);
+        sweetAlertDialog = new SweetAlertDialog(getActivity(), SweetAlertDialog.ERROR_TYPE);
+        sweetAlertDialog.setTitleText(getString(R.string.error))
+                .setContentText(error)
+                .show();
+    }
+
+    @Override
+    public void showWarning(final String warning) {
+        binding.userNameContainer.setError(warning);
         binding.userNameContainer.setErrorEnabled(true);
     }
 

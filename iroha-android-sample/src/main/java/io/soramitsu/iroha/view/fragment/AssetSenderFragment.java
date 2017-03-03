@@ -19,6 +19,7 @@ package io.soramitsu.iroha.view.fragment;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -92,28 +93,32 @@ public class AssetSenderFragment extends Fragment
     }
 
     @Override
-    public void showError(String error) {
+    public void showError(final String error) {
         sweetAlertDialog = new SweetAlertDialog(getActivity(), SweetAlertDialog.ERROR_TYPE);
-        sweetAlertDialog.setTitleText("Error!")
+        sweetAlertDialog.setTitleText(getString(R.string.error))
                 .setContentText(error)
                 .show();
     }
 
     @Override
-    public void showWarning(String warning) {
+    public void showWarning(final String warning) {
         sweetAlertDialog = new SweetAlertDialog(getActivity(), SweetAlertDialog.WARNING_TYPE);
-        sweetAlertDialog.setTitleText("Warning!")
+        sweetAlertDialog.setTitleText(getString(R.string.warning))
                 .setContentText(warning)
                 .show();
     }
 
     @Override
-    public void showSuccess(String title, String message, final View.OnClickListener onClickListener) {
+    public void showSuccess(
+            @NonNull final String title,
+            @NonNull final String message,
+            final View.OnClickListener onClickListener) {
+
         sweetAlertDialog.setTitleText(title)
                 .setContentText(message)
                 .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                     @Override
-                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+                    public void onClick(SweetAlertDialog dialog) {
                         onClickListener.onClick(null);
                     }
                 })
@@ -163,7 +168,7 @@ public class AssetSenderFragment extends Fragment
     public void showProgress() {
         sweetAlertDialog = new SweetAlertDialog(getActivity(), SweetAlertDialog.PROGRESS_TYPE);
         sweetAlertDialog.setCancelable(false);
-        sweetAlertDialog.setTitleText("Connection…")
+        sweetAlertDialog.setTitleText(getString(R.string.connection))
                 .setContentText(getString(R.string.sending))
                 .show();
     }

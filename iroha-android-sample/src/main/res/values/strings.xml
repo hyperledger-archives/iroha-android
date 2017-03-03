@@ -4,7 +4,7 @@
     <string name="register">Register</string>
     <string name="validation_message_required">%1$s is required.</string>
     <string name="name">Name</string>
-    <string name="error">Error</string>
+    <string name="error">Error!</string>
     <string name="during_registration">Registration…</string>
     <string name="message_account_register_successful">Account registered!</string>
     <string name="placeholder_account_name">username:</string>
@@ -39,4 +39,6 @@
     <string name="message_copy_to_clipboard">Copy to clipboard!</string>
     <string name="successful">Successful</string>
     <string name="message_account_deleted">Account deleted</string>
+    <string name="warning">Warning!</string>
+    <string name="connection">Connection…</string>
 </resources>

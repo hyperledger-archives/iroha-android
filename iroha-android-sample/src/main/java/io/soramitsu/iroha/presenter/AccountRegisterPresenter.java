@@ -109,7 +109,7 @@ public class AccountRegisterPresenter implements Presenter<AccountRegisterView> 
                 final String alias = accountRegisterView.getAlias();
 
                 if (alias.isEmpty()) {
-                    accountRegisterView.showError(
+                    accountRegisterView.showWarning(
                             ErrorMessageFactory.create(context, new RequiredArgumentException(), context.getString(R.string.name))
                     );
                     return;
