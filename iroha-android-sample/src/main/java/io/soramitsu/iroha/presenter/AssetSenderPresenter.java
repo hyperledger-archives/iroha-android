@@ -184,7 +184,7 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
             assetSenderView.showProgress();
 
             final String assetUuid = "60f4a396b520d6c54e33634d060751814e0c4bf103a81c58da704bba82461c32";
-            final String command = QRType.TRANSFER.getType();
+            final String command = QRType.TRANSFER.getType().toLowerCase();
             final String sender = keyPair.publicKey;
             final long timestamp = System.currentTimeMillis() / 1000;
             final String message = generateMessage(timestamp, amount, sender, receiver, command, assetUuid);
