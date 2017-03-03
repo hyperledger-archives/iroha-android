@@ -27,6 +27,8 @@ import io.soramitsu.iroha.navigator.Navigator;
 import io.soramitsu.iroha.view.fragment.SplashFragment;
 import io.soramitsu.irohaandroid.model.Account;
 
+import static io.soramitsu.iroha.IrohaApplication.isRegistered;
+
 public class SplashActivity extends AppCompatActivity {
     public static final String TAG = SplashActivity.class.getSimpleName();
 
@@ -44,26 +46,25 @@ public class SplashActivity extends AppCompatActivity {
     private void openSplashFragment() {
         splashFragment = SplashFragment.newInstance();
         splashFragment.show(getSupportFragmentManager(), SplashFragment.TAG);
-        try {
-            final Context context = getApplicationContext();
-            final String uuid = Account.getUuid(getApplicationContext());
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if (uuid == null || uuid.isEmpty()) {
-                        navigator.navigateToRegisterActivity(context);
-                    } else {
-                        navigator.navigateToMainActivity(context, uuid);
-                    }
-                    finish();
-                    splashFragment.dismiss();
-                }
-            }, 1000);
-        } catch (Exception e) {
-            e.printStackTrace();
 
-            finish();
-            splashFragment.dismiss();
-        }
+        final Context context = getApplicationContext();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (isRegistered(context)) {
+                    try {
+                        final String uuid = Account.getUuid(getApplicationContext());
+                        navigator.navigateToMainActivity(context, uuid);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        navigator.navigateToRegisterActivity(context);
+                    }
+                } else {
+                    navigator.navigateToRegisterActivity(context);
+                }
+                finish();
+                splashFragment.dismiss();
+            }
+        }, 1000);
     }
 }

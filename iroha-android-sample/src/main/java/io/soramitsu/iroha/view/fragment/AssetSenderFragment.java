@@ -19,6 +19,7 @@ package io.soramitsu.iroha.view.fragment;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -26,15 +27,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.databinding.FragmentAssetSenderBinding;
 import io.soramitsu.iroha.navigator.Navigator;
 import io.soramitsu.iroha.presenter.AssetSenderPresenter;
 import io.soramitsu.iroha.view.AssetSenderView;
 import io.soramitsu.iroha.view.activity.MainActivity;
-import io.soramitsu.iroha.view.dialog.ErrorDialog;
-import io.soramitsu.iroha.view.dialog.ProgressDialog;
-import io.soramitsu.iroha.view.dialog.SuccessDialog;
 
 public class AssetSenderFragment extends Fragment
         implements AssetSenderView, MainActivity.MainActivityListener {
@@ -43,9 +42,7 @@ public class AssetSenderFragment extends Fragment
     private AssetSenderPresenter assetSenderPresenter = new AssetSenderPresenter();
 
     private FragmentAssetSenderBinding binding;
-    private ErrorDialog errorDialog;
-    private SuccessDialog successDialog;
-    private ProgressDialog progressDialog;
+    private SweetAlertDialog sweetAlertDialog;
 
     public static AssetSenderFragment newInstance() {
         AssetSenderFragment fragment = new AssetSenderFragment();
@@ -62,9 +59,6 @@ public class AssetSenderFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        errorDialog = new ErrorDialog(inflater);
-        successDialog = new SuccessDialog(inflater);
-        progressDialog = new ProgressDialog(inflater);
         return inflater.inflate(R.layout.fragment_asset_sender, container, false);
     }
 
@@ -99,18 +93,42 @@ public class AssetSenderFragment extends Fragment
     }
 
     @Override
-    public void showError(String error) {
-        errorDialog.show(getActivity(), error);
+    public void showError(final String error) {
+        sweetAlertDialog = new SweetAlertDialog(getActivity(), SweetAlertDialog.ERROR_TYPE);
+        sweetAlertDialog.setTitleText(getString(R.string.error))
+                .setContentText(error)
+                .show();
     }
 
     @Override
-    public void showSuccess(String title, String message, View.OnClickListener onClickListener) {
-        successDialog.show(getActivity(), title, message, onClickListener);
+    public void showWarning(final String warning) {
+        sweetAlertDialog = new SweetAlertDialog(getActivity(), SweetAlertDialog.WARNING_TYPE);
+        sweetAlertDialog.setTitleText(getString(R.string.warning))
+                .setContentText(warning)
+                .show();
+    }
+
+    @Override
+    public void showSuccess(
+            @NonNull final String title,
+            @NonNull final String message,
+            final View.OnClickListener onClickListener) {
+
+        sweetAlertDialog.setTitleText(title)
+                .setContentText(message)
+                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(finale SweetAlertDialog dialog) {
+                        onClickListener.onClick(null);
+                    }
+                })
+                .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
+        sweetAlertDialog.show();
     }
 
     @Override
     public void hideSuccess() {
-        successDialog.hide();
+        sweetAlertDialog.dismiss();
     }
 
     @Override
@@ -148,12 +166,16 @@ public class AssetSenderFragment extends Fragment
 
     @Override
     public void showProgress() {
-        progressDialog.show(getActivity(), getString(R.string.sending));
+        sweetAlertDialog = new SweetAlertDialog(getActivity(), SweetAlertDialog.PROGRESS_TYPE);
+        sweetAlertDialog.setCancelable(false);
+        sweetAlertDialog.setTitleText(getString(R.string.connection))
+                .setContentText(getString(R.string.sending))
+                .show();
     }
 
     @Override
     public void hideProgress() {
-        progressDialog.hide();
+        // nothing
     }
 
     @Override

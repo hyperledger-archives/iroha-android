@@ -1,5 +1,6 @@
 # iroha-android
 
+![build status](https://circleci.com/gh/hyperledger/iroha-android.svg?style=shield&circle-token=55ddf2685110d2e067b5a361ccc5743f9e7d1df9)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/122f8fc23361423e99b941b547ad95eb)](https://www.codacy.com/app/hyperledger/iroha-android?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=hyperledger/iroha-android&amp;utm_campaign=Badge_Grade)
 
 ## What is いろは(iroha)?

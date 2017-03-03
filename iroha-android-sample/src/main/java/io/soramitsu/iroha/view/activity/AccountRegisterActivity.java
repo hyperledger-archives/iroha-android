@@ -43,6 +43,8 @@ import io.soramitsu.iroha.navigator.Navigator;
 import io.soramitsu.iroha.view.fragment.AccountRegisterFragment;
 import io.soramitsu.irohaandroid.model.Account;
 
+import static io.soramitsu.iroha.IrohaApplication.applyRegistered;
+
 public class AccountRegisterActivity extends AppCompatActivity
         implements AccountRegisterFragment.AccountRegisterListener {
     public static final String TAG = AccountRegisterActivity.class.getSimpleName();
@@ -91,6 +93,9 @@ public class AccountRegisterActivity extends AppCompatActivity
             Toast.makeText(context, ErrorMessageFactory.create(context, e), Toast.LENGTH_SHORT).show();
             return;
         }
+
+        applyRegistered(context, true);
+
         navigator.navigateToMainActivity(context, uuid);
         finish();
     }
