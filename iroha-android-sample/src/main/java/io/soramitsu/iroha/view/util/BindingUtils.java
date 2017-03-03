@@ -68,7 +68,11 @@ public final class BindingUtils {
         if (command.equals("Add")) {
             displayText += "Register";
         } else {
-            displayText += transaction.params.receiver;
+            if (transaction.isSender(publicKey)) {
+                displayText += transaction.params.receiver;
+            } else {
+                displayText += transaction.params.sender;
+            }
         }
         textView.setText(displayText);
     }
