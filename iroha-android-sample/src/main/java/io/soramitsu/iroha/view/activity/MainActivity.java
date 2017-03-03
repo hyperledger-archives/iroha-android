@@ -210,7 +210,7 @@ public class MainActivity extends AppCompatActivity {
                                                                 .setContentText(getString(R.string.message_account_deleted))
                                                                 .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                                                                     @Override
-                                                                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+                                                                    public void onClick(finale SweetAlertDialog sweetAlertDialog) {
                                                                         navigator.navigateToRegisterActivity(getApplicationContext());
                                                                         finish();
                                                                     }
