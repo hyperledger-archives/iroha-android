@@ -121,7 +121,7 @@ public class AccountRegisterFragment extends Fragment implements AccountRegister
                         .setContentText(getString(R.string.message_account_register_successful))
                         .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                             @Override
-                            public void onClick(SweetAlertDialog sweetAlertDialog) {
+                            public void onClick(finale SweetAlertDialog sweetAlertDialog) {
                                 accountRegisterListener.onAccountRegisterSuccessful();
                             }
                         })
