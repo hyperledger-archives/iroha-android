@@ -18,6 +18,7 @@ limitations under the License.
 package io.soramitsu.iroha.view.fragment;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -27,12 +28,11 @@ import android.view.ViewGroup;
 
 import java.io.File;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.databinding.FragmentAccountRegisterBinding;
 import io.soramitsu.iroha.presenter.AccountRegisterPresenter;
 import io.soramitsu.iroha.view.AccountRegisterView;
-import io.soramitsu.iroha.view.dialog.ProgressDialog;
-import io.soramitsu.iroha.view.dialog.SuccessDialog;
 import io.soramitsu.irohaandroid.cache.FileManager;
 import io.soramitsu.irohaandroid.security.KeyStoreManager;
 
@@ -42,8 +42,7 @@ public class AccountRegisterFragment extends Fragment implements AccountRegister
     private AccountRegisterPresenter accountRegisterPresenter = new AccountRegisterPresenter();
 
     private FragmentAccountRegisterBinding binding;
-    private SuccessDialog successDialog;
-    private ProgressDialog progressDialog;
+    private SweetAlertDialog sweetAlertDialog;
 
     private AccountRegisterListener accountRegisterListener;
 
@@ -73,8 +72,6 @@ public class AccountRegisterFragment extends Fragment implements AccountRegister
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        successDialog = new SuccessDialog(inflater);
-        progressDialog = new ProgressDialog(inflater);
         return inflater.inflate(R.layout.fragment_account_register, container, false);
     }
 
@@ -109,17 +106,20 @@ public class AccountRegisterFragment extends Fragment implements AccountRegister
 
     @Override
     public void registerSuccessful() {
-        successDialog.show(
-                getActivity(),
-                getString(R.string.register),
-                getString(R.string.message_account_register_successful),
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        successDialog.hide();
-                        accountRegisterListener.onAccountRegisterSuccessful();
-                    }
-                });
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                sweetAlertDialog.setTitleText(getString(R.string.successful))
+                        .setContentText(getString(R.string.message_account_register_successful))
+                        .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                            @Override
+                            public void onClick(SweetAlertDialog sweetAlertDialog) {
+                                accountRegisterListener.onAccountRegisterSuccessful();
+                            }
+                        })
+                        .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
+            }
+        }, 1000);
     }
 
     @Override
@@ -130,11 +130,13 @@ public class AccountRegisterFragment extends Fragment implements AccountRegister
     @Override
     public void showProgress() {
         binding.userNameContainer.setErrorEnabled(false);
-        progressDialog.show(getActivity(), getString(R.string.during_registration));
+        sweetAlertDialog = new SweetAlertDialog(getActivity(), SweetAlertDialog.PROGRESS_TYPE);
+        sweetAlertDialog.setCancelable(false);
+        sweetAlertDialog.setTitleText(getString(R.string.during_registration)).show();
     }
 
     @Override
     public void hideProgress() {
-        progressDialog.hide();
+        // nothing
     }
 }
