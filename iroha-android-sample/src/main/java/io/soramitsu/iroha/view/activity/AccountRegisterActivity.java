@@ -27,18 +27,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Toast;
-
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-
-import javax.crypto.NoSuchPaddingException;
 
 import io.soramitsu.iroha.R;
-import io.soramitsu.iroha.exception.ErrorMessageFactory;
 import io.soramitsu.iroha.navigator.Navigator;
 import io.soramitsu.iroha.view.fragment.AccountRegisterFragment;
 import io.soramitsu.irohaandroid.model.Account;
@@ -85,18 +75,8 @@ public class AccountRegisterActivity extends AppCompatActivity
     @Override
     public void onAccountRegisterSuccessful() {
         final Context context = getApplicationContext();
-        final String uuid;
-        try {
-            uuid = Account.getUuid(context);
-        } catch (NoSuchPaddingException | UnrecoverableKeyException | NoSuchAlgorithmException
-                | KeyStoreException | InvalidKeyException | IOException e) {
-            Toast.makeText(context, ErrorMessageFactory.create(context, e), Toast.LENGTH_SHORT).show();
-            return;
-        }
-
         applyRegistered(context, true);
-
-        navigator.navigateToMainActivity(context, uuid);
+        navigator.navigateToMainActivity(context, Account.getUuid(context));
         finish();
     }
 }

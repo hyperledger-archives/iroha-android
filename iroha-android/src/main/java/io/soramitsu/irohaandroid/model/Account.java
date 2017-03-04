@@ -21,15 +21,8 @@ import android.content.Context;
 import android.util.Log;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
-import java.security.InvalidKeyException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
 import java.util.List;
-
-import javax.crypto.NoSuchPaddingException;
 
 import io.soramitsu.irohaandroid.cache.AccountCache;
 import io.soramitsu.irohaandroid.cache.FileManager;
@@ -41,10 +34,7 @@ public class Account implements Serializable, AccountCache {
     public List<Asset> assets;
 
     @Override
-    public void save(Context context)
-            throws InvalidKeyException, NoSuchAlgorithmException, KeyStoreException,
-            NoSuchPaddingException, IOException {
-
+    public void save(Context context) {
         FileManager fileManager = new FileManager();
 
         KeyStoreManager keyStoreManager = new KeyStoreManager.Builder(context).build();
@@ -60,10 +50,7 @@ public class Account implements Serializable, AccountCache {
         fileManager.writeToFile(aliasFile, encryptedAlias);
     }
 
-    public static String getUuid(Context context)
-            throws NoSuchPaddingException, UnrecoverableKeyException, NoSuchAlgorithmException,
-            KeyStoreException, InvalidKeyException, IOException {
-
+    public static String getUuid(Context context) {
         FileManager fileManager = new FileManager();
 
         KeyStoreManager keyStoreManager = new KeyStoreManager.Builder(context).build();
@@ -74,10 +61,7 @@ public class Account implements Serializable, AccountCache {
         return keyStoreManager.decrypt(fileManager.readFileContent(uuidFile));
     }
 
-    public static String getAlias(Context context)
-            throws NoSuchPaddingException, UnrecoverableKeyException, NoSuchAlgorithmException,
-            KeyStoreException, InvalidKeyException, IOException {
-
+    public static String getAlias(Context context) {
         FileManager fileManager = new FileManager();
 
         KeyStoreManager keyStoreManager = new KeyStoreManager.Builder(context).build();
