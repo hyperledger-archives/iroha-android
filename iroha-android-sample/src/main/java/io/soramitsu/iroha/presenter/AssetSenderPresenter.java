@@ -28,14 +28,6 @@ import com.google.gson.Gson;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-
-import javax.crypto.NoSuchPaddingException;
-
 import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.exception.ErrorMessageFactory;
 import io.soramitsu.iroha.exception.IllegalQRCodeException;
@@ -234,7 +226,7 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
                 if (NetworkUtil.isOnline(assetSenderView.getContext())) {
                     assetSenderView.showError(ErrorMessageFactory.create(c, throwable));
                 } else {
-                    assetSenderView.showError(ErrorMessageFactory.create(c, new NetworkNotConnectedException()));
+                    assetSenderView.showWarning(ErrorMessageFactory.create(c, new NetworkNotConnectedException()));
                 }
             }
         };
@@ -254,14 +246,7 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
     private KeyPair getKeyPair() {
         if (keyPair == null) {
             final Context context = assetSenderView.getContext();
-            try {
-                keyPair = KeyPair.getKeyPair(context);
-            } catch (NoSuchPaddingException | UnrecoverableKeyException | NoSuchAlgorithmException
-                    | KeyStoreException | InvalidKeyException | IOException e) {
-                Log.e(TAG, "getKeyPair: ", e);
-                assetSenderView.showError(ErrorMessageFactory.create(context, e));
-                return new KeyPair("", "");
-            }
+            keyPair = KeyPair.getKeyPair(context);
         }
         return keyPair;
     }

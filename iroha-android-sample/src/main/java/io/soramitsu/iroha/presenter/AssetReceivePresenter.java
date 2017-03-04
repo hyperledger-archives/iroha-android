@@ -37,14 +37,6 @@ import com.google.zxing.WriterException;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-
-import javax.crypto.NoSuchPaddingException;
-
 import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.exception.ErrorMessageFactory;
 import io.soramitsu.iroha.model.TransferQRParameter;
@@ -236,14 +228,7 @@ public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
     private String getPublicKey() {
         if (publicKey == null || publicKey.isEmpty()) {
             final Context context = assetReceiveView.getContext();
-            try {
-                publicKey = KeyPair.getKeyPair(context).publicKey;
-            } catch (NoSuchPaddingException | UnrecoverableKeyException | NoSuchAlgorithmException
-                    | KeyStoreException | InvalidKeyException | IOException e) {
-                Log.e(TAG, "getKeyPair: ", e);
-                assetReceiveView.showError(ErrorMessageFactory.create(context, e));
-                return "";
-            }
+            publicKey = KeyPair.getKeyPair(context).publicKey;
         }
         return publicKey;
     }
@@ -252,13 +237,7 @@ public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
     private String getUuid() {
         final Context context = assetReceiveView.getContext();
         if (uuid == null || uuid.isEmpty()) {
-            try {
-                uuid = Account.getUuid(context);
-            } catch (NoSuchPaddingException | UnrecoverableKeyException | NoSuchAlgorithmException
-                    | KeyStoreException | InvalidKeyException | IOException e) {
-                assetReceiveView.showError(ErrorMessageFactory.create(context, e));
-                return "";
-            }
+            uuid = Account.getUuid(context);
         }
         return uuid;
     }

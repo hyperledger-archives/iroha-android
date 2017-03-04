@@ -25,14 +25,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AbsListView;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
 import java.util.List;
-
-import javax.crypto.NoSuchPaddingException;
 
 import io.soramitsu.iroha.exception.ErrorMessageFactory;
 import io.soramitsu.iroha.exception.NetworkNotConnectedException;
@@ -145,7 +138,7 @@ public class WalletPresenter implements Presenter<WalletView> {
         }
 
         if (uuid == null || uuid.isEmpty()) {
-            uuid = getUuid();
+            uuid = Account.getUuid(walletView.getContext());
         }
 
         Iroha iroha = Iroha.getInstance();
@@ -261,18 +254,4 @@ public class WalletPresenter implements Presenter<WalletView> {
             }
         };
     }
-
-    private String getUuid() {
-        final Context context = walletView.getContext();
-        final String uuid;
-        try {
-            uuid = Account.getUuid(context);
-        } catch (NoSuchPaddingException | UnrecoverableKeyException | NoSuchAlgorithmException
-                | KeyStoreException | InvalidKeyException | IOException e) {
-            walletView.showError(ErrorMessageFactory.create(context, e));
-            return null;
-        }
-        return uuid;
-    }
-
 }
