@@ -29,14 +29,13 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.InvalidKeyException;
+import java.security.GeneralSecurityException;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Calendar;
@@ -132,49 +131,53 @@ public class KeyStoreManager {
         }
     }
 
-    public String encrypt(String plainText)
-            throws KeyStoreException, NoSuchPaddingException, NoSuchAlgorithmException,
-            InvalidKeyException, IOException {
+    public String encrypt(String plainText) {
+        try {
+            String encryptedText;
+            PublicKey publicKey = keyStore.getCertificate(KEY_ALIAS).getPublicKey();
 
-        String encryptedText;
-        PublicKey publicKey = keyStore.getCertificate(KEY_ALIAS).getPublicKey();
+            Cipher cipher = getCipherInstance();
+            cipher.init(Cipher.ENCRYPT_MODE, publicKey);
 
-        Cipher cipher = getCipherInstance();
-        cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            CipherOutputStream cipherOutputStream = new CipherOutputStream(
+                    outputStream, cipher);
+            cipherOutputStream.write(plainText.getBytes(CHARACTER_CODE_UTF8));
+            cipherOutputStream.close();
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        CipherOutputStream cipherOutputStream = new CipherOutputStream(
-                outputStream, cipher);
-        cipherOutputStream.write(plainText.getBytes(CHARACTER_CODE_UTF8));
-        cipherOutputStream.close();
+            byte[] bytes = outputStream.toByteArray();
+            encryptedText = Base64.encodeToString(bytes, Base64.DEFAULT);
 
-        byte[] bytes = outputStream.toByteArray();
-        encryptedText = Base64.encodeToString(bytes, Base64.DEFAULT);
-
-        return encryptedText;
+            return encryptedText;
+        } catch (GeneralSecurityException | IOException e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 
-    public String decrypt(String encryptedText)
-            throws KeyStoreException, NoSuchPaddingException, NoSuchAlgorithmException,
-            UnrecoverableKeyException, InvalidKeyException, IOException {
+    public String decrypt(String encryptedText) {
+        try {
+            String plainText;
+            PrivateKey privateKey = (PrivateKey) keyStore.getKey(KEY_ALIAS, null);
 
-        String plainText;
-        PrivateKey privateKey = (PrivateKey) keyStore.getKey(KEY_ALIAS, null);
+            Cipher cipher = getCipherInstance();
+            cipher.init(Cipher.DECRYPT_MODE, privateKey);
 
-        Cipher cipher = getCipherInstance();
-        cipher.init(Cipher.DECRYPT_MODE, privateKey);
+            CipherInputStream cipherInputStream = new CipherInputStream(
+                    new ByteArrayInputStream(Base64.decode(encryptedText, Base64.DEFAULT)), cipher);
 
-        CipherInputStream cipherInputStream = new CipherInputStream(
-                new ByteArrayInputStream(Base64.decode(encryptedText, Base64.DEFAULT)), cipher);
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            int b;
+            while ((b = cipherInputStream.read()) != -1) {
+                outputStream.write(b);
+            }
+            outputStream.close();
+            plainText = outputStream.toString(CHARACTER_CODE_UTF8);
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        int b;
-        while ((b = cipherInputStream.read()) != -1) {
-            outputStream.write(b);
+            return plainText;
+        } catch (GeneralSecurityException | IOException e) {
+            e.printStackTrace();
+            return "";
         }
-        outputStream.close();
-        plainText = outputStream.toString(CHARACTER_CODE_UTF8);
-
-        return plainText;
     }
 }
