@@ -51,7 +51,7 @@ public class KeyStoreManager {
 
     private static final String ANDROID_KEY_STORE = "AndroidKeyStore";
     private static final String KEY_ALIAS = "io.soramitsu.iroha.key_alias";
-    private static final String CIPHER_ALGO_LEAGER_THAN_M = "RSA/ECB/OAEPwithSHA-256andMGF1Padding";
+    private static final String CIPHER_ALGO_LARGER_THAN_M = "RSA/ECB/OAEPwithSHA-256andMGF1Padding";
     private static final String CIPHER_ALGO = "RSA/ECB/PKCS1Padding";
     private static final String CHARACTER_CODE_UTF8 = "UTF-8";
 
@@ -125,7 +125,7 @@ public class KeyStoreManager {
 
     private Cipher getCipherInstance() throws NoSuchPaddingException, NoSuchAlgorithmException {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            return Cipher.getInstance(CIPHER_ALGO_LEAGER_THAN_M);
+            return Cipher.getInstance(CIPHER_ALGO_LARGER_THAN_M);
         } else {
             return Cipher.getInstance(CIPHER_ALGO);
         }
