@@ -21,20 +21,15 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import java.io.File;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.databinding.FragmentAccountRegisterBinding;
 import io.soramitsu.iroha.presenter.AccountRegisterPresenter;
 import io.soramitsu.iroha.view.AccountRegisterView;
-import io.soramitsu.irohaandroid.cache.FileManager;
-import io.soramitsu.irohaandroid.security.KeyStoreManager;
 
 public class AccountRegisterFragment extends Fragment implements AccountRegisterView {
     public static final String TAG = AccountRegisterFragment.class.getSimpleName();
@@ -55,18 +50,6 @@ public class AccountRegisterFragment extends Fragment implements AccountRegister
         super.onCreate(savedInstanceState);
         accountRegisterPresenter.setView(this);
         accountRegisterPresenter.onCreate();
-
-        FileManager fileManager = new FileManager();
-        File extStorage = getContext().getExternalFilesDir("keypair");
-        Log.d("Account soramitsu", "save: " + extStorage.toString());
-        File uuidFile = new File(extStorage, "private_key.txt");
-        KeyStoreManager keyStoreManager = new KeyStoreManager.Builder(getContext()).build();
-        try {
-            String result = keyStoreManager.decrypt(fileManager.readFileContent(uuidFile));
-            Log.d(TAG, "onCreate: result: " + result);
-        } catch (Exception e) {
-        }
-
     }
 
     @Override

@@ -41,23 +41,13 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.mikepenz.aboutlibraries.LibsBuilder;
 import com.mikepenz.aboutlibraries.ui.LibsSupportFragment;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-
-import javax.crypto.NoSuchPaddingException;
-
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.databinding.ActivityMainBinding;
-import io.soramitsu.iroha.exception.ErrorMessageFactory;
 import io.soramitsu.iroha.navigator.Navigator;
 import io.soramitsu.iroha.view.fragment.AssetReceiveFragment;
 import io.soramitsu.iroha.view.fragment.AssetSenderFragment;
@@ -153,17 +143,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void initNavigationHeader() {
         final Context context = getApplicationContext();
-        final String alias;
-        final String uuid;
-        try {
-            alias = Account.getAlias(context);
-            uuid = Account.getUuid(context);
-        } catch (NoSuchPaddingException | UnrecoverableKeyException | NoSuchAlgorithmException
-                | KeyStoreException | InvalidKeyException | IOException e) {
-            Toast.makeText(context, ErrorMessageFactory.create(context, e), Toast.LENGTH_SHORT).show();
-            return;
-        }
-
+        final String alias = Account.getAlias(context);
+        final String uuid = Account.getUuid(context);
         View headerView = binding.navigation.getHeaderView(0);
         ((TextView) headerView.findViewById(R.id.name)).setText(alias);
         ((TextView) headerView.findViewById(R.id.email)).setText(uuid);

@@ -20,13 +20,6 @@ package io.soramitsu.irohaandroid.model;
 import android.content.Context;
 
 import java.io.File;
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-
-import javax.crypto.NoSuchPaddingException;
 
 import io.soramitsu.irohaandroid.cache.FileManager;
 import io.soramitsu.irohaandroid.cache.KeyPairCache;
@@ -39,10 +32,7 @@ public class KeyPair implements KeyPairCache {
     public String privateKey;
     public String publicKey;
 
-    public static KeyPair getKeyPair(Context context)
-            throws NoSuchPaddingException, UnrecoverableKeyException, NoSuchAlgorithmException,
-            KeyStoreException, InvalidKeyException, IOException {
-
+    public static KeyPair getKeyPair(Context context) {
         FileManager fileManager = new FileManager();
 
         KeyStoreManager keyStoreManager = new KeyStoreManager.Builder(context).build();
@@ -63,10 +53,7 @@ public class KeyPair implements KeyPairCache {
     }
 
     @Override
-    public void save(Context context)
-            throws InvalidKeyException, NoSuchAlgorithmException, KeyStoreException,
-            NoSuchPaddingException, IOException {
-
+    public void save(Context context) {
         FileManager fileManager = new FileManager();
 
         KeyStoreManager keyStoreManager = new KeyStoreManager.Builder(context).build();
