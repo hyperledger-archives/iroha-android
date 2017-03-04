@@ -27,7 +27,7 @@
 In your ```app/build.gradle```   
 
 ```gradle
-compile 'org.hyperledger:iroha-android:1.2.6'
+compile 'org.hyperledger:iroha-android:1.2.7'
 ```
 
 ### Maven

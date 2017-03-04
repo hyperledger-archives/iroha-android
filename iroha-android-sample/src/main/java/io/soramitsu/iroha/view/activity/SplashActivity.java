@@ -52,13 +52,8 @@ public class SplashActivity extends AppCompatActivity {
             @Override
             public void run() {
                 if (isRegistered(context)) {
-                    try {
-                        final String uuid = Account.getUuid(getApplicationContext());
-                        navigator.navigateToMainActivity(context, uuid);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        navigator.navigateToRegisterActivity(context);
-                    }
+                    final String uuid = Account.getUuid(getApplicationContext());
+                    navigator.navigateToMainActivity(context, uuid);
                 } else {
                     navigator.navigateToRegisterActivity(context);
                 }
