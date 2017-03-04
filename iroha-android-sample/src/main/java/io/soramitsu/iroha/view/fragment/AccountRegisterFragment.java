@@ -18,7 +18,6 @@ limitations under the License.
 package io.soramitsu.iroha.view.fragment;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -83,36 +82,35 @@ public class AccountRegisterFragment extends Fragment implements AccountRegister
 
     @Override
     public void showError(final String error) {
-        sweetAlertDialog = new SweetAlertDialog(getActivity(), SweetAlertDialog.ERROR_TYPE);
-        sweetAlertDialog.setTitleText(getString(R.string.error))
-                .setContentText(error)
-                .show();
+        if (sweetAlertDialog == null || !sweetAlertDialog.isShowing()) {
+            sweetAlertDialog = new SweetAlertDialog(getActivity(), SweetAlertDialog.ERROR_TYPE);
+            sweetAlertDialog.setTitleText(getString(R.string.error))
+                    .setContentText(error)
+                    .show();
+        } else {
+            sweetAlertDialog.setTitleText(getString(R.string.error))
+                    .setContentText(error)
+                    .changeAlertType(SweetAlertDialog.ERROR_TYPE);
+        }
     }
 
     @Override
     public void showWarning(final String warning) {
-        sweetAlertDialog = new SweetAlertDialog(getActivity(), SweetAlertDialog.WARNING_TYPE);
-        sweetAlertDialog.setTitleText(getString(R.string.error))
-                .setContentText(warning)
-                .show();
+        if (sweetAlertDialog == null || !sweetAlertDialog.isShowing()) {
+            sweetAlertDialog = new SweetAlertDialog(getActivity(), SweetAlertDialog.WARNING_TYPE);
+            sweetAlertDialog.setTitleText(getString(R.string.warning))
+                    .setContentText(warning)
+                    .show();
+        } else {
+            sweetAlertDialog.setTitleText(getString(R.string.warning))
+                    .setContentText(warning)
+                    .changeAlertType(SweetAlertDialog.ERROR_TYPE);
+        }
     }
 
     @Override
     public void registerSuccessful() {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                sweetAlertDialog.setTitleText(getString(R.string.successful))
-                        .setContentText(getString(R.string.message_account_register_successful))
-                        .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                            @Override
-                            public void onClick(SweetAlertDialog sweetAlertDialog) {
-                                accountRegisterListener.onAccountRegisterSuccessful();
-                            }
-                        })
-                        .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
-            }
-        }, 1000);
+        accountRegisterListener.onAccountRegisterSuccessful();
     }
 
     @Override
