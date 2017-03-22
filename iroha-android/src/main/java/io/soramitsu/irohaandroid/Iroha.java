@@ -381,17 +381,7 @@ public class Iroha {
             @NonNull C newAsyncTask) {
 
         asyncTaskMap.put(tag, newAsyncTask);
-        execute(newAsyncTask);
-    }
-
-    private void execute(@NonNull BaseIrohaAsyncTask<?> asyncTask) {
-        if (asyncTask instanceof IrohaAsyncTask<?>) {
-            IrohaAsyncTask<?> irohaAsyncTask = (IrohaAsyncTask<?>) asyncTask;
-            irohaAsyncTask.execute();
-        } else if (asyncTask instanceof IrohaParallelAsyncTask<?>) {
-            IrohaParallelAsyncTask<?> irohaParallelAsyncTask = (IrohaParallelAsyncTask<?>) asyncTask;
-            irohaParallelAsyncTask.execute();
-        }
+        newAsyncTask.execute();
     }
 
     /* ============ 【Async Task Management】 to here ============  */
