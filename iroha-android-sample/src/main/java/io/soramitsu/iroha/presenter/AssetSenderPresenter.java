@@ -41,6 +41,7 @@ import io.soramitsu.iroha.view.AssetSenderView;
 import io.soramitsu.irohaandroid.Iroha;
 import io.soramitsu.irohaandroid.callback.Callback;
 import io.soramitsu.irohaandroid.model.KeyPair;
+import io.soramitsu.irohaandroid.security.KeyGenerator;
 import io.soramitsu.irohaandroid.security.MessageDigest;
 
 public class AssetSenderPresenter implements Presenter<AssetSenderView> {
@@ -180,7 +181,7 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
             final String sender = keyPair.publicKey;
             final long timestamp = System.currentTimeMillis() / 1000;
             final String message = generateMessage(timestamp, amount, sender, receiver, command, assetUuid);
-            final String signature = MessageDigest.digest(message, MessageDigest.Algorithm.SHA3_256);
+            final String signature = KeyGenerator.sign(keyPair, MessageDigest.digest(message, MessageDigest.Algorithm.SHA3_256));
 
             Iroha iroha = Iroha.getInstance();
             iroha.runAsyncTask(
