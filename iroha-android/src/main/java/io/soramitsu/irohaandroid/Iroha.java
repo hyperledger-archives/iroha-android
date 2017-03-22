@@ -37,6 +37,7 @@ import io.soramitsu.irohaandroid.callback.Function;
 import io.soramitsu.irohaandroid.model.Account;
 import io.soramitsu.irohaandroid.model.Asset;
 import io.soramitsu.irohaandroid.model.Domain;
+import io.soramitsu.irohaandroid.model.KeyPair;
 import io.soramitsu.irohaandroid.model.Transaction;
 import io.soramitsu.irohaandroid.service.AccountService;
 import io.soramitsu.irohaandroid.service.AssetService;
@@ -86,6 +87,23 @@ public class Iroha {
         }
         return iroha;
     }
+
+
+    /* ============ 【KeyPair】 from here ============  */
+
+    public static KeyPair createKeyPair() {
+        return Ed25519.createKeyPair();
+    }
+
+    public static String sign(KeyPair keyPair, String message) {
+        return Ed25519.sign(message, keyPair);
+    }
+
+    public static boolean verify(String publicKey, String signature, String message) {
+        return Ed25519.verify(signature, message, publicKey);
+    }
+
+    /* ============ 【KeyPair】 to here ============  */
 
 
     /* ============ 【Web API】 from here ============  */
