@@ -1,0 +1,26 @@
+machine:
+  java:
+    version: oraclejdk7
+  environment:
+    ANDROID_HOME: /usr/local/android-sdk-linux
+    ANDROID_NDK_HOME: ${ANDROID_NDK}
+    JAVA_OPTS: "-Xmx2048m -XX:MaxPermSize=1024m"
+    GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
+  post:
+    - sudo service mysql stop
+    - sudo service postgresql stop
+dependencies:
+  pre:
+    - ( sleep 5 && while [ 1 ]; do sleep 1; echo y; done ) | android update sdk --no-ui --all --filter "tools,android-25,build-tools-25,platform-tools,extra-google-m2repository,extra-android-m2repository,extra-android-support,extra-google-google_play_services"
+    - echo "8933bad161af4178b1185d1a37fbf41ea5269c55%" > $ANDROID_HOME/licenses/android-sdk-license
+  override:
+    - echo $ANDROID_HOME/licenses/android-sdk-license
+    - ./gradlew -v
+
+test:
+  override:
+    - echo "Nothing to do here"
+
+general:
+  artifacts:
+    - "app/build/outputs/apk/app-production-release.apk"
