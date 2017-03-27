@@ -181,7 +181,7 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
             final String sender = keyPair.publicKey;
             final long timestamp = System.currentTimeMillis() / 1000;
             final String message = generateMessage(timestamp, amount, sender, receiver, command, assetUuid);
-            final String signature = KeyGenerator.sign(keyPair, MessageDigest.digest(message, MessageDigest.Algorithm.SHA3_256));
+            final String signature = Iroha.sign(keyPair, MessageDigest.digest(message, MessageDigest.Algorithm.SHA3_256));
 
             Iroha iroha = Iroha.getInstance();
             iroha.runAsyncTask(
