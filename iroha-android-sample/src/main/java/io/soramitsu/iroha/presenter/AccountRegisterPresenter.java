@@ -24,13 +24,6 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-
-import javax.crypto.NoSuchPaddingException;
-
 import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.exception.ErrorMessageFactory;
 import io.soramitsu.iroha.exception.NetworkNotConnectedException;
@@ -118,12 +111,7 @@ public class AccountRegisterPresenter implements Presenter<AccountRegisterView> 
                 accountRegisterView.showProgress();
 
                 KeyPair keyPair = KeyGenerator.createKeyPair();
-                try {
-                    keyPair.save(context);
-                } catch (InvalidKeyException | NoSuchAlgorithmException | KeyStoreException
-                        | NoSuchPaddingException | IOException e) {
-                    Log.e(TAG, "onClick: ", e);
-                }
+                keyPair.save(context);
                 register(keyPair, alias);
             }
         };
@@ -155,18 +143,8 @@ public class AccountRegisterPresenter implements Presenter<AccountRegisterView> 
 
     private void registerSuccessful(Account result) {
         accountRegisterView.hideProgress();
-
-        try {
-            result.alias = accountRegisterView.getAlias();
-            result.save(accountRegisterView.getContext());
-        } catch (InvalidKeyException | NoSuchAlgorithmException
-                | KeyStoreException | NoSuchPaddingException | IOException e) {
-            Log.e(TAG, "onSuccessful: ", e);
-            KeyPair.delete(accountRegisterView.getContext());
-            accountRegisterView.showError(ErrorMessageFactory.create(accountRegisterView.getContext(), e));
-            return;
-        }
-
+        result.alias = accountRegisterView.getAlias();
+        result.save(accountRegisterView.getContext());
         accountRegisterView.registerSuccessful();
     }
 
@@ -179,7 +157,7 @@ public class AccountRegisterPresenter implements Presenter<AccountRegisterView> 
         if (NetworkUtil.isOnline(accountRegisterView.getContext())) {
             accountRegisterView.showError(ErrorMessageFactory.create(c, throwable));
         } else {
-            accountRegisterView.showError(ErrorMessageFactory.create(c, new NetworkNotConnectedException()));
+            accountRegisterView.showWarning(ErrorMessageFactory.create(c, new NetworkNotConnectedException()));
         }
     }
 }

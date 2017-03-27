@@ -28,14 +28,6 @@ import com.google.gson.Gson;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-
-import javax.crypto.NoSuchPaddingException;
-
 import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.exception.ErrorMessageFactory;
 import io.soramitsu.iroha.exception.IllegalQRCodeException;
@@ -49,6 +41,7 @@ import io.soramitsu.iroha.view.AssetSenderView;
 import io.soramitsu.irohaandroid.Iroha;
 import io.soramitsu.irohaandroid.callback.Callback;
 import io.soramitsu.irohaandroid.model.KeyPair;
+import io.soramitsu.irohaandroid.security.KeyGenerator;
 import io.soramitsu.irohaandroid.security.MessageDigest;
 
 public class AssetSenderPresenter implements Presenter<AssetSenderView> {
@@ -188,7 +181,7 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
             final String sender = keyPair.publicKey;
             final long timestamp = System.currentTimeMillis() / 1000;
             final String message = generateMessage(timestamp, amount, sender, receiver, command, assetUuid);
-            final String signature = MessageDigest.digest(message, MessageDigest.Algorithm.SHA3_256);
+            final String signature = KeyGenerator.sign(keyPair, MessageDigest.digest(message, MessageDigest.Algorithm.SHA3_256));
 
             Iroha iroha = Iroha.getInstance();
             iroha.runAsyncTask(
@@ -234,7 +227,7 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
                 if (NetworkUtil.isOnline(assetSenderView.getContext())) {
                     assetSenderView.showError(ErrorMessageFactory.create(c, throwable));
                 } else {
-                    assetSenderView.showError(ErrorMessageFactory.create(c, new NetworkNotConnectedException()));
+                    assetSenderView.showWarning(ErrorMessageFactory.create(c, new NetworkNotConnectedException()));
                 }
             }
         };
@@ -254,14 +247,7 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
     private KeyPair getKeyPair() {
         if (keyPair == null) {
             final Context context = assetSenderView.getContext();
-            try {
-                keyPair = KeyPair.getKeyPair(context);
-            } catch (NoSuchPaddingException | UnrecoverableKeyException | NoSuchAlgorithmException
-                    | KeyStoreException | InvalidKeyException | IOException e) {
-                Log.e(TAG, "getKeyPair: ", e);
-                assetSenderView.showError(ErrorMessageFactory.create(context, e));
-                return new KeyPair("", "");
-            }
+            keyPair = KeyPair.getKeyPair(context);
         }
         return keyPair;
     }

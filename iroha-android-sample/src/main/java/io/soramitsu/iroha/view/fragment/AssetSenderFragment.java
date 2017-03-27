@@ -118,7 +118,7 @@ public class AssetSenderFragment extends Fragment
                 .setContentText(message)
                 .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                     @Override
-                    public void onClick(finale SweetAlertDialog dialog) {
+                    public void onClick(SweetAlertDialog dialog) {
                         onClickListener.onClick(null);
                     }
                 })
