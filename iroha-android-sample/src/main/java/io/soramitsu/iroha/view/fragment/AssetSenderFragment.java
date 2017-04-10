@@ -188,6 +188,7 @@ public class AssetSenderFragment extends Fragment
     @Override
     public void showQRReader() {
         IntentIntegrator.forSupportFragment(this)
+                .setBeepEnabled(false)
                 .setOrientationLocked(true)
                 .setBarcodeImageEnabled(true)
                 .setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES)
