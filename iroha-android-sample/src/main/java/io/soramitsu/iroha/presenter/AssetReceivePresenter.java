@@ -45,7 +45,7 @@ import io.soramitsu.irohaandroid.Iroha;
 import io.soramitsu.irohaandroid.callback.Callback;
 import io.soramitsu.irohaandroid.model.Account;
 import io.soramitsu.irohaandroid.model.KeyPair;
-import io.soramitsu.irohaandroid.qr.QRCodeGenerator;
+import io.soramitsu.iroha.util.QRCodeGenerator;
 
 import static android.content.Context.CLIPBOARD_SERVICE;
 
