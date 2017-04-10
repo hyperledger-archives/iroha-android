@@ -21,27 +21,21 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
-
-import com.google.gson.Gson;
 
 import org.jetbrains.annotations.NotNull;
 
 import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.exception.ErrorMessageFactory;
-import io.soramitsu.iroha.exception.IllegalQRCodeException;
 import io.soramitsu.iroha.exception.NetworkNotConnectedException;
 import io.soramitsu.iroha.exception.ReceiverNotFoundException;
 import io.soramitsu.iroha.exception.SelfSendCanNotException;
 import io.soramitsu.iroha.model.QRType;
-import io.soramitsu.iroha.model.TransferQRParameter;
 import io.soramitsu.iroha.util.NetworkUtil;
 import io.soramitsu.iroha.view.AssetSenderView;
 import io.soramitsu.irohaandroid.Iroha;
 import io.soramitsu.irohaandroid.callback.Callback;
 import io.soramitsu.irohaandroid.model.KeyPair;
-import io.soramitsu.irohaandroid.security.KeyGenerator;
 import io.soramitsu.irohaandroid.security.MessageDigest;
 
 public class AssetSenderPresenter implements Presenter<AssetSenderView> {
@@ -106,36 +100,6 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
             @Override
             public void onClick(View view) {
                 assetSenderView.showQRReader();
-            }
-        };
-    }
-
-    public Callback<String> onReadQR() {
-        return new Callback<String>() {
-            @Override
-            public void onSuccessful(String result) {
-                Log.d(TAG, "onSuccessful: " + result);
-
-                final Context context = assetSenderView.getContext();
-
-                TransferQRParameter params;
-                try {
-                    params = new Gson().fromJson(result, TransferQRParameter.class);
-                } catch (Exception e) {
-                    Log.e(TAG, "setOnResult: json could not parse to object!");
-                    assetSenderView.showError(ErrorMessageFactory.create(context, new IllegalQRCodeException()));
-                    return;
-                }
-
-                final String value = String.valueOf(params.amount).equals("0")
-                        ? ""
-                        : String.valueOf(params.amount);
-                assetSenderView.afterQRReadViewState(params.account, value);
-            }
-
-            @Override
-            public void onFailure(Throwable throwable) {
-                Log.e(TAG, "onFailure: ", throwable);
             }
         };
     }
