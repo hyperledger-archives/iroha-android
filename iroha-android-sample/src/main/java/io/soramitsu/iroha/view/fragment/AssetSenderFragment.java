@@ -17,6 +17,7 @@ limitations under the License.
 
 package io.soramitsu.iroha.view.fragment;
 
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -27,13 +28,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.gson.Gson;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
+import com.journeyapps.barcodescanner.CaptureManager;
+
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.databinding.FragmentAssetSenderBinding;
-import io.soramitsu.iroha.navigator.Navigator;
+import io.soramitsu.iroha.exception.ErrorMessageFactory;
+import io.soramitsu.iroha.exception.IllegalQRCodeException;
+import io.soramitsu.iroha.model.TransferQRParameter;
 import io.soramitsu.iroha.presenter.AssetSenderPresenter;
 import io.soramitsu.iroha.view.AssetSenderView;
 import io.soramitsu.iroha.view.activity.MainActivity;
+import io.soramitsu.iroha.view.activity.QRScannerActivity;
 
 public class AssetSenderFragment extends Fragment
         implements AssetSenderView, MainActivity.MainActivityListener {
@@ -43,6 +52,8 @@ public class AssetSenderFragment extends Fragment
 
     private FragmentAssetSenderBinding binding;
     private SweetAlertDialog sweetAlertDialog;
+
+    private CaptureManager capture;
 
     public static AssetSenderFragment newInstance() {
         AssetSenderFragment fragment = new AssetSenderFragment();
@@ -90,6 +101,33 @@ public class AssetSenderFragment extends Fragment
     public void onStop() {
         assetSenderPresenter.onStop();
         super.onStop();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+
+        if (result != null) {
+            if (result.getContents() == null) {
+                Log.e(TAG, "onActivityResult: Canceled!");
+                return;
+            }
+
+            TransferQRParameter params;
+            try {
+                params = new Gson().fromJson(result.getContents(), TransferQRParameter.class);
+            } catch (Exception e) {
+                Log.e(TAG, "onActivityResult: json could not parse to object!");
+                showError(ErrorMessageFactory.create(getContext(), new IllegalQRCodeException()));
+                return;
+            }
+
+            final String value = String.valueOf(params.amount).equals("0")
+                    ? ""
+                    : String.valueOf(params.amount);
+            Log.d(TAG, "onActivityResult: " + value);
+            afterQRReadViewState(params.account, value);
+        }
     }
 
     @Override
@@ -149,7 +187,12 @@ public class AssetSenderFragment extends Fragment
 
     @Override
     public void showQRReader() {
-        Navigator.getInstance().navigateToQRReaderActivity(getContext(), assetSenderPresenter.onReadQR());
+        IntentIntegrator.forSupportFragment(this)
+                .setOrientationLocked(true)
+                .setBarcodeImageEnabled(true)
+                .setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES)
+                .setCaptureActivity(QRScannerActivity.class)
+                .initiateScan();
     }
 
     @Override
