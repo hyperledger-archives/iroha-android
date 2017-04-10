@@ -27,7 +27,7 @@
 In your ```app/build.gradle```   
 
 ```gradle
-compile 'org.hyperledger:iroha-android:1.2.7'
+compile 'org.hyperledger:iroha-android:1.3.0'
 ```
 
 ### Maven
@@ -37,7 +37,7 @@ Or if you use Maven, like this
 <dependency>
   <groupId>org.hyperledger</groupId>
   <artifactId>iroha-android</artifactId>
-  <version>1.2.6</version>
+  <version>1.3.0</version>
   <type>pom</type>
 </dependency>
 ```
@@ -45,35 +45,6 @@ Or if you use Maven, like this
 
 ## Usage
 ### API
-
-### io.soramitsu.irohaandroid.security.KeyGenerator
-#### createKeyPair
-```java
-import io.soramitsu.irohaandroid.security.KeyGenerator;
-import io.soramitsu.irohaandroid.model.KeyPair;
-
-KeyPair keypair = KeyGenerator.createKeyPair();
-keypair.publicKey; // Ed25519 public key encoded by base64
-keypair.privateKey; // Ed25519 private key encoded by base64
-```
-
-#### sign
-```java
-import io.soramitsu.irohaandroid.security.KeyGenerator;
-import io.soramitsu.irohaandroid.model.KeyPair;
-
-String signature = KeyGenerator.sign(keyPair, "message")
-//===> signature // String
-```
-
-#### verify
-```java
-import io.soramitsu.irohaandroid.security.KeyGenerator;
-import io.soramitsu.irohaandroid.model.KeyPair;
-
-boolean verify = Iroha.verify(keyPair.publicKey, signature, "message")
-//===> true if the correct message
-```
 
 ### io.soramitsu.irohaandroid.security.MessageDigest
 #### digest
@@ -83,7 +54,7 @@ String hashedMessage = MessageDigest.digest("message", MessageDigest.SHA3_256);
 ```
 
 ### io.soramitsu.irohaandroid.Iroha
-### Initialize
+#### Initialize
 In your app
 on 'onCreate' your class inheriting Application
 
@@ -93,6 +64,34 @@ import io.soramitsu.irohaandroid.Iroha;
 new Iroha.Builder()
         .baseUrl("https://[input your domain(base url)]")
         .build();
+```
+
+#### createKeyPair
+```java
+import io.soramitsu.irohaandroid.Iroha;
+import io.soramitsu.irohaandroid.model.KeyPair;
+
+KeyPair keypair = Iroha.createKeyPair();
+keypair.publicKey; // Ed25519 public key encoded by base64
+keypair.privateKey; // Ed25519 private key encoded by base64
+```
+
+#### sign
+```java
+import io.soramitsu.irohaandroid.Iroha;
+import io.soramitsu.irohaandroid.model.KeyPair;
+
+String signature = Iroha.sign(keyPair, "message")
+//===> signature // String
+```
+
+#### verify
+```java
+import io.soramitsu.irohaandroid.Iroha;
+import io.soramitsu.irohaandroid.model.KeyPair;
+
+boolean verify = Iroha.verify(keyPair.publicKey, signature, "message")
+//===> true if the correct message
 ```
 
 ### Web API

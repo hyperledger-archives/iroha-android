@@ -34,7 +34,6 @@ import io.soramitsu.irohaandroid.Iroha;
 import io.soramitsu.irohaandroid.callback.Callback;
 import io.soramitsu.irohaandroid.model.Account;
 import io.soramitsu.irohaandroid.model.KeyPair;
-import io.soramitsu.irohaandroid.security.KeyGenerator;
 
 public class AccountRegisterPresenter implements Presenter<AccountRegisterView> {
     public static final String TAG = AccountRegisterPresenter.class.getSimpleName();
@@ -110,7 +109,7 @@ public class AccountRegisterPresenter implements Presenter<AccountRegisterView> 
 
                 accountRegisterView.showProgress();
 
-                KeyPair keyPair = KeyGenerator.createKeyPair();
+                KeyPair keyPair = Iroha.createKeyPair();
                 keyPair.save(context);
                 register(keyPair, alias);
             }

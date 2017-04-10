@@ -32,6 +32,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -93,7 +94,8 @@ public class MainActivity extends AppCompatActivity {
         final Intent intent = getIntent();
         uuid = intent.getStringExtra(BUNDLE_MAIN_ACTIVITY_KEY_UUID);
 
-        if ((uuid == null || uuid.isEmpty())) {
+        if (TextUtils.isEmpty(uuid)) {
+            Log.d(TAG, "uuid is empty!");
             navigator.navigateToRegisterActivity(getApplicationContext());
             finish();
             return;
