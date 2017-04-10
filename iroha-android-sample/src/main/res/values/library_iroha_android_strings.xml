@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+	<string name="define_int_iroha_android"></string>
+	<!-- Author section -->
+	<string name="library_iroha_android_author">kobaken0029</string>
+	<string name="library_iroha_android_authorWebsite">https://github.com/kobaken0029</string>
+	<!-- Library section -->
+	<string name="library_iroha_android_libraryName">iroha-android</string>
+	<string name="library_iroha_android_libraryDescription">Android library for Iroha, a Distributed Ledger Technology (blockchain) platform.</string>
+	<string name="library_iroha_android_libraryWebsite">https://github.com/hyperledger/iroha-android</string>
+	<string name="library_iroha_android_libraryVersion">1.3.0</string>
+	<!-- OpenSource section -->
+	<string name="library_iroha_android_isOpenSource">true</string>
+	<string name="library_iroha_android_repositoryLink">https://github.com/hyperledger/iroha-android</string>
+	<!-- ClassPath for autoDetect section -->
+	<string name="library_iroha_android_classPath">io.soramitsu.irohaandroid</string>
+	<!-- License section -->
+	<string name="library_iroha_android_licenseId">apache_2_0</string>
+	<!-- Custom variables section -->
+</resources>
