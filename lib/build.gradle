@@ -4,7 +4,7 @@ apply plugin: 'me.tatarka.retrolambda'
 
 def versionMajor = 0
 def versionMinor = 3
-def versionPatch = 1
+def versionPatch = 2
 def versionBuild = 0
 
 def RX_IROHA_LIBRARY_VERSION = "${versionMajor}.${versionMinor}.${versionPatch}"
