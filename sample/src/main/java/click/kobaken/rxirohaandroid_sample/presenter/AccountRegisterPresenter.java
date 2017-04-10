@@ -33,7 +33,6 @@ import javax.crypto.NoSuchPaddingException;
 import click.kobaken.rxirohaandroid.Iroha;
 import click.kobaken.rxirohaandroid.model.Account;
 import click.kobaken.rxirohaandroid.model.KeyPair;
-import click.kobaken.rxirohaandroid.security.KeyGenerator;
 import click.kobaken.rxirohaandroid_sample.R;
 import click.kobaken.rxirohaandroid_sample.exception.ErrorMessageFactory;
 import click.kobaken.rxirohaandroid_sample.exception.NetworkNotConnectedException;
@@ -113,7 +112,7 @@ public class AccountRegisterPresenter implements Presenter<AccountRegisterView> 
 
             accountRegisterView.showProgress();
 
-            KeyPair keyPair = KeyGenerator.createKeyPair();
+            KeyPair keyPair = Iroha.createKeyPair();
             try {
                 keyPair.save(context);
             } catch (InvalidKeyException | NoSuchAlgorithmException | KeyStoreException

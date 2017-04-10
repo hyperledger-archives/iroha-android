@@ -27,9 +27,9 @@ import org.junit.runner.RunWith;
 import click.kobaken.rxirohaandroid.model.KeyPair;
 import click.kobaken.rxirohaandroid.security.MessageDigest;
 
-import static click.kobaken.rxirohaandroid.security.KeyGenerator.createKeyPair;
-import static click.kobaken.rxirohaandroid.security.KeyGenerator.sign;
-import static click.kobaken.rxirohaandroid.security.KeyGenerator.verify;
+import static click.kobaken.rxirohaandroid.Iroha.createKeyPair;
+import static click.kobaken.rxirohaandroid.Iroha.sign;
+import static click.kobaken.rxirohaandroid.Iroha.verify;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
