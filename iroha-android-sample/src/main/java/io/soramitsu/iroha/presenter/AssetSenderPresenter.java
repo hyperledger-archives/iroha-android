@@ -41,7 +41,6 @@ import io.soramitsu.iroha.view.AssetSenderView;
 import io.soramitsu.irohaandroid.Iroha;
 import io.soramitsu.irohaandroid.callback.Callback;
 import io.soramitsu.irohaandroid.model.KeyPair;
-import io.soramitsu.irohaandroid.security.KeyGenerator;
 import io.soramitsu.irohaandroid.security.MessageDigest;
 
 public class AssetSenderPresenter implements Presenter<AssetSenderView> {
