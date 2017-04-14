@@ -31,7 +31,6 @@ import android.view.ViewGroup;
 import com.google.gson.Gson;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
-import com.journeyapps.barcodescanner.CaptureManager;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import io.soramitsu.iroha.R;
@@ -52,8 +51,6 @@ public class AssetSenderFragment extends Fragment
 
     private FragmentAssetSenderBinding binding;
     private SweetAlertDialog sweetAlertDialog;
-
-    private CaptureManager capture;
 
     public static AssetSenderFragment newInstance() {
         AssetSenderFragment fragment = new AssetSenderFragment();
@@ -188,6 +185,7 @@ public class AssetSenderFragment extends Fragment
     @Override
     public void showQRReader() {
         IntentIntegrator.forSupportFragment(this)
+                .setBeepEnabled(false)
                 .setOrientationLocked(true)
                 .setBarcodeImageEnabled(true)
                 .setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES)
