@@ -104,27 +104,25 @@ public class AssetSenderFragment extends Fragment
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
 
-        if (result != null) {
-            if (result.getContents() == null) {
-                Log.e(TAG, "onActivityResult: Canceled!");
-                return;
-            }
-
-            TransferQRParameter params;
-            try {
-                params = new Gson().fromJson(result.getContents(), TransferQRParameter.class);
-            } catch (Exception e) {
-                Log.e(TAG, "onActivityResult: json could not parse to object!");
-                showError(ErrorMessageFactory.create(getContext(), new IllegalQRCodeException()));
-                return;
-            }
-
-            final String value = String.valueOf(params.amount).equals("0")
-                    ? ""
-                    : String.valueOf(params.amount);
-            Log.d(TAG, "onActivityResult: " + value);
-            afterQRReadViewState(params.account, value);
+        if (result == null || result.getContents() == null) {
+            Log.e(TAG, "onActivityResult: Canceled!");
+            return;
         }
+
+        TransferQRParameter params;
+        try {
+            params = new Gson().fromJson(result.getContents(), TransferQRParameter.class);
+        } catch (Exception e) {
+            Log.e(TAG, "onActivityResult: json could not parse to object!");
+            showError(ErrorMessageFactory.create(getContext(), new IllegalQRCodeException()));
+            return;
+        }
+
+        final String value = String.valueOf(params.amount).equals("0")
+                ? ""
+                : String.valueOf(params.amount);
+        Log.d(TAG, "onActivityResult: " + value);
+        afterQRReadViewState(params.account, value);
     }
 
     @Override
