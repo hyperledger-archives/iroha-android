@@ -26,6 +26,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
@@ -172,7 +173,7 @@ public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
 
     private void fetchAccountAsset() {
         String assetValue = assetReceiveView.getHasAssetValue();
-        if (assetValue == null) {
+        if (TextUtils.isEmpty(assetValue)) {
             fetchAccountAssetFromApi();
         } else {
             assetReceiveView.setHasAssetValue(assetValue);
@@ -180,7 +181,7 @@ public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
     }
 
     private void fetchAccountAssetFromApi() {
-        if (uuid == null || uuid.isEmpty()) {
+        if (TextUtils.isEmpty(uuid)) {
             uuid = getUuid();
         }
 
@@ -224,7 +225,7 @@ public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
 
     @NonNull
     private String getPublicKey() {
-        if (publicKey == null || publicKey.isEmpty()) {
+        if (TextUtils.isEmpty(publicKey)) {
             final Context context = assetReceiveView.getContext();
             publicKey = KeyPair.getKeyPair(context).publicKey;
         }
@@ -234,7 +235,7 @@ public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
     @NonNull
     private String getUuid() {
         final Context context = assetReceiveView.getContext();
-        if (uuid == null || uuid.isEmpty()) {
+        if (TextUtils.isEmpty(uuid)) {
             uuid = Account.getUuid(context);
         }
         return uuid;
