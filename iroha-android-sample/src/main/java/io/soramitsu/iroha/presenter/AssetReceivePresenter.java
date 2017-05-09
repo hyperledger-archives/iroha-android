@@ -35,8 +35,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.zxing.WriterException;
 
-import org.jetbrains.annotations.NotNull;
-
 import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.exception.ErrorMessageFactory;
 import io.soramitsu.iroha.model.TransferQRParameter;
@@ -224,7 +222,7 @@ public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
         assetReceiveView.setPublicKey(getPublicKey());
     }
 
-    @NotNull
+    @NonNull
     private String getPublicKey() {
         if (publicKey == null || publicKey.isEmpty()) {
             final Context context = assetReceiveView.getContext();
@@ -233,7 +231,7 @@ public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
         return publicKey;
     }
 
-    @NotNull
+    @NonNull
     private String getUuid() {
         final Context context = assetReceiveView.getContext();
         if (uuid == null || uuid.isEmpty()) {

@@ -23,8 +23,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 
-import org.jetbrains.annotations.NotNull;
-
 import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.exception.ErrorMessageFactory;
 import io.soramitsu.iroha.exception.NetworkNotConnectedException;
@@ -207,7 +205,7 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
                 + ",asset-uuid:" + uuid;
     }
 
-    @NotNull
+    @NonNull
     private KeyPair getKeyPair() {
         if (keyPair == null) {
             final Context context = assetSenderView.getContext();
