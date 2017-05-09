@@ -45,17 +45,17 @@ def BOUNCY_CASTLE_PACKAGE_VERSION = "1.55";
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestCompile("com.android.support.test.espresso:espresso-core:${ESPRESSO_PACKAGE_VERSION}", {
+    androidTestCompile("com.android.support.test.espresso:espresso-core:$ESPRESSO_PACKAGE_VERSION", {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    testCompile "junit:junit:${JUNIT_PACKAGE_VERSION}"
+    testCompile "junit:junit:$JUNIT_PACKAGE_VERSION"
 
-    compile "com.android.support:appcompat-v7:${SUPPORT_PACKAGE_VERSION}"
-    compile "com.squareup.okhttp3:okhttp:${OKHTTP_PACKAGE_VERSION}"
-    compile "com.squareup.okhttp3:logging-interceptor:${OKHTTP_PACKAGE_VERSION}"
-    compile "com.google.code.gson:gson:${GSON_PACKAGE_VERSION}"
-    compile "com.google.android.gms:play-services-vision:${PLAY_SERVICES_VISION_PACKAGE_VERSION}"
-    compile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: "${BOUNCY_CASTLE_PACKAGE_VERSION}"
+    compile "com.android.support:appcompat-v7:$SUPPORT_PACKAGE_VERSION"
+    compile "com.squareup.okhttp3:okhttp:$OKHTTP_PACKAGE_VERSION"
+    compile "com.squareup.okhttp3:logging-interceptor:$OKHTTP_PACKAGE_VERSION"
+    compile "com.google.code.gson:gson:$GSON_PACKAGE_VERSION"
+    compile "com.google.android.gms:play-services-vision:$PLAY_SERVICES_VISION_PACKAGE_VERSION"
+    compile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: "$BOUNCY_CASTLE_PACKAGE_VERSION"
 }
 
 publish {
