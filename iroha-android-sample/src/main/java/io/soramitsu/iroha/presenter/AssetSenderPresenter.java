@@ -20,10 +20,9 @@ package io.soramitsu.iroha.presenter;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
-
-import org.jetbrains.annotations.NotNull;
 
 import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.exception.ErrorMessageFactory;
@@ -133,7 +132,7 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
         final String receiver = assetSenderView.getReceiver();
         final String amount = assetSenderView.getAmount();
 
-        if (receiver.isEmpty() || amount.isEmpty()) {
+        if (TextUtils.isEmpty(receiver) || TextUtils.isEmpty(amount)) {
             throw new ReceiverNotFoundException();
         } else if (isQRMine()) {
             throw new SelfSendCanNotException();
@@ -207,7 +206,7 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
                 + ",asset-uuid:" + uuid;
     }
 
-    @NotNull
+    @NonNull
     private KeyPair getKeyPair() {
         if (keyPair == null) {
             final Context context = assetSenderView.getContext();

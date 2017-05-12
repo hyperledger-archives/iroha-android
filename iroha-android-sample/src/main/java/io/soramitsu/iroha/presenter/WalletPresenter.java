@@ -21,6 +21,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.AbsListView;
@@ -137,7 +138,7 @@ public class WalletPresenter implements Presenter<WalletView> {
                 break;
         }
 
-        if (uuid == null || uuid.isEmpty()) {
+        if (TextUtils.isEmpty(uuid)) {
             uuid = Account.getUuid(walletView.getContext());
         }
 
