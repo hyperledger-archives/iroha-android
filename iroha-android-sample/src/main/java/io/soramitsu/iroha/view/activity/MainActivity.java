@@ -20,7 +20,6 @@ package io.soramitsu.iroha.view.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -35,8 +34,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
@@ -74,10 +71,6 @@ public class MainActivity extends AppCompatActivity {
 
     public interface MainActivityListener {
         void onNavigationItemClicked();
-    }
-
-    public interface OnKeyboardVisibilityListener {
-        void onVisibilityChanged(boolean isVisible);
     }
 
     public static Intent getCallingIntent(Context context, String uuid) {
@@ -123,12 +116,6 @@ public class MainActivity extends AppCompatActivity {
         initNavigationView();
         initBottomNavigationView();
         initFragments(savedInstanceState);
-//        setKeyboardListener(new OnKeyboardVisibilityListener() {
-//            @Override
-//            public void onVisibilityChanged(boolean isVisible) {
-//                binding.bottomNavigation.setVisibility(isVisible ? View.GONE : View.VISIBLE);
-//            }
-//        });
     }
 
     private void initToolbar() {
@@ -320,34 +307,5 @@ public class MainActivity extends AppCompatActivity {
         switchFragment(libsFragment, "libs");
         allClearNavigationMenuChecked();
         binding.navigation.getMenu().getItem(2).setChecked(true);
-    }
-
-    private void setKeyboardListener(final OnKeyboardVisibilityListener listener) {
-        final View activityRootView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
-
-        activityRootView.getViewTreeObserver().addOnGlobalLayoutListener(
-                new ViewTreeObserver.OnGlobalLayoutListener() {
-                    private boolean wasOpened;
-                    private final Rect r = new Rect();
-
-                    @Override
-                    public void onGlobalLayout() {
-                        activityRootView.getWindowVisibleDisplayFrame(r);
-
-                        // Compare root view height and layout height.
-                        int heightDiff = activityRootView.getRootView().getHeight() - r.height();
-
-                        boolean isOpen = heightDiff > 200;
-
-                        if (isOpen == wasOpened) {
-                            // Since display state of keyboard should not change, do nothing.
-                            return;
-                        }
-
-                        wasOpened = isOpen;
-
-                        listener.onVisibilityChanged(isOpen);
-                    }
-                });
     }
 }
