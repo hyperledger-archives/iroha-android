@@ -79,40 +79,35 @@ public class AccountRegisterPresenter implements Presenter<AccountRegisterView> 
     }
 
     public View.OnKeyListener onKeyEventOnUserName() {
-        return new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View view, int keyCode, KeyEvent keyEvent) {
-                if (keyEvent.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
-                    InputMethodManager inputMethodManager =
-                            (InputMethodManager) accountRegisterView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                    inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
-                    return true;
-                }
-                return false;
+        return (v, code, event) -> {
+            if (event.getAction() == KeyEvent.ACTION_DOWN && code == KeyEvent.KEYCODE_ENTER) {
+                final Context ctx = accountRegisterView.getContext();
+                InputMethodManager inputMethodManager =
+                        (InputMethodManager) ctx.getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                return true;
             }
+            return false;
         };
     }
 
     public View.OnClickListener onRegisterClicked() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                final Context context = accountRegisterView.getContext();
-                final String alias = accountRegisterView.getAlias();
+        return v -> {
+            final Context ctx = accountRegisterView.getContext();
+            final String alias = accountRegisterView.getAlias();
 
-                if (alias.isEmpty()) {
-                    accountRegisterView.showWarning(
-                            ErrorMessageFactory.create(context, new RequiredArgumentException(), context.getString(R.string.name))
-                    );
-                    return;
-                }
-
-                accountRegisterView.showProgress();
-
-                KeyPair keyPair = Iroha.createKeyPair();
-                keyPair.save(context);
-                register(keyPair, alias);
+            if (alias.isEmpty()) {
+                final String warningMessage = ErrorMessageFactory
+                        .create(ctx, new RequiredArgumentException(), ctx.getString(R.string.name));
+                accountRegisterView.showWarning(warningMessage);
+                return;
             }
+
+            accountRegisterView.showProgress();
+
+            KeyPair keyPair = Iroha.createKeyPair();
+            keyPair.save(ctx);
+            register(keyPair, alias);
         };
     }
 
@@ -154,9 +149,12 @@ public class AccountRegisterPresenter implements Presenter<AccountRegisterView> 
 
         Context c = accountRegisterView.getContext();
         if (NetworkUtil.isOnline(accountRegisterView.getContext())) {
-            accountRegisterView.showError(ErrorMessageFactory.create(c, throwable));
+            final String errorMessage = ErrorMessageFactory.create(c, throwable);
+            accountRegisterView.showError(errorMessage);
         } else {
-            accountRegisterView.showWarning(ErrorMessageFactory.create(c, new NetworkNotConnectedException()));
+            final String warningMessage = ErrorMessageFactory
+                    .create(c, new NetworkNotConnectedException());
+            accountRegisterView.showWarning(warningMessage);
         }
     }
 }

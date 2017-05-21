@@ -40,7 +40,8 @@ import io.soramitsu.irohaandroid.security.MessageDigest;
 public class AssetSenderPresenter implements Presenter<AssetSenderView> {
     public static final String TAG = AssetSenderPresenter.class.getSimpleName();
 
-    public static final String IROHA_TASK_TAG_SEND = "AssetSend";
+    private static final String IROHA_ASSET_UUID = "60f4a396b520d6c54e33634d060751814e0c4bf103a81c58da704bba82461c32";
+    private static final String IROHA_TASK_TAG_SEND = "AssetSend";
 
     private AssetSenderView assetSenderView;
 
@@ -82,25 +83,17 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
     }
 
     public View.OnClickListener onSubmitClicked() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    send();
-                } catch (ReceiverNotFoundException | SelfSendCanNotException e) {
-                    assetSenderView.showWarning(ErrorMessageFactory.create(assetSenderView.getContext(), e));
-                }
+        return v -> {
+            try {
+                send();
+            } catch (ReceiverNotFoundException | SelfSendCanNotException e) {
+                assetSenderView.showWarning(ErrorMessageFactory.create(assetSenderView.getContext(), e));
             }
         };
     }
 
     public View.OnClickListener onQRShowClicked() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                assetSenderView.showQRReader();
-            }
-        };
+        return v -> assetSenderView.showQRReader();
     }
 
     public TextWatcher textWatcher() {
@@ -139,18 +132,17 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
         } else {
             assetSenderView.showProgress();
 
-            final String assetUuid = "60f4a396b520d6c54e33634d060751814e0c4bf103a81c58da704bba82461c32";
             final String command = QRType.TRANSFER.getType().toLowerCase();
             final String sender = keyPair.publicKey;
             final long timestamp = System.currentTimeMillis() / 1000;
-            final String message = generateMessage(timestamp, amount, sender, receiver, command, assetUuid);
+            final String message = generateMessage(timestamp, amount, sender, receiver, command, IROHA_ASSET_UUID);
             final String signature = Iroha.sign(keyPair, MessageDigest.digest(message, MessageDigest.Algorithm.SHA3_256));
 
             Iroha iroha = Iroha.getInstance();
             iroha.runAsyncTask(
                     IROHA_TASK_TAG_SEND,
                     iroha.operateAssetFunction(
-                            assetUuid,
+                            IROHA_ASSET_UUID,
                             command,
                             amount,
                             sender,
@@ -174,12 +166,9 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
                         c.getString(R.string.successful_title_sent),
                         c.getString(R.string.message_send_asset_successful,
                                 assetSenderView.getReceiver(), assetSenderView.getAmount()),
-                        new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                assetSenderView.hideSuccess();
-                                assetSenderView.beforeQRReadViewState();
-                            }
+                        v -> {
+                            assetSenderView.hideSuccess();
+                            assetSenderView.beforeQRReadViewState();
                         });
             }
 
@@ -188,9 +177,12 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
                 assetSenderView.hideProgress();
 
                 if (NetworkUtil.isOnline(assetSenderView.getContext())) {
-                    assetSenderView.showError(ErrorMessageFactory.create(c, throwable));
+                    final String errorMessage = ErrorMessageFactory.create(c, throwable);
+                    assetSenderView.showError(errorMessage);
                 } else {
-                    assetSenderView.showWarning(ErrorMessageFactory.create(c, new NetworkNotConnectedException()));
+                    final String warningMessage = ErrorMessageFactory
+                            .create(c, new NetworkNotConnectedException());
+                    assetSenderView.showWarning(warningMessage);
                 }
             }
         };

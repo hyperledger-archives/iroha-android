@@ -32,7 +32,8 @@ import io.soramitsu.iroha.presenter.AssetReceivePresenter;
 import io.soramitsu.iroha.view.AssetReceiveView;
 import io.soramitsu.iroha.view.activity.MainActivity;
 
-public class AssetReceiveFragment extends Fragment implements AssetReceiveView, MainActivity.MainActivityListener {
+public class AssetReceiveFragment extends Fragment
+        implements AssetReceiveView, MainActivity.MainActivityListener {
     public static final String TAG = AssetReceiveFragment.class.getSimpleName();
 
     private static final String ARG_ASSET_RECEIVE_KEY_UUID = "uuid";
@@ -69,7 +70,8 @@ public class AssetReceiveFragment extends Fragment implements AssetReceiveView, 
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         binding = DataBindingUtil.bind(view);
-        binding.swipeRefresh.setColorSchemeResources(R.color.red600, R.color.green600, R.color.blue600, R.color.orange600);
+        binding.swipeRefresh.setColorSchemeResources(
+                R.color.red600, R.color.green600, R.color.blue600, R.color.orange600);
         binding.swipeRefresh.setOnRefreshListener(assetReceivePresenter.onSwipeRefresh());
         binding.receiverAmount.addTextChangedListener(assetReceivePresenter.textWatcher());
         binding.publicKey.setOnClickListener(assetReceivePresenter.onPublicKeyTextClicked());

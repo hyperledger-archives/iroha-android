@@ -66,12 +66,7 @@ public class WalletPresenter implements Presenter<WalletView> {
     @Override
     public void onStart() {
         refreshHandler = new Handler();
-        transactionRunnable = new Runnable() {
-            @Override
-            public void run() {
-                transactionHistory(WalletFragment.RefreshState.SWIPE_UP);
-            }
-        };
+        transactionRunnable = () -> transactionHistory(WalletFragment.RefreshState.SWIPE_UP);
     }
 
     @Override
@@ -155,16 +150,13 @@ public class WalletPresenter implements Presenter<WalletView> {
     }
 
     private Func2<Account, List<Transaction>, TransactionHistory> collectFunc() {
-        return new Func2<Account, List<Transaction>, TransactionHistory>() {
-            @Override
-            public TransactionHistory call(Account account, List<Transaction> transactions) {
-                TransactionHistory transactionHistory = new TransactionHistory();
-                if (account != null && account.assets != null && !account.assets.isEmpty()) {
-                    transactionHistory.value = account.assets.get(0).value;
-                }
-                transactionHistory.histories = transactions;
-                return transactionHistory;
+        return (account, transactions) -> {
+            TransactionHistory transactionHistory = new TransactionHistory();
+            if (account != null && account.assets != null && !account.assets.isEmpty()) {
+                transactionHistory.value = account.assets.get(0).value;
             }
+            transactionHistory.histories = transactions;
+            return transactionHistory;
         };
     }
 
@@ -208,21 +200,11 @@ public class WalletPresenter implements Presenter<WalletView> {
     }
 
     public SwipeRefreshLayout.OnRefreshListener onSwipeRefresh() {
-        return new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                refreshHandler.postDelayed(transactionRunnable, 1500);
-            }
-        };
+        return () -> refreshHandler.postDelayed(transactionRunnable, 1500);
     }
 
     public View.OnClickListener onRefresh() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                transactionHistory(WalletFragment.RefreshState.EMPTY_REFRESH);
-            }
-        };
+        return v -> transactionHistory(WalletFragment.RefreshState.EMPTY_REFRESH);
     }
 
     public AbsListView.OnScrollListener onTransactionListScroll() {

@@ -37,7 +37,6 @@ import io.soramitsu.iroha.view.WalletView;
 import io.soramitsu.iroha.view.activity.MainActivity;
 import io.soramitsu.iroha.view.adapter.TransactionListAdapter;
 import io.soramitsu.irohaandroid.model.KeyPair;
-import io.soramitsu.irohaandroid.model.Transaction;
 
 public class WalletFragment extends Fragment
         implements WalletView, MainActivity.MainActivityListener {
@@ -82,7 +81,8 @@ public class WalletFragment extends Fragment
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         binding = DataBindingUtil.bind(view);
-        binding.swipeRefresh.setColorSchemeResources(R.color.red600, R.color.green600, R.color.blue600, R.color.orange600);
+        binding.swipeRefresh.setColorSchemeResources(
+                R.color.red600, R.color.green600, R.color.blue600, R.color.orange600);
         binding.swipeRefresh.setOnRefreshListener(walletPresenter.onSwipeRefresh());
         binding.transactionList.setOnScrollListener(walletPresenter.onTransactionListScroll());
         binding.transactionList.setEmptyView(binding.emptyView);
@@ -102,7 +102,7 @@ public class WalletFragment extends Fragment
 
         transactionListAdapter = new TransactionListAdapter(
                 getContext(),
-                new ArrayList<Transaction>(),
+                new ArrayList<>(),
                 publicKey
         );
         binding.transactionList.setAdapter(transactionListAdapter);

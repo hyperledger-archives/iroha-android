@@ -48,18 +48,15 @@ public class SplashActivity extends AppCompatActivity {
         splashFragment.show(getSupportFragmentManager(), SplashFragment.TAG);
 
         final Context context = getApplicationContext();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (isRegistered(context)) {
-                    final String uuid = Account.getUuid(getApplicationContext());
-                    navigator.navigateToMainActivity(context, uuid);
-                } else {
-                    navigator.navigateToRegisterActivity(context);
-                }
-                finish();
-                splashFragment.dismiss();
+        new Handler().postDelayed(() -> {
+            if (isRegistered(context)) {
+                final String uuid = Account.getUuid(context);
+                navigator.navigateToMainActivity(context, uuid);
+            } else {
+                navigator.navigateToRegisterActivity(context);
             }
+            finish();
+            splashFragment.dismiss();
         }, 1000);
     }
 }
