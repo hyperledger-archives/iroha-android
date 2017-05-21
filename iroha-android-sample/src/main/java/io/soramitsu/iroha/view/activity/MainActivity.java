@@ -27,7 +27,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GravityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -49,6 +48,7 @@ import io.soramitsu.iroha.view.fragment.AssetSenderFragment;
 import io.soramitsu.iroha.view.fragment.WalletFragment;
 import io.soramitsu.irohaandroid.model.Account;
 
+import static android.view.Gravity.START;
 import static cn.pedant.SweetAlert.SweetAlertDialog.SUCCESS_TYPE;
 import static cn.pedant.SweetAlert.SweetAlertDialog.WARNING_TYPE;
 
@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void init(Bundle savedInstanceState) {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-        inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         initToolbar();
         initNavigationHeader();
         initNavigationView();
@@ -122,9 +122,7 @@ public class MainActivity extends AppCompatActivity {
         binding.toolbar.setTitle(getString(R.string.receive));
         binding.toolbar.setNavigationIcon(
                 ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_menu_white_24dp));
-        binding.toolbar.setNavigationOnClickListener(v -> {
-            binding.drawerLayout.openDrawer(GravityCompat.START);
-        });
+        binding.toolbar.setNavigationOnClickListener(v -> binding.drawerLayout.openDrawer(START));
     }
 
     private void initNavigationHeader() {
@@ -154,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
                             gotoOssInfo();
                             break;
                     }
-                    binding.drawerLayout.closeDrawer(GravityCompat.START);
+                    binding.drawerLayout.closeDrawer(START);
                     return true;
                 }
         );

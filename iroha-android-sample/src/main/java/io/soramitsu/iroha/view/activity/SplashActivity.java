@@ -50,7 +50,7 @@ public class SplashActivity extends AppCompatActivity {
         final Context context = getApplicationContext();
         new Handler().postDelayed(() -> {
             if (isRegistered(context)) {
-                final String uuid = Account.getUuid(getApplicationContext());
+                final String uuid = Account.getUuid(context);
                 navigator.navigateToMainActivity(context, uuid);
             } else {
                 navigator.navigateToRegisterActivity(context);
