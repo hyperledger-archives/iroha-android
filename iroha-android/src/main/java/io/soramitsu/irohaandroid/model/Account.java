@@ -18,7 +18,6 @@ limitations under the License.
 package io.soramitsu.irohaandroid.model;
 
 import android.content.Context;
-import android.util.Log;
 
 import java.io.File;
 import java.io.Serializable;
@@ -42,7 +41,8 @@ public class Account implements Serializable, AccountCache {
         String encryptedAlias = keyStoreManager.encrypt(alias);
 
         File extStorage = context.getExternalFilesDir("account");
-        Log.d("Account soramitsu", "save: " + extStorage.toString());
+        fileManager.clearDirectory(extStorage);
+
         File uuidFile = new File(extStorage, "uuid.txt");
         File aliasFile = new File(extStorage, "alias.txt");
 
