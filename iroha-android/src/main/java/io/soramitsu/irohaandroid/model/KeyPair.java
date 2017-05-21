@@ -61,6 +61,8 @@ public class KeyPair implements KeyPairCache {
         String encryptedPublicKey = keyStoreManager.encrypt(publicKey);
 
         File extStorage = context.getExternalFilesDir("keypair");
+        fileManager.clearDirectory(extStorage);
+
         File privateKeyFile = new File(extStorage, "private_key.txt");
         File publicKeyFile = new File(extStorage, "public_key.txt");
 
