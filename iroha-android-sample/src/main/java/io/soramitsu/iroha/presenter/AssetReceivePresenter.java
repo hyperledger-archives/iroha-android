@@ -77,12 +77,7 @@ public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
     @Override
     public void onStart() {
         refreshHandler = new Handler();
-        transactionRunnable = new Runnable() {
-            @Override
-            public void run() {
-                fetchAccountAssetFromApi();
-            }
-        };
+        transactionRunnable = this::fetchAccountAssetFromApi;
 
         generateQR();
         fetchAccountAsset();
@@ -114,12 +109,7 @@ public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
     }
 
     public SwipeRefreshLayout.OnRefreshListener onSwipeRefresh() {
-        return new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                refreshHandler.postDelayed(transactionRunnable, 1500);
-            }
-        };
+        return () -> refreshHandler.postDelayed(transactionRunnable, 1500);
     }
 
     public View.OnClickListener onPublicKeyTextClicked() {
@@ -245,7 +235,8 @@ public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
         try {
             if (qr == null) {
                 Log.d(TAG, "generateQR: new generation!");
-                qr = QRCodeGenerator.generateQR(generateQrParamsText(), 500, QRCodeGenerator.ENCODE_CHARACTER_TYPE_UTF_8);
+                qr = QRCodeGenerator.generateQR(
+                        generateQrParamsText(), 500, QRCodeGenerator.ENCODE_CHARACTER_TYPE_UTF_8);
             }
             setQR(qr);
         } catch (WriterException e) {
@@ -255,7 +246,8 @@ public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
 
     private void changeQR() {
         try {
-            qr = QRCodeGenerator.generateQR(generateQrParamsText(), 500, QRCodeGenerator.ENCODE_CHARACTER_TYPE_UTF_8);
+            qr = QRCodeGenerator.generateQR(
+                    generateQrParamsText(), 500, QRCodeGenerator.ENCODE_CHARACTER_TYPE_UTF_8);
             setQR(qr);
         } catch (WriterException e) {
             assetReceiveView.showError(ErrorMessageFactory.create(assetReceiveView.getContext(), e));

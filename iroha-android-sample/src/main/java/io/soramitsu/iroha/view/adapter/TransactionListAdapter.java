@@ -26,7 +26,6 @@ import android.widget.BaseAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import io.soramitsu.iroha.R;
@@ -66,13 +65,10 @@ public class TransactionListAdapter extends BaseAdapter {
 
     public void setItems(List<Transaction> transactionHistory) {
         ArrayList<Transaction> sortedTransactionList = new ArrayList<>(transactionHistory);
-        Collections.sort(sortedTransactionList, new Comparator<Transaction>() {
-            @Override
-            public int compare(Transaction t1, Transaction t2) {
-                long ts1 = t1.params.timestamp;
-                long ts2 = t2.params.timestamp;
-                return ts1 < ts2 ? 1 : ts1 == ts2 ? 0 : -1;
-            }
+        Collections.sort(sortedTransactionList, (tx1, tx2) -> {
+            long ts1 = tx1.params.timestamp;
+            long ts2 = tx2.params.timestamp;
+            return ts1 < ts2 ? 1 : ts1 == ts2 ? 0 : -1;
         });
         this.transactionHistory = sortedTransactionList;
     }
@@ -81,7 +77,8 @@ public class TransactionListAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         io.soramitsu.iroha.databinding.RowTransactionListBinding binding;
         if (convertView == null) {
-            binding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.row_transaction_list, parent, false);
+            binding = DataBindingUtil
+                    .inflate(LayoutInflater.from(context), R.layout.row_transaction_list, parent, false);
             convertView = binding.getRoot();
             convertView.setTag(binding);
         } else {
