@@ -23,16 +23,14 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.List;
 
-import io.soramitsu.iroha.cache.AccountCache;
 import io.soramitsu.irohaandroid.cache.FileManager;
 import io.soramitsu.irohaandroid.security.KeyStoreManager;
 
-public class Account implements Serializable, AccountCache {
+public class Account implements Serializable {
     public String uuid;
     public String alias;
     public List<Asset> assets;
 
-    @Override
     public void save(Context context) {
         FileManager fileManager = new FileManager();
 
