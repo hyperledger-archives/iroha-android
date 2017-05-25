@@ -15,24 +15,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package io.soramitsu.iroha.view;
+package io.soramitsu.iroha.cache;
 
-import android.app.Activity;
+import android.content.Context;
 
-import io.soramitsu.iroha.model.AccountInfo;
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 
-public interface WalletView extends LoadingView {
-    Activity getActivity();
+import javax.crypto.NoSuchPaddingException;
 
-    boolean isRefreshing();
+public interface AccountCache {
+    String PREFERENCES_KEY_UUID = "uuid";
+    String PREFERENCES_KEY_ALIAS = "alias";
 
-    void setRefreshing(boolean refreshing);
-
-    void setRefreshEnable(boolean enable);
-
-    void showError(String error);
-
-    AccountInfo getTransaction();
-
-    void renderTransactionHistory(AccountInfo accountInfo);
+    void save(Context context)
+            throws InvalidKeyException, NoSuchAlgorithmException, KeyStoreException,
+            NoSuchPaddingException, IOException;
 }

@@ -107,6 +107,12 @@ public class AssetSenderFragment extends Fragment
     }
 
     @Override
+    public void onDestroy() {
+        assetSenderPresenter.onDestroy();
+        super.onDestroy();
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
 

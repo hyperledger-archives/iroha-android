@@ -81,6 +81,12 @@ public class AccountRegisterFragment extends Fragment implements AccountRegister
     }
 
     @Override
+    public void onDestroy() {
+        accountRegisterPresenter.onDestroy();
+        super.onDestroy();
+    }
+
+    @Override
     public void showError(final String error) {
         if (sweetAlertDialog == null || !sweetAlertDialog.isShowing()) {
             sweetAlertDialog = new SweetAlertDialog(getActivity(), SweetAlertDialog.ERROR_TYPE);

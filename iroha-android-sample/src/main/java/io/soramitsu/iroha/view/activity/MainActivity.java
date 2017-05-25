@@ -42,11 +42,11 @@ import com.mikepenz.aboutlibraries.ui.LibsSupportFragment;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.databinding.ActivityMainBinding;
+import io.soramitsu.iroha.model.Account;
 import io.soramitsu.iroha.navigator.Navigator;
 import io.soramitsu.iroha.view.fragment.AssetReceiveFragment;
 import io.soramitsu.iroha.view.fragment.AssetSenderFragment;
 import io.soramitsu.iroha.view.fragment.WalletFragment;
-import io.soramitsu.irohaandroid.model.Account;
 
 import static android.view.Gravity.START;
 import static cn.pedant.SweetAlert.SweetAlertDialog.SUCCESS_TYPE;

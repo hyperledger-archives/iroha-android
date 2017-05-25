@@ -26,27 +26,26 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AbsListView;
 
-import java.util.List;
-
+import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+import io.soramitsu.iroha.api.IrohaClient;
+import io.soramitsu.iroha.entity.mapper.TransactionEntityDataMapper;
 import io.soramitsu.iroha.exception.ErrorMessageFactory;
 import io.soramitsu.iroha.exception.NetworkNotConnectedException;
-import io.soramitsu.iroha.model.TransactionHistory;
+import io.soramitsu.iroha.model.Account;
+import io.soramitsu.iroha.model.AccountInfo;
 import io.soramitsu.iroha.util.NetworkUtil;
 import io.soramitsu.iroha.view.WalletView;
 import io.soramitsu.iroha.view.fragment.WalletFragment;
-import io.soramitsu.irohaandroid.Iroha;
-import io.soramitsu.irohaandroid.callback.Callback;
-import io.soramitsu.irohaandroid.callback.Func2;
-import io.soramitsu.irohaandroid.model.Account;
-import io.soramitsu.irohaandroid.model.Transaction;
 
 public class WalletPresenter implements Presenter<WalletView> {
     public static final String TAG = WalletPresenter.class.getSimpleName();
 
-    private static final String IROHA_TASK_TAG_USER_INFO_ON_WALLET = "UserInfoOnWallet";
-    private static final String IROHA_TASK_TAG_TRANSACTION = "Transaction";
-
     private WalletView walletView;
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     private Handler refreshHandler;
     private Runnable transactionRunnable;
@@ -85,14 +84,12 @@ public class WalletPresenter implements Presenter<WalletView> {
 
     @Override
     public void onStop() {
-        Iroha iroha = Iroha.getInstance();
-        iroha.cancelAsyncTask(IROHA_TASK_TAG_USER_INFO_ON_WALLET);
-        iroha.cancelAsyncTask(IROHA_TASK_TAG_TRANSACTION);
+        // nothing
     }
 
     @Override
     public void onDestroy() {
-        // nothing
+        compositeDisposable.dispose();
     }
 
     public void setUuid(String uuid) {
@@ -137,50 +134,35 @@ public class WalletPresenter implements Presenter<WalletView> {
             uuid = Account.getUuid(walletView.getContext());
         }
 
-        Iroha iroha = Iroha.getInstance();
-        iroha.runParallelAsyncTask(
-                walletView.getActivity(),
-                IROHA_TASK_TAG_USER_INFO_ON_WALLET,
-                iroha.findAccountFunction(uuid),
-                IROHA_TASK_TAG_TRANSACTION,
-                iroha.findTransactionHistoryFunction(uuid, 30, 0),
-                collectFunc(),
-                callback()
-        );
+        final IrohaClient irohaClient = IrohaClient.getInstance();
+        Disposable disposable = Single.zip(
+                irohaClient.fetchAccountInfo(uuid),
+                irohaClient.fetchTx(uuid, 30, 0),
+                (account, tx) -> {
+                    AccountInfo accountInfo = new AccountInfo();
+                    if (account != null && account.assets != null && !account.assets.isEmpty()) {
+                        accountInfo.value = account.assets.get(0).value;
+                    }
+                    accountInfo.transactionHistory = TransactionEntityDataMapper.transform(tx);
+                    return accountInfo;
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::onSuccess, this::onError);
+        compositeDisposable.add(disposable);
     }
 
-    private Func2<Account, List<Transaction>, TransactionHistory> collectFunc() {
-        return (account, transactions) -> {
-            TransactionHistory transactionHistory = new TransactionHistory();
-            if (account != null && account.assets != null && !account.assets.isEmpty()) {
-                transactionHistory.value = account.assets.get(0).value;
-            }
-            transactionHistory.histories = transactions;
-            return transactionHistory;
-        };
+    private void onSuccess(AccountInfo result) {
+        if (walletView.isRefreshing()) {
+            walletView.setRefreshing(false);
+        }
+
+        walletView.hideProgress();
+
+        walletView.renderTransactionHistory(result);
     }
 
-    private Callback<TransactionHistory> callback() {
-        return new Callback<TransactionHistory>() {
-            @Override
-            public void onSuccessful(TransactionHistory result) {
-                if (walletView.isRefreshing()) {
-                    walletView.setRefreshing(false);
-                }
-
-                walletView.hideProgress();
-
-                walletView.renderTransactionHistory(result);
-            }
-
-            @Override
-            public void onFailure(Throwable throwable) {
-                fail(throwable);
-            }
-        };
-    }
-
-    private void fail(Throwable throwable) {
+    private void onError(Throwable e) {
         if (walletView.isRefreshing()) {
             walletView.setRefreshing(false);
         }
@@ -189,13 +171,9 @@ public class WalletPresenter implements Presenter<WalletView> {
 
         final Context context = walletView.getContext();
         if (NetworkUtil.isOnline(walletView.getContext())) {
-            walletView.showError(
-                    ErrorMessageFactory.create(context, throwable)
-            );
+            walletView.showError(ErrorMessageFactory.create(context, e));
         } else {
-            walletView.showError(
-                    ErrorMessageFactory.create(context, new NetworkNotConnectedException())
-            );
+            walletView.showError(ErrorMessageFactory.create(context, new NetworkNotConnectedException()));
         }
     }
 

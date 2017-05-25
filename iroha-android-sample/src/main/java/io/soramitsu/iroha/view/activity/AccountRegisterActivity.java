@@ -29,9 +29,9 @@ import android.view.MotionEvent;
 import android.view.inputmethod.InputMethodManager;
 
 import io.soramitsu.iroha.R;
+import io.soramitsu.iroha.model.Account;
 import io.soramitsu.iroha.navigator.Navigator;
 import io.soramitsu.iroha.view.fragment.AccountRegisterFragment;
-import io.soramitsu.irohaandroid.model.Account;
 
 import static io.soramitsu.iroha.IrohaApplication.applyRegistered;
 

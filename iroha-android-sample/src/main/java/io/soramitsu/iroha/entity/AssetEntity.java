@@ -15,24 +15,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package io.soramitsu.iroha.view;
+package io.soramitsu.iroha.entity;
 
-import android.app.Activity;
+import com.google.gson.annotations.SerializedName;
 
-import io.soramitsu.iroha.model.AccountInfo;
-
-public interface WalletView extends LoadingView {
-    Activity getActivity();
-
-    boolean isRefreshing();
-
-    void setRefreshing(boolean refreshing);
-
-    void setRefreshEnable(boolean enable);
-
-    void showError(String error);
-
-    AccountInfo getTransaction();
-
-    void renderTransactionHistory(AccountInfo accountInfo);
+public class AssetEntity extends Entity {
+    @SerializedName(value = "asset-uuid")
+    public String uuid;
+    public String name;
+    public String domain;
+    public String creator;
+    public String signature;
+    public String value;
+    public long timestamp;
 }

@@ -24,23 +24,27 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import io.soramitsu.iroha.R;
+import io.soramitsu.iroha.api.IrohaClient;
+import io.soramitsu.iroha.entity.mapper.AccountEntityDataMapper;
 import io.soramitsu.iroha.exception.ErrorMessageFactory;
 import io.soramitsu.iroha.exception.NetworkNotConnectedException;
 import io.soramitsu.iroha.exception.RequiredArgumentException;
+import io.soramitsu.iroha.model.Account;
 import io.soramitsu.iroha.util.NetworkUtil;
 import io.soramitsu.iroha.view.AccountRegisterView;
 import io.soramitsu.irohaandroid.Iroha;
-import io.soramitsu.irohaandroid.callback.Callback;
-import io.soramitsu.irohaandroid.model.Account;
 import io.soramitsu.irohaandroid.model.KeyPair;
 
 public class AccountRegisterPresenter implements Presenter<AccountRegisterView> {
     public static final String TAG = AccountRegisterPresenter.class.getSimpleName();
 
-    private static final String IROHA_TASK_TAG_ACCOUNT_REGISTER = "AccountRegister";
-
     private AccountRegisterView accountRegisterView;
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     @Override
     public void setView(@NonNull AccountRegisterView view) {
@@ -69,13 +73,12 @@ public class AccountRegisterPresenter implements Presenter<AccountRegisterView> 
 
     @Override
     public void onStop() {
-        Iroha.getInstance().cancelAsyncTask(IROHA_TASK_TAG_ACCOUNT_REGISTER);
         accountRegisterView.hideProgress();
     }
 
     @Override
     public void onDestroy() {
-        // nothing
+        compositeDisposable.dispose();
     }
 
     public View.OnKeyListener onKeyEventOnUserName() {
@@ -113,36 +116,22 @@ public class AccountRegisterPresenter implements Presenter<AccountRegisterView> 
 
     private void register(final KeyPair keyPair, final String alias) {
         Log.d(TAG, "register: " + keyPair.publicKey);
-        Iroha iroha = Iroha.getInstance();
-        iroha.runAsyncTask(
-                IROHA_TASK_TAG_ACCOUNT_REGISTER,
-                iroha.registerAccountFunction(keyPair.publicKey, alias),
-                callback()
-        );
+        Disposable disposable = IrohaClient.getInstance().createAccount(keyPair.publicKey, alias)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .map(AccountEntityDataMapper::transform)
+                .subscribe(this::onSuccess, this::onError);
+        compositeDisposable.add(disposable);
     }
 
-    private Callback<Account> callback() {
-        return new Callback<Account>() {
-            @Override
-            public void onSuccessful(Account result) {
-                registerSuccessful(result);
-            }
-
-            @Override
-            public void onFailure(Throwable throwable) {
-                registerFailure(throwable);
-            }
-        };
-    }
-
-    private void registerSuccessful(Account result) {
+    private void onSuccess(Account result) {
         accountRegisterView.hideProgress();
         result.alias = accountRegisterView.getAlias();
         result.save(accountRegisterView.getContext());
         accountRegisterView.registerSuccessful();
     }
 
-    private void registerFailure(Throwable throwable) {
+    private void onError(Throwable throwable) {
         accountRegisterView.hideProgress();
 
         KeyPair.delete(accountRegisterView.getContext());
