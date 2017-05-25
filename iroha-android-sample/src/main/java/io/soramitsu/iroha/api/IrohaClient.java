@@ -8,6 +8,7 @@ import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import java.util.Date;
 
+import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.soramitsu.iroha.api.reqest.AccountRegisterRequest;
 import io.soramitsu.iroha.api.reqest.AssetOperationRequest;
@@ -57,7 +58,7 @@ public class IrohaClient {
         return irohaService.fetchAccountInfo(uuid);
     }
 
-    public Single<Boolean> operation(String uuid,
+    public Completable operation(String uuid,
                                      String command,
                                      String sender,
                                      String receiver,
@@ -88,7 +89,7 @@ public class IrohaClient {
         Single<AccountEntity> fetchAccountInfo(@Query("uuid") String uuid);
 
         @POST("asset/operation")
-        Single<Boolean> operation(@Body AssetOperationRequest payload);
+        Completable operation(@Body AssetOperationRequest payload);
 
         @GET("history/transaction")
         Single<TransactionListEntity> fetchTx(@Query("uuid") String uuid,

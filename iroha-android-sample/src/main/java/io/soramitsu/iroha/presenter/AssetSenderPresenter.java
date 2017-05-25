@@ -22,6 +22,7 @@ import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -154,7 +155,7 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
         }
     }
 
-    private void onSuccess(boolean result) {
+    private void onSuccess() {
         assetSenderView.hideProgress();
 
         final Context ctx = assetSenderView.getContext();
@@ -170,6 +171,8 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
     }
 
     private void onError(Throwable e) {
+        Log.e(TAG, "onError: ", e);
+
         assetSenderView.hideProgress();
 
         final Context ctx = assetSenderView.getContext();
