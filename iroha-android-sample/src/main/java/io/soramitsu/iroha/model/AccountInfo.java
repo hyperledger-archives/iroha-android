@@ -17,47 +17,9 @@ limitations under the License.
 
 package io.soramitsu.iroha.model;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
-import java.util.ArrayList;
 import java.util.List;
 
-public class AccountInfo implements Parcelable {
-    public static final String TAG = AccountInfo.class.getSimpleName();
-
+public class AccountInfo {
     public String value;
     public List<Transaction> transactionHistory;
-
-    public AccountInfo() {
-    }
-
-    protected AccountInfo(Parcel in) {
-        this.value = in.readString();
-        this.transactionHistory = new ArrayList<>();
-        in.readList(this.transactionHistory, Transaction.class.getClassLoader());
-    }
-
-    public static final Creator<AccountInfo> CREATOR = new Creator<AccountInfo>() {
-        @Override
-        public AccountInfo createFromParcel(Parcel source) {
-            return new AccountInfo(source);
-        }
-
-        @Override
-        public AccountInfo[] newArray(int size) {
-            return new AccountInfo[size];
-        }
-    };
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.value);
-        dest.writeList(this.transactionHistory);
-    }
 }

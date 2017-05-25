@@ -106,10 +106,6 @@ public class WalletFragment extends Fragment
                 publicKey
         );
         binding.transactionList.setAdapter(transactionListAdapter);
-
-        if (savedInstanceState != null) {
-            accountInfo = savedInstanceState.getParcelable(AccountInfo.TAG);
-        }
     }
 
     @Override
@@ -129,12 +125,6 @@ public class WalletFragment extends Fragment
     public void onPause() {
         walletPresenter.onPause();
         super.onPause();
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putParcelable(AccountInfo.TAG, accountInfo);
     }
 
     @Override
