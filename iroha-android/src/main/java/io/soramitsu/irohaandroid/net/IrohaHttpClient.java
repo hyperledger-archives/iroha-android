@@ -19,7 +19,6 @@ package io.soramitsu.irohaandroid.net;
 
 import java.io.IOException;
 
-import io.soramitsu.irohaandroid.Iroha;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -57,6 +56,7 @@ public class IrohaHttpClient {
     }
 
     private static Request.Builder request(String path) {
-        return new Request.Builder().url(Iroha.getInstance().baseUrl + path);
+//        return new Request.Builder().url(Iroha.getInstance().baseUrl + path);
+        throw new RuntimeException();
     }
 }
