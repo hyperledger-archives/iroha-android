@@ -31,7 +31,7 @@ import java.util.ArrayList;
 
 import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.databinding.FragmentWalletBinding;
-import io.soramitsu.iroha.model.TransactionHistory;
+import io.soramitsu.iroha.model.AccountInfo;
 import io.soramitsu.iroha.presenter.WalletPresenter;
 import io.soramitsu.iroha.view.WalletView;
 import io.soramitsu.iroha.view.activity.MainActivity;
@@ -49,7 +49,7 @@ public class WalletFragment extends Fragment
     private FragmentWalletBinding binding;
     private TransactionListAdapter transactionListAdapter;
 
-    private TransactionHistory transactionHistory;
+    private AccountInfo accountInfo;
 
     public enum RefreshState {
         SWIPE_UP, RE_CREATED_FRAGMENT, EMPTY_REFRESH
@@ -108,7 +108,7 @@ public class WalletFragment extends Fragment
         binding.transactionList.setAdapter(transactionListAdapter);
 
         if (savedInstanceState != null) {
-            transactionHistory = savedInstanceState.getParcelable(TransactionHistory.TAG);
+            accountInfo = savedInstanceState.getParcelable(AccountInfo.TAG);
         }
     }
 
@@ -134,7 +134,7 @@ public class WalletFragment extends Fragment
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable(TransactionHistory.TAG, transactionHistory);
+        outState.putParcelable(AccountInfo.TAG, accountInfo);
     }
 
     @Override
@@ -170,17 +170,17 @@ public class WalletFragment extends Fragment
     }
 
     @Override
-    public TransactionHistory getTransaction() {
-        return transactionHistory;
+    public AccountInfo getTransaction() {
+        return accountInfo;
     }
 
     @Override
-    public void renderTransactionHistory(final TransactionHistory transactionHistory) {
-        this.transactionHistory = transactionHistory;
-        if (transactionHistory.value != null) {
-            binding.pocketMoney.setText(getString(R.string.has_asset_amount, transactionHistory.value));
+    public void renderTransactionHistory(final AccountInfo accountInfo) {
+        this.accountInfo = accountInfo;
+        if (accountInfo.value != null) {
+            binding.pocketMoney.setText(getString(R.string.has_asset_amount, accountInfo.value));
         }
-        transactionListAdapter.setItems(this.transactionHistory.histories);
+        transactionListAdapter.setItems(this.accountInfo.transactionHistory);
         transactionListAdapter.notifyDataSetChanged();
     }
 

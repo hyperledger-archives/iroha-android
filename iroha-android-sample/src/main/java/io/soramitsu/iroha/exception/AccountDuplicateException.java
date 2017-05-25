@@ -15,24 +15,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package io.soramitsu.iroha.view;
+package io.soramitsu.iroha.exception;
 
-import android.app.Activity;
+public class AccountDuplicateException extends RuntimeException {
+    public AccountDuplicateException() {
+        super("Account is duplicated.");
+    }
 
-import io.soramitsu.iroha.model.AccountInfo;
+    public AccountDuplicateException(final String message) {
+        super(message);
+    }
 
-public interface WalletView extends LoadingView {
-    Activity getActivity();
+    public AccountDuplicateException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
 
-    boolean isRefreshing();
-
-    void setRefreshing(boolean refreshing);
-
-    void setRefreshEnable(boolean enable);
-
-    void showError(String error);
-
-    AccountInfo getTransaction();
-
-    void renderTransactionHistory(AccountInfo accountInfo);
+    public AccountDuplicateException(final Throwable cause) {
+        super(cause);
+    }
 }

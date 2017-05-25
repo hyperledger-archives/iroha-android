@@ -23,32 +23,30 @@ import android.os.Parcelable;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.soramitsu.irohaandroid.model.Transaction;
-
-public class TransactionHistory implements Parcelable {
-    public static final String TAG = TransactionHistory.class.getSimpleName();
+public class AccountInfo implements Parcelable {
+    public static final String TAG = AccountInfo.class.getSimpleName();
 
     public String value;
-    public List<Transaction> histories;
+    public List<Transaction> transactionHistory;
 
-    public TransactionHistory() {
+    public AccountInfo() {
     }
 
-    protected TransactionHistory(Parcel in) {
+    protected AccountInfo(Parcel in) {
         this.value = in.readString();
-        this.histories = new ArrayList<>();
-        in.readList(this.histories, Transaction.class.getClassLoader());
+        this.transactionHistory = new ArrayList<>();
+        in.readList(this.transactionHistory, Transaction.class.getClassLoader());
     }
 
-    public static final Creator<TransactionHistory> CREATOR = new Creator<TransactionHistory>() {
+    public static final Creator<AccountInfo> CREATOR = new Creator<AccountInfo>() {
         @Override
-        public TransactionHistory createFromParcel(Parcel source) {
-            return new TransactionHistory(source);
+        public AccountInfo createFromParcel(Parcel source) {
+            return new AccountInfo(source);
         }
 
         @Override
-        public TransactionHistory[] newArray(int size) {
-            return new TransactionHistory[size];
+        public AccountInfo[] newArray(int size) {
+            return new AccountInfo[size];
         }
     };
 
@@ -60,6 +58,6 @@ public class TransactionHistory implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.value);
-        dest.writeList(this.histories);
+        dest.writeList(this.transactionHistory);
     }
 }

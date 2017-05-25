@@ -22,9 +22,6 @@ import android.content.Context;
 import com.google.zxing.WriterException;
 
 import io.soramitsu.iroha.R;
-import io.soramitsu.irohaandroid.exception.AccountDuplicateException;
-import io.soramitsu.irohaandroid.exception.HttpBadRequestException;
-import io.soramitsu.irohaandroid.exception.UserNotFoundException;
 
 public class ErrorMessageFactory {
 
@@ -34,7 +31,7 @@ public class ErrorMessageFactory {
     public static String create(Context context, Throwable exception, String... params) {
         String message;
 
-        if (exception instanceof UserNotFoundException) {
+        if (exception instanceof AccountNotFoundException) {
             message = context.getString(R.string.error_message_user_not_found);
         } else if (exception instanceof AccountDuplicateException) {
             message = context.getString(R.string.error_message_account_duplicate);
@@ -54,8 +51,6 @@ public class ErrorMessageFactory {
             message = context.getString(R.string.error_receiver_not_found);
         } else if (exception instanceof NetworkNotConnectedException) {
             message = context.getString(R.string.error_message_check_network_state);
-        } else if (exception instanceof HttpBadRequestException) {
-            message = context.getString(R.string.error_message_retry_again);
         } else {
             message = context.getString(R.string.error_message_retry_again);
         }

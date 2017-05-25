@@ -22,19 +22,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 
-import io.soramitsu.irohaandroid.Iroha;
-
 public class IrohaApplication extends Application {
     public static final String SHARED_PREF_FILE = "preferences";
     public static final String SHARED_PREF_REGISTERED_KEY = "registered";
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        new Iroha.Builder()
-                .baseUrl("https://point-demo.iroha.tech")
-                .build();
-    }
 
     public static SharedPreferences getSharedPreferences(@NonNull final Context context) {
         return context.getSharedPreferences(SHARED_PREF_FILE, MODE_PRIVATE);

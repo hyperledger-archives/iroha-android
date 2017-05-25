@@ -30,7 +30,7 @@ import java.util.List;
 
 import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.databinding.RowTransactionListBinding;
-import io.soramitsu.irohaandroid.model.Transaction;
+import io.soramitsu.iroha.model.Transaction;
 
 public class TransactionListAdapter extends BaseAdapter {
     private Context context;

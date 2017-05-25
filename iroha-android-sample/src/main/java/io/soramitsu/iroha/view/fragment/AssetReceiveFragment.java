@@ -28,6 +28,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import io.soramitsu.iroha.R;
+import io.soramitsu.iroha.databinding.FragmentAssetReceiveBinding;
 import io.soramitsu.iroha.presenter.AssetReceivePresenter;
 import io.soramitsu.iroha.view.AssetReceiveView;
 import io.soramitsu.iroha.view.activity.MainActivity;
@@ -40,7 +41,7 @@ public class AssetReceiveFragment extends Fragment
 
     private AssetReceivePresenter assetReceivePresenter = new AssetReceivePresenter();
 
-    private io.soramitsu.iroha.databinding.FragmentAssetReceiveBinding binding;
+    private FragmentAssetReceiveBinding binding;
 
     private String hasAssetValue;
 
@@ -87,6 +88,12 @@ public class AssetReceiveFragment extends Fragment
     public void onStop() {
         assetReceivePresenter.onStop();
         super.onStop();
+    }
+
+    @Override
+    public void onDestroy() {
+        assetReceivePresenter.onDestroy();
+        super.onDestroy();
     }
 
     @Override
