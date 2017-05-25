@@ -43,6 +43,12 @@ import io.soramitsu.iroha.view.AssetSenderView;
 import io.soramitsu.iroha.view.activity.MainActivity;
 import io.soramitsu.iroha.view.activity.QRScannerActivity;
 
+import static cn.pedant.SweetAlert.SweetAlertDialog.ERROR_TYPE;
+import static cn.pedant.SweetAlert.SweetAlertDialog.PROGRESS_TYPE;
+import static cn.pedant.SweetAlert.SweetAlertDialog.SUCCESS_TYPE;
+import static cn.pedant.SweetAlert.SweetAlertDialog.WARNING_TYPE;
+import static com.google.zxing.integration.android.IntentIntegrator.QR_CODE_TYPES;
+
 public class AssetSenderFragment extends Fragment
         implements AssetSenderView, MainActivity.MainActivityListener {
     public static final String TAG = AssetSenderFragment.class.getSimpleName();
@@ -101,35 +107,39 @@ public class AssetSenderFragment extends Fragment
     }
 
     @Override
+    public void onDestroy() {
+        assetSenderPresenter.onDestroy();
+        super.onDestroy();
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
 
-        if (result != null) {
-            if (result.getContents() == null) {
-                Log.e(TAG, "onActivityResult: Canceled!");
-                return;
-            }
-
-            TransferQRParameter params;
-            try {
-                params = new Gson().fromJson(result.getContents(), TransferQRParameter.class);
-            } catch (Exception e) {
-                Log.e(TAG, "onActivityResult: json could not parse to object!");
-                showError(ErrorMessageFactory.create(getContext(), new IllegalQRCodeException()));
-                return;
-            }
-
-            final String value = String.valueOf(params.amount).equals("0")
-                    ? ""
-                    : String.valueOf(params.amount);
-            Log.d(TAG, "onActivityResult: " + value);
-            afterQRReadViewState(params.account, value);
+        if (result == null || result.getContents() == null) {
+            Log.e(TAG, "onActivityResult: Canceled!");
+            return;
         }
+
+        TransferQRParameter params;
+        try {
+            params = new Gson().fromJson(result.getContents(), TransferQRParameter.class);
+        } catch (Exception e) {
+            Log.e(TAG, "onActivityResult: json could not parse to object!");
+            showError(ErrorMessageFactory.create(getContext(), new IllegalQRCodeException()));
+            return;
+        }
+
+        final String value = String.valueOf(params.amount).equals("0")
+                ? ""
+                : String.valueOf(params.amount);
+        Log.d(TAG, "onActivityResult: " + value);
+        afterQRReadViewState(params.account, value);
     }
 
     @Override
     public void showError(final String error) {
-        sweetAlertDialog = new SweetAlertDialog(getActivity(), SweetAlertDialog.ERROR_TYPE);
+        sweetAlertDialog = new SweetAlertDialog(getActivity(), ERROR_TYPE);
         sweetAlertDialog.setTitleText(getString(R.string.error))
                 .setContentText(error)
                 .show();
@@ -137,7 +147,7 @@ public class AssetSenderFragment extends Fragment
 
     @Override
     public void showWarning(final String warning) {
-        sweetAlertDialog = new SweetAlertDialog(getActivity(), SweetAlertDialog.WARNING_TYPE);
+        sweetAlertDialog = new SweetAlertDialog(getActivity(), WARNING_TYPE);
         sweetAlertDialog.setTitleText(getString(R.string.warning))
                 .setContentText(warning)
                 .show();
@@ -151,13 +161,8 @@ public class AssetSenderFragment extends Fragment
 
         sweetAlertDialog.setTitleText(title)
                 .setContentText(message)
-                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                    @Override
-                    public void onClick(SweetAlertDialog dialog) {
-                        onClickListener.onClick(null);
-                    }
-                })
-                .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
+                .setConfirmClickListener(dialog -> onClickListener.onClick(null))
+                .changeAlertType(SUCCESS_TYPE);
         sweetAlertDialog.show();
     }
 
@@ -188,7 +193,7 @@ public class AssetSenderFragment extends Fragment
                 .setBeepEnabled(false)
                 .setOrientationLocked(true)
                 .setBarcodeImageEnabled(true)
-                .setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES)
+                .setDesiredBarcodeFormats(QR_CODE_TYPES)
                 .setCaptureActivity(QRScannerActivity.class)
                 .initiateScan();
     }
@@ -207,7 +212,7 @@ public class AssetSenderFragment extends Fragment
 
     @Override
     public void showProgress() {
-        sweetAlertDialog = new SweetAlertDialog(getActivity(), SweetAlertDialog.PROGRESS_TYPE);
+        sweetAlertDialog = new SweetAlertDialog(getActivity(), PROGRESS_TYPE);
         sweetAlertDialog.setCancelable(false);
         sweetAlertDialog.setTitleText(getString(R.string.connection))
                 .setContentText(getString(R.string.sending))

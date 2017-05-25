@@ -20,26 +20,19 @@ package io.soramitsu.iroha.view.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GravityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
@@ -49,11 +42,15 @@ import com.mikepenz.aboutlibraries.ui.LibsSupportFragment;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.databinding.ActivityMainBinding;
+import io.soramitsu.iroha.model.Account;
 import io.soramitsu.iroha.navigator.Navigator;
 import io.soramitsu.iroha.view.fragment.AssetReceiveFragment;
 import io.soramitsu.iroha.view.fragment.AssetSenderFragment;
 import io.soramitsu.iroha.view.fragment.WalletFragment;
-import io.soramitsu.irohaandroid.model.Account;
+
+import static android.view.Gravity.START;
+import static cn.pedant.SweetAlert.SweetAlertDialog.SUCCESS_TYPE;
+import static cn.pedant.SweetAlert.SweetAlertDialog.WARNING_TYPE;
 
 public class MainActivity extends AppCompatActivity {
     public static final String TAG = MainActivity.class.getSimpleName();
@@ -74,10 +71,6 @@ public class MainActivity extends AppCompatActivity {
 
     public interface MainActivityListener {
         void onNavigationItemClicked();
-    }
-
-    public interface OnKeyboardVisibilityListener {
-        void onVisibilityChanged(boolean isVisible);
     }
 
     public static Intent getCallingIntent(Context context, String uuid) {
@@ -117,30 +110,19 @@ public class MainActivity extends AppCompatActivity {
 
     private void init(Bundle savedInstanceState) {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-        inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         initToolbar();
         initNavigationHeader();
         initNavigationView();
         initBottomNavigationView();
         initFragments(savedInstanceState);
-//        setKeyboardListener(new OnKeyboardVisibilityListener() {
-//            @Override
-//            public void onVisibilityChanged(boolean isVisible) {
-//                binding.bottomNavigation.setVisibility(isVisible ? View.GONE : View.VISIBLE);
-//            }
-//        });
     }
 
     private void initToolbar() {
         binding.toolbar.setTitle(getString(R.string.receive));
         binding.toolbar.setNavigationIcon(
                 ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_menu_white_24dp));
-        binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                binding.drawerLayout.openDrawer(GravityCompat.START);
-            }
-        });
+        binding.toolbar.setNavigationOnClickListener(v -> binding.drawerLayout.openDrawer(START));
     }
 
     private void initNavigationHeader() {
@@ -155,106 +137,59 @@ public class MainActivity extends AppCompatActivity {
 
     private void initNavigationView() {
         binding.navigation.getMenu().getItem(0).setChecked(true);
-        binding.navigation.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                        boolean isChecked = item.isChecked();
-                        switch (item.getItemId()) {
-                            case R.id.action_home:
-                                if (isChecked) break;
-                                binding.bottomNavigation.setVisibility(View.VISIBLE);
-                                binding.toolbar.setTitle(getString(R.string.receive));
-                                switchFragment(assetReceiveFragment, AssetReceiveFragment.TAG);
-                                allClearNavigationMenuChecked();
-                                allClearBottomNavigationMenuChecked();
-                                binding.navigation.getMenu().getItem(0).setChecked(true);
-                                binding.bottomNavigation.getMenu().getItem(0).setChecked(true);
-                                break;
-                            case R.id.action_unregister:
-                                SweetAlertDialog dialog = new SweetAlertDialog(MainActivity.this, SweetAlertDialog.WARNING_TYPE)
-                                        .setTitleText("Account Delete")
-                                        .setContentText("Are you sure you want to delete your account info?")
-                                        .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                                            @Override
-                                            public void onClick(final SweetAlertDialog sweetAlertDialog) {
-                                                sweetAlertDialog
-                                                        .setTitleText("Deleting…")
-                                                        .setContentText(null)
-                                                        .changeAlertType(SweetAlertDialog.PROGRESS_TYPE);
-
-                                                Account.delete(getApplicationContext());
-
-                                                new Handler().postDelayed(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        sweetAlertDialog
-                                                                .setTitleText(getString(R.string.successful))
-                                                                .setContentText(getString(R.string.message_account_deleted))
-                                                                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                                                                    @Override
-                                                                    public void onClick(SweetAlertDialog sweetAlertDialog) {
-                                                                        navigator.navigateToRegisterActivity(getApplicationContext());
-                                                                        finish();
-                                                                    }
-                                                                })
-                                                                .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
-                                                    }
-                                                }, 1000);
-                                            }
-                                        });
-                                dialog.setCancelable(true);
-                                dialog.show();
-                                break;
-                            case R.id.action_oss:
-                                if (isChecked) break;
-                                binding.bottomNavigation.setVisibility(View.GONE);
-                                binding.toolbar.setTitle(getString(R.string.open_source_license));
-                                switchFragment(libsFragment, "libs");
-                                allClearNavigationMenuChecked();
-                                binding.navigation.getMenu().getItem(2).setChecked(true);
-                                break;
-                        }
-                        binding.drawerLayout.closeDrawer(GravityCompat.START);
-                        return true;
+        binding.navigation.setNavigationItemSelectedListener(item -> {
+                    boolean isChecked = item.isChecked();
+                    switch (item.getItemId()) {
+                        case R.id.action_home:
+                            if (isChecked) break;
+                            gotoHome();
+                            break;
+                        case R.id.action_unregister:
+                            unregister();
+                            break;
+                        case R.id.action_oss:
+                            if (isChecked) break;
+                            gotoOssInfo();
+                            break;
                     }
+                    binding.drawerLayout.closeDrawer(START);
+                    return true;
                 }
         );
     }
 
     private void initBottomNavigationView() {
         binding.bottomNavigation.setOnNavigationItemSelectedListener(
-                new BottomNavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                        allClearNavigationMenuChecked();
-                        if (!item.isChecked()) {
-                            binding.navigation.getMenu().getItem(0).setChecked(true);
-                            switch (item.getItemId()) {
-                                case R.id.action_receipt:
-                                    Log.d(TAG, "onNavigationItemSelected: Receiver");
-                                    binding.toolbar.setTitle(getString(R.string.receive));
-                                    switchFragment(assetReceiveFragment, AssetReceiveFragment.TAG);
-                                    break;
-                                case R.id.action_wallet:
-                                    Log.d(TAG, "onNavigationItemSelected: Wallet");
-                                    binding.toolbar.setTitle(getString(R.string.wallet));
-                                    switchFragment(walletFragment, WalletFragment.TAG);
-                                    break;
-                                case R.id.action_sender:
-                                    Log.d(TAG, "onNavigationItemSelected: Sender");
-                                    binding.toolbar.setTitle(getString(R.string.send));
-                                    switchFragment(assetSenderFragment, AssetSenderFragment.TAG);
-                                    break;
-                            }
-                        } else {
-                            Log.d(TAG, "onNavigationItemSelected: Topへ!");
-                            final FragmentManager manager = getSupportFragmentManager();
-                            MainActivityListener listener = (MainActivityListener) manager.findFragmentById(R.id.container);
-                            listener.onNavigationItemClicked();
+                item -> {
+                    allClearNavigationMenuChecked();
+                    if (!item.isChecked()) {
+                        binding.navigation.getMenu().getItem(0).setChecked(true);
+                        switch (item.getItemId()) {
+                            case R.id.action_receipt:
+                                Log.d(TAG, "onNavigationItemSelected: Receiver");
+                                binding.toolbar.setTitle(getString(R.string.receive));
+                                switchFragment(assetReceiveFragment, AssetReceiveFragment.TAG);
+                                break;
+                            case R.id.action_wallet:
+                                Log.d(TAG, "onNavigationItemSelected: Wallet");
+                                binding.toolbar.setTitle(getString(R.string.wallet));
+                                switchFragment(walletFragment, WalletFragment.TAG);
+                                break;
+                            case R.id.action_sender:
+                                Log.d(TAG, "onNavigationItemSelected: Sender");
+                                binding.toolbar.setTitle(getString(R.string.send));
+                                switchFragment(assetSenderFragment, AssetSenderFragment.TAG);
+                                break;
                         }
-                        return true;
+                    } else {
+                        Log.d(TAG, "onNavigationItemSelected: Topへ!");
+                        final FragmentManager manager = getSupportFragmentManager();
+                        final Fragment fragment = manager.findFragmentById(R.id.container);
+                        if (fragment instanceof MainActivityListener) {
+                            ((MainActivityListener) fragment).onNavigationItemClicked();
+                        }
                     }
+                    return true;
                 });
     }
 
@@ -323,32 +258,52 @@ public class MainActivity extends AppCompatActivity {
                 .commit();
     }
 
-    private void setKeyboardListener(final OnKeyboardVisibilityListener listener) {
-        final View activityRootView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
+    private void gotoHome() {
+        binding.bottomNavigation.setVisibility(View.VISIBLE);
+        binding.toolbar.setTitle(getString(R.string.receive));
+        switchFragment(assetReceiveFragment, AssetReceiveFragment.TAG);
+        allClearNavigationMenuChecked();
+        allClearBottomNavigationMenuChecked();
+        binding.navigation.getMenu().getItem(0).setChecked(true);
+        binding.bottomNavigation.getMenu().getItem(0).setChecked(true);
+    }
 
-        activityRootView.getViewTreeObserver().addOnGlobalLayoutListener(
-                new ViewTreeObserver.OnGlobalLayoutListener() {
-                    private boolean wasOpened;
-                    private final Rect r = new Rect();
+    private void unregister() {
+        SweetAlertDialog dialog = new SweetAlertDialog(this, WARNING_TYPE)
+                .setTitleText("Account Delete")
+                .setContentText("Are you sure you want to delete your account info?")
+                .setConfirmClickListener(sweetAlertDialog -> {
+                    sweetAlertDialog
+                            .setTitleText("Deleting…")
+                            .setContentText(null)
+                            .changeAlertType(SweetAlertDialog.PROGRESS_TYPE);
 
-                    @Override
-                    public void onGlobalLayout() {
-                        activityRootView.getWindowVisibleDisplayFrame(r);
+                    Account.delete(getApplicationContext());
 
-                        // Compare root view height and layout height.
-                        int heightDiff = activityRootView.getRootView().getHeight() - r.height();
-
-                        boolean isOpen = heightDiff > 200;
-
-                        if (isOpen == wasOpened) {
-                            // Since display state of keyboard should not change, do nothing.
-                            return;
-                        }
-
-                        wasOpened = isOpen;
-
-                        listener.onVisibilityChanged(isOpen);
-                    }
+                    new Handler().postDelayed(() -> {
+                        final String title = getString(R.string.successful);
+                        final String content = getString(R.string.message_account_deleted);
+                        sweetAlertDialog
+                                .setTitleText(title)
+                                .setContentText(content)
+                                .setConfirmClickListener(d -> gotoRegister())
+                                .changeAlertType(SUCCESS_TYPE);
+                    }, 1000);
                 });
+        dialog.setCancelable(true);
+        dialog.show();
+    }
+
+    private void gotoRegister() {
+        navigator.navigateToRegisterActivity(getApplicationContext());
+        finish();
+    }
+
+    private void gotoOssInfo() {
+        binding.bottomNavigation.setVisibility(View.GONE);
+        binding.toolbar.setTitle(getString(R.string.open_source_license));
+        switchFragment(libsFragment, "libs");
+        allClearNavigationMenuChecked();
+        binding.navigation.getMenu().getItem(2).setChecked(true);
     }
 }

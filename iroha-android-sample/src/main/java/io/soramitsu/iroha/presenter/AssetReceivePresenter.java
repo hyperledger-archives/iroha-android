@@ -26,6 +26,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
@@ -35,28 +36,29 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.zxing.WriterException;
 
-import org.jetbrains.annotations.NotNull;
-
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import io.soramitsu.iroha.R;
+import io.soramitsu.iroha.api.IrohaClient;
+import io.soramitsu.iroha.entity.mapper.AccountEntityDataMapper;
 import io.soramitsu.iroha.exception.ErrorMessageFactory;
+import io.soramitsu.iroha.model.Account;
 import io.soramitsu.iroha.model.TransferQRParameter;
-import io.soramitsu.iroha.view.AssetReceiveView;
-import io.soramitsu.irohaandroid.Iroha;
-import io.soramitsu.irohaandroid.callback.Callback;
-import io.soramitsu.irohaandroid.model.Account;
-import io.soramitsu.irohaandroid.model.KeyPair;
 import io.soramitsu.iroha.util.QRCodeGenerator;
+import io.soramitsu.iroha.view.AssetReceiveView;
+import io.soramitsu.irohaandroid.model.KeyPair;
 
 import static android.content.Context.CLIPBOARD_SERVICE;
 
 public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
     public static final String TAG = AssetReceivePresenter.class.getSimpleName();
 
-    private static final String IROHA_TASK_TAG_USER_INFO_ON_RECEIVE = "UserInfoOnReceive";
-
     private final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
 
     private AssetReceiveView assetReceiveView;
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     private Handler refreshHandler;
     private Runnable transactionRunnable;
@@ -78,12 +80,7 @@ public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
     @Override
     public void onStart() {
         refreshHandler = new Handler();
-        transactionRunnable = new Runnable() {
-            @Override
-            public void run() {
-                fetchAccountAssetFromApi();
-            }
-        };
+        transactionRunnable = this::fetchAccountAssetFromApi;
 
         generateQR();
         fetchAccountAsset();
@@ -102,12 +99,12 @@ public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
 
     @Override
     public void onStop() {
-        Iroha.getInstance().cancelAsyncTask(IROHA_TASK_TAG_USER_INFO_ON_RECEIVE);
+        // nothing
     }
 
     @Override
     public void onDestroy() {
-        // nothing
+        compositeDisposable.dispose();
     }
 
     public void setUuid(String uuid) {
@@ -115,12 +112,7 @@ public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
     }
 
     public SwipeRefreshLayout.OnRefreshListener onSwipeRefresh() {
-        return new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                refreshHandler.postDelayed(transactionRunnable, 1500);
-            }
-        };
+        return () -> refreshHandler.postDelayed(transactionRunnable, 1500);
     }
 
     public View.OnClickListener onPublicKeyTextClicked() {
@@ -174,7 +166,7 @@ public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
 
     private void fetchAccountAsset() {
         String assetValue = assetReceiveView.getHasAssetValue();
-        if (assetValue == null) {
+        if (TextUtils.isEmpty(assetValue)) {
             fetchAccountAssetFromApi();
         } else {
             assetReceiveView.setHasAssetValue(assetValue);
@@ -182,61 +174,52 @@ public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
     }
 
     private void fetchAccountAssetFromApi() {
-        if (uuid == null || uuid.isEmpty()) {
+        if (TextUtils.isEmpty(uuid)) {
             uuid = getUuid();
         }
 
-        Iroha iroha = Iroha.getInstance();
-        iroha.runAsyncTask(
-                IROHA_TASK_TAG_USER_INFO_ON_RECEIVE,
-                iroha.findAccountFunction(uuid),
-                callback()
-        );
+        Disposable disposable = IrohaClient.getInstance().fetchAccountInfo(uuid)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .map(AccountEntityDataMapper::transform)
+                .subscribe(this::onSuccess, this::onError);
+        compositeDisposable.add(disposable);
     }
 
-    private Callback<Account> callback() {
-        return new Callback<Account>() {
-            @Override
-            public void onSuccessful(Account result) {
-                if (assetReceiveView.isRefreshing()) {
-                    assetReceiveView.setRefreshing(false);
-                }
+    private void onSuccess(Account result) {
+        if (assetReceiveView.isRefreshing()) {
+            assetReceiveView.setRefreshing(false);
+        }
 
-                if (result != null && result.assets != null && !result.assets.isEmpty()) {
-                    assetReceiveView.setHasAssetValue(result.assets.get(0).value);
-                }
-            }
+        if (result != null && result.assets != null && !result.assets.isEmpty()) {
+            assetReceiveView.setHasAssetValue(result.assets.get(0).value);
+        }
+    }
 
-            @Override
-            public void onFailure(Throwable throwable) {
-                if (assetReceiveView.isRefreshing()) {
-                    assetReceiveView.setRefreshing(false);
-                }
-
-                assetReceiveView.showError(
-                        ErrorMessageFactory.create(assetReceiveView.getContext(), throwable)
-                );
-            }
-        };
+    private void onError(Throwable e) {
+        if (assetReceiveView.isRefreshing()) {
+            assetReceiveView.setRefreshing(false);
+        }
+        assetReceiveView.showError(ErrorMessageFactory.create(assetReceiveView.getContext(), e));
     }
 
     private void setPublicKey() {
         assetReceiveView.setPublicKey(getPublicKey());
     }
 
-    @NotNull
+    @NonNull
     private String getPublicKey() {
-        if (publicKey == null || publicKey.isEmpty()) {
+        if (TextUtils.isEmpty(publicKey)) {
             final Context context = assetReceiveView.getContext();
             publicKey = KeyPair.getKeyPair(context).publicKey;
         }
         return publicKey;
     }
 
-    @NotNull
+    @NonNull
     private String getUuid() {
         final Context context = assetReceiveView.getContext();
-        if (uuid == null || uuid.isEmpty()) {
+        if (TextUtils.isEmpty(uuid)) {
             uuid = Account.getUuid(context);
         }
         return uuid;
@@ -246,7 +229,8 @@ public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
         try {
             if (qr == null) {
                 Log.d(TAG, "generateQR: new generation!");
-                qr = QRCodeGenerator.generateQR(generateQrParamsText(), 500, QRCodeGenerator.ENCODE_CHARACTER_TYPE_UTF_8);
+                qr = QRCodeGenerator.generateQR(
+                        generateQrParamsText(), 500, QRCodeGenerator.ENCODE_CHARACTER_TYPE_UTF_8);
             }
             setQR(qr);
         } catch (WriterException e) {
@@ -256,7 +240,8 @@ public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
 
     private void changeQR() {
         try {
-            qr = QRCodeGenerator.generateQR(generateQrParamsText(), 500, QRCodeGenerator.ENCODE_CHARACTER_TYPE_UTF_8);
+            qr = QRCodeGenerator.generateQR(
+                    generateQrParamsText(), 500, QRCodeGenerator.ENCODE_CHARACTER_TYPE_UTF_8);
             setQR(qr);
         } catch (WriterException e) {
             assetReceiveView.showError(ErrorMessageFactory.create(assetReceiveView.getContext(), e));

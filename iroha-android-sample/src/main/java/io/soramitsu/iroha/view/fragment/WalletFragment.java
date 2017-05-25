@@ -31,13 +31,12 @@ import java.util.ArrayList;
 
 import io.soramitsu.iroha.R;
 import io.soramitsu.iroha.databinding.FragmentWalletBinding;
-import io.soramitsu.iroha.model.TransactionHistory;
+import io.soramitsu.iroha.model.AccountInfo;
 import io.soramitsu.iroha.presenter.WalletPresenter;
 import io.soramitsu.iroha.view.WalletView;
 import io.soramitsu.iroha.view.activity.MainActivity;
 import io.soramitsu.iroha.view.adapter.TransactionListAdapter;
 import io.soramitsu.irohaandroid.model.KeyPair;
-import io.soramitsu.irohaandroid.model.Transaction;
 
 public class WalletFragment extends Fragment
         implements WalletView, MainActivity.MainActivityListener {
@@ -50,7 +49,7 @@ public class WalletFragment extends Fragment
     private FragmentWalletBinding binding;
     private TransactionListAdapter transactionListAdapter;
 
-    private TransactionHistory transactionHistory;
+    private AccountInfo accountInfo;
 
     public enum RefreshState {
         SWIPE_UP, RE_CREATED_FRAGMENT, EMPTY_REFRESH
@@ -82,7 +81,8 @@ public class WalletFragment extends Fragment
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         binding = DataBindingUtil.bind(view);
-        binding.swipeRefresh.setColorSchemeResources(R.color.red600, R.color.green600, R.color.blue600, R.color.orange600);
+        binding.swipeRefresh.setColorSchemeResources(
+                R.color.red600, R.color.green600, R.color.blue600, R.color.orange600);
         binding.swipeRefresh.setOnRefreshListener(walletPresenter.onSwipeRefresh());
         binding.transactionList.setOnScrollListener(walletPresenter.onTransactionListScroll());
         binding.transactionList.setEmptyView(binding.emptyView);
@@ -102,14 +102,10 @@ public class WalletFragment extends Fragment
 
         transactionListAdapter = new TransactionListAdapter(
                 getContext(),
-                new ArrayList<Transaction>(),
+                new ArrayList<>(),
                 publicKey
         );
         binding.transactionList.setAdapter(transactionListAdapter);
-
-        if (savedInstanceState != null) {
-            transactionHistory = savedInstanceState.getParcelable(TransactionHistory.TAG);
-        }
     }
 
     @Override
@@ -129,12 +125,6 @@ public class WalletFragment extends Fragment
     public void onPause() {
         walletPresenter.onPause();
         super.onPause();
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putParcelable(TransactionHistory.TAG, transactionHistory);
     }
 
     @Override
@@ -170,17 +160,17 @@ public class WalletFragment extends Fragment
     }
 
     @Override
-    public TransactionHistory getTransaction() {
-        return transactionHistory;
+    public AccountInfo getTransaction() {
+        return accountInfo;
     }
 
     @Override
-    public void renderTransactionHistory(final TransactionHistory transactionHistory) {
-        this.transactionHistory = transactionHistory;
-        if (transactionHistory.value != null) {
-            binding.pocketMoney.setText(getString(R.string.has_asset_amount, transactionHistory.value));
+    public void renderTransactionHistory(final AccountInfo accountInfo) {
+        this.accountInfo = accountInfo;
+        if (accountInfo.value != null) {
+            binding.pocketMoney.setText(getString(R.string.has_asset_amount, accountInfo.value));
         }
-        transactionListAdapter.setItems(this.transactionHistory.histories);
+        transactionListAdapter.setItems(this.accountInfo.transactionHistory);
         transactionListAdapter.notifyDataSetChanged();
     }
 

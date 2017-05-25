@@ -23,9 +23,9 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 
 import io.soramitsu.iroha.R;
+import io.soramitsu.iroha.model.Account;
 import io.soramitsu.iroha.navigator.Navigator;
 import io.soramitsu.iroha.view.fragment.SplashFragment;
-import io.soramitsu.irohaandroid.model.Account;
 
 import static io.soramitsu.iroha.IrohaApplication.isRegistered;
 
@@ -48,18 +48,15 @@ public class SplashActivity extends AppCompatActivity {
         splashFragment.show(getSupportFragmentManager(), SplashFragment.TAG);
 
         final Context context = getApplicationContext();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (isRegistered(context)) {
-                    final String uuid = Account.getUuid(getApplicationContext());
-                    navigator.navigateToMainActivity(context, uuid);
-                } else {
-                    navigator.navigateToRegisterActivity(context);
-                }
-                finish();
-                splashFragment.dismiss();
+        new Handler().postDelayed(() -> {
+            if (isRegistered(context)) {
+                final String uuid = Account.getUuid(context);
+                navigator.navigateToMainActivity(context, uuid);
+            } else {
+                navigator.navigateToRegisterActivity(context);
             }
+            finish();
+            splashFragment.dismiss();
         }, 1000);
     }
 }

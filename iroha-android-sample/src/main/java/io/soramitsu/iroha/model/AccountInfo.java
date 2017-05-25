@@ -15,24 +15,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package io.soramitsu.iroha.view;
+package io.soramitsu.iroha.model;
 
-import android.app.Activity;
+import java.util.List;
 
-import io.soramitsu.iroha.model.AccountInfo;
-
-public interface WalletView extends LoadingView {
-    Activity getActivity();
-
-    boolean isRefreshing();
-
-    void setRefreshing(boolean refreshing);
-
-    void setRefreshEnable(boolean enable);
-
-    void showError(String error);
-
-    AccountInfo getTransaction();
-
-    void renderTransactionHistory(AccountInfo accountInfo);
+public class AccountInfo {
+    public String value;
+    public List<Transaction> transactionHistory;
 }

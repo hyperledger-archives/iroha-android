@@ -76,8 +76,14 @@ public class AccountRegisterFragment extends Fragment implements AccountRegister
 
     @Override
     public void onStop() {
-        super.onStop();
         accountRegisterPresenter.onStop();
+        super.onStop();
+    }
+
+    @Override
+    public void onDestroy() {
+        accountRegisterPresenter.onDestroy();
+        super.onDestroy();
     }
 
     @Override
