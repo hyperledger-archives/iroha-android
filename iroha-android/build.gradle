@@ -38,6 +38,8 @@ android {
 def SUPPORT_PACKAGE_VERSION = "25.3.1"
 def ESPRESSO_PACKAGE_VERSION = "2.2.2"
 def JUNIT_PACKAGE_VERSION = "4.12"
+def MOCKITO_PACKAGE_VERSION = "1.10.19"
+def POWERMOCK_PACKAGE_VERSION = "1.6.6"
 def OKHTTP_PACKAGE_VERSION = "3.5.0";
 def GSON_PACKAGE_VERSION = "2.4";
 def BOUNCY_CASTLE_PACKAGE_VERSION = "1.55";
@@ -48,6 +50,9 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     testCompile "junit:junit:$JUNIT_PACKAGE_VERSION"
+    testCompile "org.mockito:mockito-core:$MOCKITO_PACKAGE_VERSION"
+    testCompile "org.powermock:powermock-module-junit4:$POWERMOCK_PACKAGE_VERSION"
+    testCompile "org.powermock:powermock-api-mockito:$POWERMOCK_PACKAGE_VERSION"
 
     compile "com.android.support:appcompat-v7:$SUPPORT_PACKAGE_VERSION"
     compile "com.squareup.okhttp3:okhttp:$OKHTTP_PACKAGE_VERSION"
