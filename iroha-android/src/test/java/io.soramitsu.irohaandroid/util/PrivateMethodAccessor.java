@@ -40,7 +40,7 @@ public class PrivateMethodAccessor {
      */
     public static Object invoke(Class<?> clazz, String methodName, Class<?>[] paramTypes, Object... args)
             throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        Method method = clazz.getDeclaredMethod(methodName, paramTypes);
+        final Method method = clazz.getDeclaredMethod(methodName, paramTypes);
         method.setAccessible(true);
         return method.invoke(null, args);
     }
@@ -58,9 +58,10 @@ public class PrivateMethodAccessor {
      * @throws IllegalAccessException    If target method object implements Java language access control<br>
      *                                   and can not access the basic method.
      */
-    public Object invoke(Object obj, String methodName, Class<?>[] paramTypes, Object[] args) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        Class<?> clazz = obj.getClass();
-        Method method = clazz.getDeclaredMethod(methodName, paramTypes);
+    public Object invoke(Object obj, String methodName, Class<?>[] paramTypes, Object[] args)
+            throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        final Class<?> clazz = obj.getClass();
+        final Method method = clazz.getDeclaredMethod(methodName, paramTypes);
         method.setAccessible(true);
         return method.invoke(obj, args);
     }
