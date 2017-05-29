@@ -20,13 +20,11 @@ package io.soramitsu.irohaandroid;
 import android.support.test.filters.SmallTest;
 import android.support.test.runner.AndroidJUnit4;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import io.soramitsu.irohaandroid.model.KeyPair;
-import io.soramitsu.irohaandroid.security.MessageDigest;
 
 import static io.soramitsu.irohaandroid.Iroha.createKeyPair;
 import static io.soramitsu.irohaandroid.Iroha.sign;
@@ -43,80 +41,75 @@ import static org.junit.Assert.assertThat;
 @SmallTest
 public class IrohaTest {
 
+    private String publicKey;
     private KeyPair keyPair;
+
+    private String plaintextMessage;
+    private String sha3Message;
 
     @Before
     public void setUp() throws Exception {
-        keyPair = createKeyPair();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-    }
-
-    @Test
-    public void test_sign_Successful() throws Exception {
-        final String publicKey = "N1X+Fv7soLknpZNtkdW5cRphgzFjqHmOJl9GvVahWxk=";
-        final String privateKey = "aFJfbcedA7p6X0b6EdQNovfFtmq4YSGK/+Bw+XBrsnAEBpXRu+Qfw0559lgLwF2QusChGiDEkLAxPqodQH1kbA==";
-        final KeyPair keyPair = new KeyPair(privateKey, publicKey);
-        final String message = MessageDigest.digest("test", MessageDigest.Algorithm.SHA3_256);
-        final String signature = "bl7EyGwrdDIcHpizHUcDd4Ui34pQRv5VoM69WEPGNveZVOIXJbX3nWhvBvyGXaCxZIuu0THCo5g8PSr2NZJKBg==";
-
-        String result = sign(keyPair, message);
-
-        assertThat(result, is(signature));
+        publicKey = "N1X+Fv7soLknpZNtkdW5cRphgzFjqHmOJl9GvVahWxk=";
+        keyPair = new KeyPair("aFJfbcedA7p6X0b6EdQNovfFtmq4YSGK/+Bw+XBrsnAEBpXRu+Qfw0559lgLwF2QusChGiDEkLAxPqodQH1kbA==", publicKey);
+        plaintextMessage = "message";
+        sha3Message = "7f4a23d90de90d100754f82d6c14073b7fb466f76fd1f61b187b9f39c3ffd895";
     }
 
     @Test
-    public void test_verify_Successful() throws Exception {
-        final String publicKey = "N1X+Fv7soLknpZNtkdW5cRphgzFjqHmOJl9GvVahWxk=";
-        final String message = MessageDigest.digest("test", MessageDigest.Algorithm.SHA3_256);
-        final String signature = "bl7EyGwrdDIcHpizHUcDd4Ui34pQRv5VoM69WEPGNveZVOIXJbX3nWhvBvyGXaCxZIuu0THCo5g8PSr2NZJKBg==";
-
-        boolean result = verify(publicKey, signature, message);
-
-        assertThat(result, is(Boolean.TRUE));
+    public void test_sign_with_plaintext_Successful() throws Exception {
+        final String signature = "jOngFkLJSx+ietTXyAT6PmZWo7LwxZLtulBF8yGTj/QrcsvFK6k9D2h7epSPSXh8cScTVnwF8jAwtJEAYgELDg==";
+        assertThat(sign(keyPair, plaintextMessage), is(signature));
     }
 
     @Test
-    public void test_verify_with_createKeyPair_Successful() throws Exception {
-        final String message = "Iroha Android";
-        final String signature = sign(keyPair, message);
+    public void test_sign_with_sha3_Successful() throws Exception {
+        final String signature = "fZtf7CCkCDv7qulpk3ckkVPBRITxslp0mGgEPyBWFv6UFR8bP8CnM4UyZEchJXf6qOCZZda2z9xEs6K7XNwHCw==";
+        assertThat(sign(keyPair, sha3Message), is(signature));
+    }
 
-        boolean result = verify(keyPair.publicKey, signature, message);
-
-        assertThat(result, is(Boolean.TRUE));
+    @Test
+    public void test_verify_with_plaintext_Successful() throws Exception {
+        final String signature = "jOngFkLJSx+ietTXyAT6PmZWo7LwxZLtulBF8yGTj/QrcsvFK6k9D2h7epSPSXh8cScTVnwF8jAwtJEAYgELDg==";
+        assertThat(verify(publicKey, signature, plaintextMessage), is(Boolean.TRUE));
     }
 
     @Test
     public void test_verify_with_sha3_Successful() throws Exception {
-        final String message = MessageDigest.digest("Iroha Android", MessageDigest.Algorithm.SHA3_256);
-        final String signature = sign(keyPair, message);
-
-        boolean result = verify(keyPair.publicKey, signature, message);
-
-        assertThat(result, is(Boolean.TRUE));
+        final String signature = "fZtf7CCkCDv7qulpk3ckkVPBRITxslp0mGgEPyBWFv6UFR8bP8CnM4UyZEchJXf6qOCZZda2z9xEs6K7XNwHCw==";
+        assertThat(verify(publicKey, signature, sha3Message), is(Boolean.TRUE));
     }
 
     @Test
-    public void test_verify_another_public_key_Failure() throws Exception {
-        final String message = "Iroha Android";
-        final String signature = sign(keyPair, message);
-
-        final KeyPair anotherKeyPair = createKeyPair();
-        boolean result = verify(anotherKeyPair.publicKey, signature, message);
-
-        assertThat(result, is(Boolean.FALSE));
+    public void test_verify_with_plaintext_and_createKeyPair_Successful() throws Exception {
+        final KeyPair keyPair = createKeyPair();
+        final String signature = sign(keyPair, plaintextMessage);
+        assertThat(verify(keyPair.publicKey, signature, plaintextMessage), is(Boolean.TRUE));
     }
 
     @Test
-    public void test_verify_with_sha3_another_public_key_Failure() throws Exception {
-        final String message = MessageDigest.digest("Iroha Android", MessageDigest.Algorithm.SHA3_256);
-        final String signature = sign(keyPair, message);
+    public void test_verify_with_sha3_and_createKeyPair_Successful() throws Exception {
+        final KeyPair keyPair = createKeyPair();
+        final String signature = sign(keyPair, sha3Message);
+        assertThat(verify(keyPair.publicKey, signature, sha3Message), is(Boolean.TRUE));
+    }
 
+    @Test
+    public void test_verify_with_another_message_Failure() throws Exception {
+        final String signature = sign(keyPair, plaintextMessage);
+        assertThat(verify(keyPair.publicKey, signature, sha3Message), is(Boolean.FALSE));
+    }
+
+    @Test
+    public void test_verify_with_plaintext_and_another_public_key_Failure() throws Exception {
+        final String signature = sign(keyPair, plaintextMessage);
         final KeyPair anotherKeyPair = createKeyPair();
-        boolean result = verify(anotherKeyPair.publicKey, signature, message);
+        assertThat(verify(anotherKeyPair.publicKey, signature, plaintextMessage), is(Boolean.FALSE));
+    }
 
-        assertThat(result, is(Boolean.FALSE));
+    @Test
+    public void test_verify_with_sha3_and_another_public_key_Failure() throws Exception {
+        final String signature = sign(keyPair, sha3Message);
+        final KeyPair anotherKeyPair = createKeyPair();
+        assertThat(verify(anotherKeyPair.publicKey, signature, sha3Message), is(Boolean.FALSE));
     }
 }
