@@ -17,6 +17,8 @@ limitations under the License.
 
 package io.soramitsu.irohaandroid.security;
 
+import android.support.annotation.NonNull;
+
 import org.bouncycastle.jcajce.provider.digest.SHA3;
 
 public class MessageDigest {
@@ -27,7 +29,7 @@ public class MessageDigest {
         SHA3_256, SHA3_384, SHA3_512
     }
 
-    public static String digest(String message, Algorithm algorithm) {
+    public static String digest(String message, @NonNull Algorithm algorithm) {
         switch (algorithm) {
             case SHA3_256:
                 return sha3_256(message);
