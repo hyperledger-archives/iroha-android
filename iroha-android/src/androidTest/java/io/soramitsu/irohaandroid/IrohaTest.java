@@ -26,7 +26,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import io.soramitsu.irohaandroid.model.KeyPair;
-import io.soramitsu.irohaandroid.security.MessageDigest;
 
 import static io.soramitsu.irohaandroid.Iroha.createKeyPair;
 import static io.soramitsu.irohaandroid.Iroha.sign;
@@ -59,7 +58,7 @@ public class IrohaTest {
         final String publicKey = "N1X+Fv7soLknpZNtkdW5cRphgzFjqHmOJl9GvVahWxk=";
         final String privateKey = "aFJfbcedA7p6X0b6EdQNovfFtmq4YSGK/+Bw+XBrsnAEBpXRu+Qfw0559lgLwF2QusChGiDEkLAxPqodQH1kbA==";
         final KeyPair keyPair = new KeyPair(privateKey, publicKey);
-        final String message = MessageDigest.digest("test", MessageDigest.Algorithm.SHA3_256);
+        final String message = "36f028580bb02cc8272a9a020f4200e346e276ae664e45ee80745574e2f5ab80";
         final String signature = "bl7EyGwrdDIcHpizHUcDd4Ui34pQRv5VoM69WEPGNveZVOIXJbX3nWhvBvyGXaCxZIuu0THCo5g8PSr2NZJKBg==";
 
         String result = sign(keyPair, message);
@@ -70,7 +69,7 @@ public class IrohaTest {
     @Test
     public void test_verify_Successful() throws Exception {
         final String publicKey = "N1X+Fv7soLknpZNtkdW5cRphgzFjqHmOJl9GvVahWxk=";
-        final String message = MessageDigest.digest("test", MessageDigest.Algorithm.SHA3_256);
+        final String message = "36f028580bb02cc8272a9a020f4200e346e276ae664e45ee80745574e2f5ab80";
         final String signature = "bl7EyGwrdDIcHpizHUcDd4Ui34pQRv5VoM69WEPGNveZVOIXJbX3nWhvBvyGXaCxZIuu0THCo5g8PSr2NZJKBg==";
 
         boolean result = verify(publicKey, signature, message);
@@ -90,7 +89,7 @@ public class IrohaTest {
 
     @Test
     public void test_verify_with_sha3_Successful() throws Exception {
-        final String message = MessageDigest.digest("Iroha Android", MessageDigest.Algorithm.SHA3_256);
+        final String message = "8cc3985a0c8132a1111f4f44402e072b456c9a128e945ec819cbe253cdbdaf53";
         final String signature = sign(keyPair, message);
 
         boolean result = verify(keyPair.publicKey, signature, message);
@@ -111,7 +110,7 @@ public class IrohaTest {
 
     @Test
     public void test_verify_with_sha3_another_public_key_Failure() throws Exception {
-        final String message = MessageDigest.digest("Iroha Android", MessageDigest.Algorithm.SHA3_256);
+        final String message = "8cc3985a0c8132a1111f4f44402e072b456c9a128e945ec819cbe253cdbdaf53";
         final String signature = sign(keyPair, message);
 
         final KeyPair anotherKeyPair = createKeyPair();
