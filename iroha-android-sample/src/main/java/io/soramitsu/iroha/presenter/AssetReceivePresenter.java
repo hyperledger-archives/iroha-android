@@ -55,6 +55,8 @@ import static android.content.Context.CLIPBOARD_SERVICE;
 public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
     public static final String TAG = AssetReceivePresenter.class.getSimpleName();
 
+    private static final int QR_SIZE = 500;
+
     private final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
 
     private AssetReceiveView assetReceiveView;
@@ -140,6 +142,8 @@ public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
 
     public TextWatcher textWatcher() {
         return new TextWatcher() {
+            private static final String ZERO = "0";
+
             private boolean isAmountEmpty;
 
             @Override
@@ -150,7 +154,7 @@ public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (isAmountEmpty && charSequence.toString().equals("0")) {
+                if (isAmountEmpty && charSequence.toString().equals(ZERO)) {
                     assetReceiveView.setAmount("");
                     return;
                 }
@@ -230,7 +234,7 @@ public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
             if (qr == null) {
                 Log.d(TAG, "generateQR: new generation!");
                 qr = QRCodeGenerator.generateQR(
-                        generateQrParamsText(), 500, QRCodeGenerator.ENCODE_CHARACTER_TYPE_UTF_8);
+                        generateQrParamsText(), QR_SIZE, QRCodeGenerator.ENCODE_CHARACTER_TYPE_UTF_8);
             }
             setQR(qr);
         } catch (WriterException e) {
@@ -241,7 +245,7 @@ public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
     private void changeQR() {
         try {
             qr = QRCodeGenerator.generateQR(
-                    generateQrParamsText(), 500, QRCodeGenerator.ENCODE_CHARACTER_TYPE_UTF_8);
+                    generateQrParamsText(), QR_SIZE, QRCodeGenerator.ENCODE_CHARACTER_TYPE_UTF_8);
             setQR(qr);
         } catch (WriterException e) {
             assetReceiveView.showError(ErrorMessageFactory.create(assetReceiveView.getContext(), e));

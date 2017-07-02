@@ -44,6 +44,10 @@ import io.soramitsu.iroha.view.fragment.WalletFragment;
 public class WalletPresenter implements Presenter<WalletView> {
     public static final String TAG = WalletPresenter.class.getSimpleName();
 
+    private static final int FETCHING_TRANSACTION_LIMIT = 30;
+    private static final int FETCHING_TRANSACTION_OFFSET = 0;
+    private static final int HANDLER_TASK_DELAY_TIME = 1500;
+
     private WalletView walletView;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
@@ -114,12 +118,12 @@ public class WalletPresenter implements Presenter<WalletView> {
     }
 
     private void renderFromMemory() {
-        Log.d(TAG, "transactionHistory: cache in memory");
+        Log.i(TAG, "transactionHistory: cache in memory");
         walletView.renderTransactionHistory(walletView.getTransaction());
     }
 
     private void renderFromNetwork(WalletFragment.RefreshState state) {
-        Log.d(TAG, "transactionHistory: fetch network or cache");
+        Log.i(TAG, "transactionHistory: fetch network or cache");
 
         switch (state) {
             case RE_CREATED_FRAGMENT:
@@ -137,7 +141,7 @@ public class WalletPresenter implements Presenter<WalletView> {
         final IrohaClient irohaClient = IrohaClient.getInstance();
         Disposable disposable = Single.zip(
                 irohaClient.fetchAccountInfo(uuid),
-                irohaClient.fetchTx(uuid, 30, 0),
+                irohaClient.fetchTx(uuid, FETCHING_TRANSACTION_LIMIT, FETCHING_TRANSACTION_OFFSET),
                 (account, tx) -> {
                     AccountInfo accountInfo = new AccountInfo();
                     if (account != null && account.assets != null && !account.assets.isEmpty()) {
@@ -178,7 +182,7 @@ public class WalletPresenter implements Presenter<WalletView> {
     }
 
     public SwipeRefreshLayout.OnRefreshListener onSwipeRefresh() {
-        return () -> refreshHandler.postDelayed(transactionRunnable, 1500);
+        return () -> refreshHandler.postDelayed(transactionRunnable, HANDLER_TASK_DELAY_TIME);
     }
 
     public View.OnClickListener onRefresh() {
