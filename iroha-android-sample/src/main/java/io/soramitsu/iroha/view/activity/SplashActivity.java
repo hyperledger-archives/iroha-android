@@ -32,6 +32,8 @@ import static io.soramitsu.iroha.IrohaApplication.isRegistered;
 public class SplashActivity extends AppCompatActivity {
     public static final String TAG = SplashActivity.class.getSimpleName();
 
+    private static final int HANDLER_TASK_DELAY_TIME = 1000;
+
     private Navigator navigator = Navigator.getInstance();
 
     private SplashFragment splashFragment;
@@ -48,7 +50,7 @@ public class SplashActivity extends AppCompatActivity {
         splashFragment.show(getSupportFragmentManager(), SplashFragment.TAG);
 
         final Context context = getApplicationContext();
-        new Handler().postDelayed(() -> {
+        new Handler().postDelayed(() -> { // FIXME methodに切り分ける ex. gotoNextScreen
             if (isRegistered(context)) {
                 final String uuid = Account.getUuid(context);
                 navigator.navigateToMainActivity(context, uuid);
@@ -57,6 +59,6 @@ public class SplashActivity extends AppCompatActivity {
             }
             finish();
             splashFragment.dismiss();
-        }, 1000);
+        }, HANDLER_TASK_DELAY_TIME);
     }
 }

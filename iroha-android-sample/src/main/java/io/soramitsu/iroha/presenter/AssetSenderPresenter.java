@@ -22,7 +22,6 @@ import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -104,6 +103,8 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
 
     public TextWatcher textWatcher() {
         return new TextWatcher() {
+            private static final String ZERO = "0";
+
             private boolean isAmountEmpty;
 
             @Override
@@ -114,7 +115,7 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (isAmountEmpty && charSequence.toString().equals("0")) {
+                if (isAmountEmpty && charSequence.toString().equals(ZERO)) {
                     assetSenderView.setAmount("");
                     return;
                 }
@@ -171,8 +172,6 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
     }
 
     private void onError(Throwable e) {
-        Log.e(TAG, "onError: ", e);
-
         assetSenderView.hideProgress();
 
         final Context ctx = assetSenderView.getContext();

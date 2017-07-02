@@ -41,6 +41,7 @@ import retrofit2.http.POST;
 import retrofit2.http.Query;
 
 public class IrohaClient {
+    private static final String IROHA_BASE_URL = "https://point-demo.iroha.tech/";
     private static final IrohaClient client = new IrohaClient();
 
     private final IrohaService irohaService;
@@ -52,7 +53,7 @@ public class IrohaClient {
                 .create();
 
         irohaService = new Retrofit.Builder()
-                .baseUrl("https://point-demo.iroha.tech/")
+                .baseUrl(IROHA_BASE_URL)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build()

@@ -55,7 +55,11 @@ import static cn.pedant.SweetAlert.SweetAlertDialog.WARNING_TYPE;
 public class MainActivity extends AppCompatActivity {
     public static final String TAG = MainActivity.class.getSimpleName();
 
+    private static final String TAG_FOR_LIBS_SCREEN = "libs";
+
     private static final String BUNDLE_MAIN_ACTIVITY_KEY_UUID = "UUID";
+    private static final String IROHA_ANDROID_LIB_NAME = "iroha_android";
+    private static final int HANDLER_TASK_DELAY_TIME = 1000;
 
     private Navigator navigator = Navigator.getInstance();
 
@@ -99,7 +103,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        Log.d(TAG, "dispatchTouchEvent: ");
         inputMethodManager.hideSoftInputFromWindow(
                 binding.container.getWindowToken(),
                 InputMethodManager.HIDE_NOT_ALWAYS
@@ -132,7 +135,6 @@ public class MainActivity extends AppCompatActivity {
         View headerView = binding.navigation.getHeaderView(0);
         ((TextView) headerView.findViewById(R.id.name)).setText(alias);
         ((TextView) headerView.findViewById(R.id.email)).setText(uuid);
-        Log.d(TAG, "initNavigationHeader: " + uuid);
     }
 
     private void initNavigationView() {
@@ -227,7 +229,7 @@ public class MainActivity extends AppCompatActivity {
                     .withAboutIconShown(true)
                     .withAboutVersionShown(true)
                     .withAboutDescription(getString(R.string.library_description))
-                    .withLibraries("iroha_android")
+                    .withLibraries(IROHA_ANDROID_LIB_NAME)
                     .supportFragment();
         }
 
@@ -270,25 +272,22 @@ public class MainActivity extends AppCompatActivity {
 
     private void unregister() {
         SweetAlertDialog dialog = new SweetAlertDialog(this, WARNING_TYPE)
-                .setTitleText("Account Delete")
-                .setContentText("Are you sure you want to delete your account info?")
-                .setConfirmClickListener(sweetAlertDialog -> {
+                .setTitleText(getString(R.string.account_delete))
+                .setContentText(getString(R.string.message_delete_account))
+                .setConfirmClickListener(sweetAlertDialog -> { // FIXME methodに切り分ける ex. changeAlertTypeToProgress
                     sweetAlertDialog
-                            .setTitleText("Deleting…")
+                            .setTitleText(getString(R.string.during_delete))
                             .setContentText(null)
                             .changeAlertType(SweetAlertDialog.PROGRESS_TYPE);
 
-                    Account.delete(getApplicationContext());
+                    Account.delete(getApplicationContext()); // TODO Account#deleteで成否がわからないのは問題では？
 
-                    new Handler().postDelayed(() -> {
-                        final String title = getString(R.string.successful);
-                        final String content = getString(R.string.message_account_deleted);
-                        sweetAlertDialog
-                                .setTitleText(title)
-                                .setContentText(content)
-                                .setConfirmClickListener(d -> gotoRegister())
-                                .changeAlertType(SUCCESS_TYPE);
-                    }, 1000);
+                    new Handler().postDelayed(() -> // FIXME methodに切り分ける ex. changeAlertTypeToSuccess
+                            sweetAlertDialog
+                                    .setTitleText(getString(R.string.successful))
+                                    .setContentText(getString(R.string.message_account_deleted))
+                                    .setConfirmClickListener(d -> gotoRegister())
+                                    .changeAlertType(SUCCESS_TYPE), HANDLER_TASK_DELAY_TIME);
                 });
         dialog.setCancelable(true);
         dialog.show();
@@ -302,7 +301,7 @@ public class MainActivity extends AppCompatActivity {
     private void gotoOssInfo() {
         binding.bottomNavigation.setVisibility(View.GONE);
         binding.toolbar.setTitle(getString(R.string.open_source_license));
-        switchFragment(libsFragment, "libs");
+        switchFragment(libsFragment, TAG_FOR_LIBS_SCREEN);
         allClearNavigationMenuChecked();
         binding.navigation.getMenu().getItem(2).setChecked(true);
     }
