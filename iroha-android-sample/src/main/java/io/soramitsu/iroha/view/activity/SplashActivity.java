@@ -38,27 +38,43 @@ public class SplashActivity extends AppCompatActivity {
 
     private SplashFragment splashFragment;
 
+    private Handler uiThreadHandler;
+    private Runnable taskOnUiThread;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+        init();
         openSplashFragment();
+    }
+
+    @Override
+    protected void onDestroy() {
+        uiThreadHandler.removeCallbacks(taskOnUiThread);
+        super.onDestroy();
+    }
+
+    private void init() {
+        uiThreadHandler = new Handler(getMainLooper());
+        taskOnUiThread = this::gotoNextScreen;
     }
 
     private void openSplashFragment() {
         splashFragment = SplashFragment.newInstance();
         splashFragment.show(getSupportFragmentManager(), SplashFragment.TAG);
+        uiThreadHandler.postDelayed(taskOnUiThread, HANDLER_TASK_DELAY_TIME);
+    }
 
+    private void gotoNextScreen() {
         final Context context = getApplicationContext();
-        new Handler().postDelayed(() -> { // FIXME methodに切り分ける ex. gotoNextScreen
-            if (isRegistered(context)) {
-                final String uuid = Account.getUuid(context);
-                navigator.navigateToMainActivity(context, uuid);
-            } else {
-                navigator.navigateToRegisterActivity(context);
-            }
-            finish();
-            splashFragment.dismiss();
-        }, HANDLER_TASK_DELAY_TIME);
+        if (isRegistered(context)) {
+            final String uuid = Account.getUuid(context);
+            navigator.navigateToMainActivity(context, uuid);
+        } else {
+            navigator.navigateToRegisterActivity(context);
+        }
+        finish();
+        splashFragment.dismiss();
     }
 }
