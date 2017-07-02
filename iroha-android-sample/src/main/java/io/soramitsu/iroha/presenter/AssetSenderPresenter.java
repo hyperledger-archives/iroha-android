@@ -65,6 +65,7 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
     @Override
     public void onStart() {
         keyPair = getKeyPair();
+        assetSenderView.setupViewState();
     }
 
     @Override

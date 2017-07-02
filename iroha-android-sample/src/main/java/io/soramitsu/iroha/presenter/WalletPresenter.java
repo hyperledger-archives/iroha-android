@@ -49,7 +49,7 @@ public class WalletPresenter implements Presenter<WalletView> {
     private static final int HANDLER_TASK_DELAY_TIME = 1500;
 
     private WalletView walletView;
-    private CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     private Handler refreshHandler;
     private Runnable transactionRunnable;
@@ -70,6 +70,7 @@ public class WalletPresenter implements Presenter<WalletView> {
     public void onStart() {
         refreshHandler = new Handler();
         transactionRunnable = () -> transactionHistory(WalletFragment.RefreshState.SWIPE_UP);
+        transactionHistory(WalletFragment.RefreshState.RE_CREATED_FRAGMENT);
     }
 
     @Override

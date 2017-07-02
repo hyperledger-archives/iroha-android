@@ -22,7 +22,6 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,13 +48,13 @@ import static cn.pedant.SweetAlert.SweetAlertDialog.SUCCESS_TYPE;
 import static cn.pedant.SweetAlert.SweetAlertDialog.WARNING_TYPE;
 import static com.google.zxing.integration.android.IntentIntegrator.QR_CODE_TYPES;
 
-public class AssetSenderFragment extends Fragment
+public class AssetSenderFragment extends BaseFragment<AssetSenderPresenter>
         implements AssetSenderView, MainActivity.MainActivityListener {
     public static final String TAG = AssetSenderFragment.class.getSimpleName();
 
     private static final String ZERO = "0";
 
-    private AssetSenderPresenter assetSenderPresenter = new AssetSenderPresenter();
+    private final AssetSenderPresenter assetSenderPresenter = new AssetSenderPresenter();
 
     private FragmentAssetSenderBinding binding;
     private SweetAlertDialog sweetAlertDialog;
@@ -67,9 +66,8 @@ public class AssetSenderFragment extends Fragment
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
+        setPresenter(assetSenderPresenter);
         super.onCreate(savedInstanceState);
-        assetSenderPresenter.setView(this);
-        assetSenderPresenter.onCreate();
     }
 
     @Override
@@ -85,33 +83,6 @@ public class AssetSenderFragment extends Fragment
         binding.qrButton.setOnClickListener(assetSenderPresenter.onQRShowClicked());
         binding.submitButton.setOnClickListener(assetSenderPresenter.onSubmitClicked());
         binding.amount.addTextChangedListener(assetSenderPresenter.textWatcher());
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        assetSenderPresenter.onStart();
-        if (binding.receiver.getText().length() != 0) {
-            Log.d(TAG, "onStart: " + binding.receiver.getText().toString());
-            afterQRReadViewState(
-                    binding.receiver.getText().toString(),
-                    binding.amount.getText().toString()
-            );
-        } else {
-            beforeQRReadViewState();
-        }
-    }
-
-    @Override
-    public void onStop() {
-        assetSenderPresenter.onStop();
-        super.onStop();
-    }
-
-    @Override
-    public void onDestroy() {
-        assetSenderPresenter.onDestroy();
-        super.onDestroy();
     }
 
     @Override
@@ -132,10 +103,11 @@ public class AssetSenderFragment extends Fragment
             return;
         }
 
-        final String value = String.valueOf(params.amount).equals(ZERO)
+        final String receiverAddress = params.account;
+        final String sendAmount = String.valueOf(params.amount).equals(ZERO)
                 ? ""
                 : String.valueOf(params.amount);
-        afterQRReadViewState(params.account, value);
+        afterQRReadViewState(receiverAddress, sendAmount);
     }
 
     @Override
@@ -222,6 +194,17 @@ public class AssetSenderFragment extends Fragment
     @Override
     public void hideProgress() {
         // nothing
+    }
+
+    @Override
+    public void setupViewState() {
+        if (binding.receiver.getText().length() != 0) {
+            final String receiverAddress = binding.receiver.getText().toString();
+            final String sendAmount = binding.amount.getText().toString();
+            afterQRReadViewState(receiverAddress, sendAmount);
+        } else {
+            beforeQRReadViewState();
+        }
     }
 
     @Override

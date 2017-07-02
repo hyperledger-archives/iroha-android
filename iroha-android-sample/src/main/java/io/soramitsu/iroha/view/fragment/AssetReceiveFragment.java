@@ -21,7 +21,6 @@ import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,13 +32,13 @@ import io.soramitsu.iroha.presenter.AssetReceivePresenter;
 import io.soramitsu.iroha.view.AssetReceiveView;
 import io.soramitsu.iroha.view.activity.MainActivity;
 
-public class AssetReceiveFragment extends Fragment
+public class AssetReceiveFragment extends BaseFragment<AssetReceivePresenter>
         implements AssetReceiveView, MainActivity.MainActivityListener {
     public static final String TAG = AssetReceiveFragment.class.getSimpleName();
 
     private static final String ARG_ASSET_RECEIVE_KEY_UUID = "uuid";
 
-    private AssetReceivePresenter assetReceivePresenter = new AssetReceivePresenter();
+    private final AssetReceivePresenter assetReceivePresenter = new AssetReceivePresenter();
 
     private FragmentAssetReceiveBinding binding;
 
@@ -55,10 +54,9 @@ public class AssetReceiveFragment extends Fragment
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
+        setPresenter(assetReceivePresenter);
         super.onCreate(savedInstanceState);
-        assetReceivePresenter.setView(this);
         assetReceivePresenter.setUuid(getArguments().getString(ARG_ASSET_RECEIVE_KEY_UUID));
-        assetReceivePresenter.onCreate();
     }
 
     @Override
@@ -76,24 +74,6 @@ public class AssetReceiveFragment extends Fragment
         binding.swipeRefresh.setOnRefreshListener(assetReceivePresenter.onSwipeRefresh());
         binding.receiverAmount.addTextChangedListener(assetReceivePresenter.textWatcher());
         binding.publicKey.setOnClickListener(assetReceivePresenter.onPublicKeyTextClicked());
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        assetReceivePresenter.onStart();
-    }
-
-    @Override
-    public void onStop() {
-        assetReceivePresenter.onStop();
-        super.onStop();
-    }
-
-    @Override
-    public void onDestroy() {
-        assetReceivePresenter.onDestroy();
-        super.onDestroy();
     }
 
     @Override

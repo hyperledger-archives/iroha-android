@@ -39,4 +39,6 @@ public interface AssetSenderView extends LoadingView {
     void beforeQRReadViewState();
 
     void afterQRReadViewState(String receiver, String value);
+
+    void setupViewState();
 }
