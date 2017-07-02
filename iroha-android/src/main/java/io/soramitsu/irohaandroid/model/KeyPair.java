@@ -29,6 +29,10 @@ import io.soramitsu.irohaandroid.security.KeyStoreManager;
  * KeyPair for ed25519.
  */
 public class KeyPair implements KeyPairCache {
+    public static final String EXTERNAL_DIRECTORY_NAME = "keypair";
+    private static final String EXTERNAL_PRIVATE_KEY_FILE_NAME = "private_key.txt";
+    private static final String EXTERNAL_PUBLIC_KEY_FILE_NAME = "public_key.txt";
+
     public String privateKey;
     public String publicKey;
 
@@ -37,9 +41,9 @@ public class KeyPair implements KeyPairCache {
 
         KeyStoreManager keyStoreManager = new KeyStoreManager.Builder(context).build();
 
-        File extStorage = context.getExternalFilesDir("keypair");
-        File privateKeyFile = new File(extStorage, "private_key.txt");
-        File publicKeyFile = new File(extStorage, "public_key.txt");
+        File extStorage = context.getExternalFilesDir(EXTERNAL_DIRECTORY_NAME);
+        File privateKeyFile = new File(extStorage, EXTERNAL_PRIVATE_KEY_FILE_NAME);
+        File publicKeyFile = new File(extStorage, EXTERNAL_PUBLIC_KEY_FILE_NAME);
 
         String privateKey = keyStoreManager.decrypt(fileManager.readFileContent(privateKeyFile));
         String publicKey = keyStoreManager.decrypt(fileManager.readFileContent(publicKeyFile));
@@ -60,11 +64,11 @@ public class KeyPair implements KeyPairCache {
         String encryptedPrivateKey = keyStoreManager.encrypt(privateKey);
         String encryptedPublicKey = keyStoreManager.encrypt(publicKey);
 
-        File extStorage = context.getExternalFilesDir("keypair");
+        File extStorage = context.getExternalFilesDir(EXTERNAL_DIRECTORY_NAME);
         fileManager.clearDirectory(extStorage);
 
-        File privateKeyFile = new File(extStorage, "private_key.txt");
-        File publicKeyFile = new File(extStorage, "public_key.txt");
+        File privateKeyFile = new File(extStorage, EXTERNAL_PRIVATE_KEY_FILE_NAME);
+        File publicKeyFile = new File(extStorage, EXTERNAL_PUBLIC_KEY_FILE_NAME);
 
         fileManager.writeToFile(privateKeyFile, encryptedPrivateKey);
         fileManager.writeToFile(publicKeyFile, encryptedPublicKey);
@@ -72,7 +76,7 @@ public class KeyPair implements KeyPairCache {
 
     public static void delete(Context context) {
         FileManager fileManager = new FileManager();
-        fileManager.clearDirectory(context.getExternalFilesDir("keypair"));
+        fileManager.clearDirectory(context.getExternalFilesDir(EXTERNAL_DIRECTORY_NAME));
     }
 
     public boolean isEmpty() {
