@@ -19,7 +19,6 @@ package io.soramitsu.iroha.view.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,10 +29,11 @@ import io.soramitsu.iroha.databinding.FragmentAccountRegisterBinding;
 import io.soramitsu.iroha.presenter.AccountRegisterPresenter;
 import io.soramitsu.iroha.view.AccountRegisterView;
 
-public class AccountRegisterFragment extends Fragment implements AccountRegisterView {
+public class AccountRegisterFragment extends BaseFragment<AccountRegisterPresenter>
+        implements AccountRegisterView {
     public static final String TAG = AccountRegisterFragment.class.getSimpleName();
 
-    private AccountRegisterPresenter accountRegisterPresenter = new AccountRegisterPresenter();
+    private final AccountRegisterPresenter accountRegisterPresenter = new AccountRegisterPresenter();
 
     private FragmentAccountRegisterBinding binding;
     private SweetAlertDialog sweetAlertDialog;
@@ -45,10 +45,9 @@ public class AccountRegisterFragment extends Fragment implements AccountRegister
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        setPresenter(accountRegisterPresenter);
         super.onCreate(savedInstanceState);
-        accountRegisterPresenter.setView(this);
-        accountRegisterPresenter.onCreate();
     }
 
     @Override
@@ -72,18 +71,6 @@ public class AccountRegisterFragment extends Fragment implements AccountRegister
             throw new ClassCastException();
         }
         accountRegisterListener = (AccountRegisterListener) getActivity();
-    }
-
-    @Override
-    public void onStop() {
-        accountRegisterPresenter.onStop();
-        super.onStop();
-    }
-
-    @Override
-    public void onDestroy() {
-        accountRegisterPresenter.onDestroy();
-        super.onDestroy();
     }
 
     @Override

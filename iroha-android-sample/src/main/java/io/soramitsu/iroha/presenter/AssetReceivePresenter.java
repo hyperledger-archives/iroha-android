@@ -60,7 +60,7 @@ public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
     private final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
 
     private AssetReceiveView assetReceiveView;
-    private CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     private Handler refreshHandler;
     private Runnable transactionRunnable;

@@ -20,7 +20,6 @@ package io.soramitsu.iroha.view.fragment;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,13 +37,13 @@ import io.soramitsu.iroha.view.activity.MainActivity;
 import io.soramitsu.iroha.view.adapter.TransactionListAdapter;
 import io.soramitsu.irohaandroid.model.KeyPair;
 
-public class WalletFragment extends Fragment
+public class WalletFragment extends BaseFragment<WalletPresenter>
         implements WalletView, MainActivity.MainActivityListener {
     public static final String TAG = WalletFragment.class.getSimpleName();
 
     private static final String ARG_WALLET_KEY_UUID = "uuid";
 
-    private WalletPresenter walletPresenter = new WalletPresenter();
+    private final WalletPresenter walletPresenter = new WalletPresenter();
 
     private FragmentWalletBinding binding;
     private TransactionListAdapter transactionListAdapter;
@@ -65,10 +64,9 @@ public class WalletFragment extends Fragment
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        setPresenter(walletPresenter);
         super.onCreate(savedInstanceState);
-        walletPresenter.setView(this);
         walletPresenter.setUuid(getArguments().getString(ARG_WALLET_KEY_UUID));
-        walletPresenter.onCreate();
     }
 
     @Override
@@ -106,37 +104,6 @@ public class WalletFragment extends Fragment
                 publicKey
         );
         binding.transactionList.setAdapter(transactionListAdapter);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        walletPresenter.onStart();
-        walletPresenter.transactionHistory(RefreshState.RE_CREATED_FRAGMENT);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        walletPresenter.onResume();
-    }
-
-    @Override
-    public void onPause() {
-        walletPresenter.onPause();
-        super.onPause();
-    }
-
-    @Override
-    public void onStop() {
-        walletPresenter.onStop();
-        super.onStop();
-    }
-
-    @Override
-    public void onDestroy() {
-        walletPresenter.onDestroy();
-        super.onDestroy();
     }
 
     @Override
