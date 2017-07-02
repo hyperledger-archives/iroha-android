@@ -71,6 +71,9 @@ public class MainActivity extends AppCompatActivity {
     private AssetReceiveFragment assetReceiveFragment;
     private LibsSupportFragment libsFragment;
 
+    private Handler uiThreadHandler;
+    private Runnable taskOnUiThread;
+
     private String uuid;
 
     public interface MainActivityListener {
@@ -102,6 +105,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        if (taskOnUiThread != null) {
+            uiThreadHandler.removeCallbacks(taskOnUiThread);
+        }
+        super.onDestroy();
+    }
+
+    @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         inputMethodManager.hideSoftInputFromWindow(
                 binding.container.getWindowToken(),
@@ -114,6 +125,7 @@ public class MainActivity extends AppCompatActivity {
     private void init(Bundle savedInstanceState) {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        uiThreadHandler = new Handler(getMainLooper());
         initToolbar();
         initNavigationHeader();
         initNavigationView();
@@ -274,23 +286,32 @@ public class MainActivity extends AppCompatActivity {
         SweetAlertDialog dialog = new SweetAlertDialog(this, WARNING_TYPE)
                 .setTitleText(getString(R.string.account_delete))
                 .setContentText(getString(R.string.message_delete_account))
-                .setConfirmClickListener(sweetAlertDialog -> { // FIXME methodに切り分ける ex. changeAlertTypeToProgress
-                    sweetAlertDialog
-                            .setTitleText(getString(R.string.during_delete))
-                            .setContentText(null)
-                            .changeAlertType(SweetAlertDialog.PROGRESS_TYPE);
-
-                    Account.delete(getApplicationContext()); // TODO Account#deleteで成否がわからないのは問題では？
-
-                    new Handler().postDelayed(() -> // FIXME methodに切り分ける ex. changeAlertTypeToSuccess
-                            sweetAlertDialog
-                                    .setTitleText(getString(R.string.successful))
-                                    .setContentText(getString(R.string.message_account_deleted))
-                                    .setConfirmClickListener(d -> gotoRegister())
-                                    .changeAlertType(SUCCESS_TYPE), HANDLER_TASK_DELAY_TIME);
-                });
+                .setConfirmClickListener(this::changeAlertTypeToProgress);
         dialog.setCancelable(true);
         dialog.show();
+    }
+
+    private void changeAlertTypeToProgress(SweetAlertDialog sweetAlertDialog) {
+        sweetAlertDialog
+                .setTitleText(getString(R.string.during_delete))
+                .setContentText(null)
+                .changeAlertType(SweetAlertDialog.PROGRESS_TYPE);
+
+        Account.delete(getApplicationContext()); // TODO Account#deleteで成否がわからないのは問題では？
+
+        if (taskOnUiThread == null) {
+            taskOnUiThread = () -> changeAlertTypeToSuccess(sweetAlertDialog);
+        }
+
+        uiThreadHandler.postDelayed(taskOnUiThread, HANDLER_TASK_DELAY_TIME);
+    }
+
+    private void changeAlertTypeToSuccess(SweetAlertDialog sweetAlertDialog) {
+        sweetAlertDialog
+                .setTitleText(getString(R.string.successful))
+                .setContentText(getString(R.string.message_account_deleted))
+                .setConfirmClickListener(d -> gotoRegister())
+                .changeAlertType(SUCCESS_TYPE);
     }
 
     private void gotoRegister() {
