@@ -21,7 +21,7 @@ import android.support.annotation.NonNull;
 
 import io.soramitsu.iroha.view.View;
 
-interface Presenter<T extends View> {
+public interface Presenter<T extends View> {
     void setView(@NonNull T view);
 
     void onCreate();
