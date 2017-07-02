@@ -39,6 +39,12 @@ public abstract class BaseFragment<P extends Presenter> extends Fragment impleme
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        presenter.onStart();
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         presenter.onResume();
