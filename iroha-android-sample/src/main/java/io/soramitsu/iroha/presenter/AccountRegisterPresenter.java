@@ -44,7 +44,7 @@ public class AccountRegisterPresenter implements Presenter<AccountRegisterView> 
     public static final String TAG = AccountRegisterPresenter.class.getSimpleName();
 
     private AccountRegisterView accountRegisterView;
-    private CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     @Override
     public void setView(@NonNull AccountRegisterView view) {

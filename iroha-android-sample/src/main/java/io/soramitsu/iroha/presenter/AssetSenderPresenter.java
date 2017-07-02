@@ -48,7 +48,7 @@ public class AssetSenderPresenter implements Presenter<AssetSenderView> {
     private static final String IROHA_ASSET_UUID = "60f4a396b520d6c54e33634d060751814e0c4bf103a81c58da704bba82461c32";
 
     private AssetSenderView assetSenderView;
-    private CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     private KeyPair keyPair;
 
