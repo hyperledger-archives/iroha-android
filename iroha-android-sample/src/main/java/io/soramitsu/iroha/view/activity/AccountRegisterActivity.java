@@ -24,7 +24,6 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.inputmethod.InputMethodManager;
 
@@ -38,6 +37,8 @@ import static io.soramitsu.iroha.IrohaApplication.applyRegistered;
 public class AccountRegisterActivity extends AppCompatActivity
         implements AccountRegisterFragment.AccountRegisterListener {
     public static final String TAG = AccountRegisterActivity.class.getSimpleName();
+
+    private static final float BACKGROUND_ALPHA = 0.2f;
 
     private Navigator navigator = Navigator.getInstance();
 
@@ -55,7 +56,7 @@ public class AccountRegisterActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_account_register);
-        binding.backgroundImage.setAlpha(0.2f);
+        binding.backgroundImage.setAlpha(BACKGROUND_ALPHA);
         AnimatorSet set = (AnimatorSet) AnimatorInflater.loadAnimator(this, R.animator.rotate);
         set.setTarget(binding.backgroundImage);
         set.start();
@@ -63,7 +64,6 @@ public class AccountRegisterActivity extends AppCompatActivity
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        Log.d(TAG, "dispatchTouchEvent: ");
         inputMethodManager.hideSoftInputFromWindow(
                 binding.getRoot().getWindowToken(),
                 InputMethodManager.HIDE_NOT_ALWAYS

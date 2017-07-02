@@ -53,6 +53,8 @@ public class AssetSenderFragment extends Fragment
         implements AssetSenderView, MainActivity.MainActivityListener {
     public static final String TAG = AssetSenderFragment.class.getSimpleName();
 
+    private static final String ZERO = "0";
+
     private AssetSenderPresenter assetSenderPresenter = new AssetSenderPresenter();
 
     private FragmentAssetSenderBinding binding;
@@ -130,10 +132,9 @@ public class AssetSenderFragment extends Fragment
             return;
         }
 
-        final String value = String.valueOf(params.amount).equals("0")
+        final String value = String.valueOf(params.amount).equals(ZERO)
                 ? ""
                 : String.valueOf(params.amount);
-        Log.d(TAG, "onActivityResult: " + value);
         afterQRReadViewState(params.account, value);
     }
 
@@ -183,7 +184,6 @@ public class AssetSenderFragment extends Fragment
 
     @Override
     public String getReceiver() {
-        Log.d(TAG, "getReceiver: " + binding.receiver.getText().toString());
         return binding.receiver.getText().toString();
     }
 

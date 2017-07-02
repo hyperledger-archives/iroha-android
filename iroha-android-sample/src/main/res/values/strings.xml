@@ -58,4 +58,7 @@
     <string name="message_account_deleted">Account deleted</string>
     <string name="warning">Warning!</string>
     <string name="connection">Connection…</string>
+    <string name="message_delete_account">Are you sure you want to delete your account info?</string>
+    <string name="account_delete">Account Delete</string>
+    <string name="during_delete">Deleting…</string>
 </resources>
