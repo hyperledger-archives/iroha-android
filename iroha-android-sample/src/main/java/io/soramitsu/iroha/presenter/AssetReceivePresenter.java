@@ -218,8 +218,8 @@ public class AssetReceivePresenter implements Presenter<AssetReceiveView> {
 
     @NonNull
     private String getUuid() {
-        final Context context = assetReceiveView.getContext();
         if (TextUtils.isEmpty(uuid)) {
+            final Context context = assetReceiveView.getContext();
             uuid = Account.getUuid(context);
         }
         return uuid;
