@@ -15,7 +15,7 @@
 - [Usage](#usage)
 - [License](#license)
 
-## Requirement
+## Requirements
 
 - Android Studio >=2.2.1  
 - Android API Level >=v19 (v4.4, KitKat)
