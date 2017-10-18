@@ -25,9 +25,10 @@ import java.util.List;
 
 import io.soramitsu.irohaandroid.cache.FileManager;
 import io.soramitsu.irohaandroid.model.KeyPair;
-import io.soramitsu.irohaandroid.security.KeyStoreManager;
+import io.soramitsu.irohaandroid.security.Encryptor;
 
 public class Account implements Serializable {
+
     private static final String EXTERNAL_DIRECTORY_NAME = "account";
     private static final String EXTERNAL_UUID_FILE_NAME = "uuid.txt";
     private static final String EXTERNAL_ALIAS_FILE_NAME = "alias.txt";
@@ -39,9 +40,8 @@ public class Account implements Serializable {
     public void save(Context context) {
         FileManager fileManager = new FileManager();
 
-        KeyStoreManager keyStoreManager = new KeyStoreManager.Builder(context).build();
-        String encryptedUuid = keyStoreManager.encrypt(uuid);
-        String encryptedAlias = keyStoreManager.encrypt(alias);
+        String encryptedUuid = Encryptor.encrypt(uuid);
+        String encryptedAlias = Encryptor.encrypt(alias);
 
         File extStorage = context.getExternalFilesDir(EXTERNAL_DIRECTORY_NAME);
         fileManager.clearDirectory(extStorage);
@@ -56,23 +56,20 @@ public class Account implements Serializable {
     public static String getUuid(Context context) {
         FileManager fileManager = new FileManager();
 
-        KeyStoreManager keyStoreManager = new KeyStoreManager.Builder(context).build();
-
         File extStorage = context.getExternalFilesDir(EXTERNAL_DIRECTORY_NAME);
         File uuidFile = new File(extStorage, EXTERNAL_UUID_FILE_NAME);
 
-        return keyStoreManager.decrypt(fileManager.readFileContent(uuidFile));
+        return Encryptor.decrypt(fileManager.readFileContent(uuidFile));
     }
 
     public static String getAlias(Context context) {
         FileManager fileManager = new FileManager();
 
-        KeyStoreManager keyStoreManager = new KeyStoreManager.Builder(context).build();
 
         File extStorage = context.getExternalFilesDir(EXTERNAL_DIRECTORY_NAME);
         File aliasFile = new File(extStorage, EXTERNAL_ALIAS_FILE_NAME);
 
-        return keyStoreManager.decrypt(fileManager.readFileContent(aliasFile));
+        return Encryptor.decrypt(fileManager.readFileContent(aliasFile));
     }
 
     public static void delete(Context context) {

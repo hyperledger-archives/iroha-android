@@ -31,8 +31,7 @@ public class FileManager {
 
     public void writeToFile(File file, String fileContent) {
         if (!file.exists()) {
-            try {
-                FileWriter writer = new FileWriter(file);
+            try (FileWriter writer = new FileWriter(file)) {
                 writer.write(fileContent);
                 writer.close();
             } catch (IOException e) {
@@ -45,8 +44,7 @@ public class FileManager {
         StringBuilder fileContentBuilder = new StringBuilder();
         if (file.exists()) {
             String stringLine;
-            try {
-                FileReader fileReader = new FileReader(file);
+            try (FileReader fileReader = new FileReader(file)) {
                 BufferedReader bufferedReader = new BufferedReader(fileReader);
                 while ((stringLine = bufferedReader.readLine()) != null) {
                     fileContentBuilder.append(stringLine + "\n");
