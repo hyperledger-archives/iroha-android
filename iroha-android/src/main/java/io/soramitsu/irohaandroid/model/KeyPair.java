@@ -23,7 +23,7 @@ import java.io.File;
 
 import io.soramitsu.irohaandroid.cache.FileManager;
 import io.soramitsu.irohaandroid.cache.KeyPairCache;
-import io.soramitsu.irohaandroid.security.KeyStoreManager;
+import io.soramitsu.irohaandroid.security.Encryptor;
 
 /**
  * KeyPair for ed25519.
@@ -39,14 +39,12 @@ public class KeyPair implements KeyPairCache {
     public static KeyPair getKeyPair(Context context) {
         FileManager fileManager = new FileManager();
 
-        KeyStoreManager keyStoreManager = new KeyStoreManager.Builder(context).build();
-
         File extStorage = context.getExternalFilesDir(EXTERNAL_DIRECTORY_NAME);
         File privateKeyFile = new File(extStorage, EXTERNAL_PRIVATE_KEY_FILE_NAME);
         File publicKeyFile = new File(extStorage, EXTERNAL_PUBLIC_KEY_FILE_NAME);
 
-        String privateKey = keyStoreManager.decrypt(fileManager.readFileContent(privateKeyFile));
-        String publicKey = keyStoreManager.decrypt(fileManager.readFileContent(publicKeyFile));
+        String privateKey = Encryptor.decrypt(fileManager.readFileContent(privateKeyFile));
+        String publicKey = Encryptor.decrypt(fileManager.readFileContent(publicKeyFile));
 
         return new KeyPair(privateKey, publicKey);
     }
@@ -60,9 +58,8 @@ public class KeyPair implements KeyPairCache {
     public void save(Context context) {
         FileManager fileManager = new FileManager();
 
-        KeyStoreManager keyStoreManager = new KeyStoreManager.Builder(context).build();
-        String encryptedPrivateKey = keyStoreManager.encrypt(privateKey);
-        String encryptedPublicKey = keyStoreManager.encrypt(publicKey);
+        String encryptedPrivateKey = Encryptor.encrypt(privateKey);
+        String encryptedPublicKey = Encryptor.encrypt(publicKey);
 
         File extStorage = context.getExternalFilesDir(EXTERNAL_DIRECTORY_NAME);
         fileManager.clearDirectory(extStorage);

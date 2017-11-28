@@ -17,7 +17,10 @@
 
 package io.soramitsu.irohaandroid;
 
+import android.content.Context;
+
 import io.soramitsu.irohaandroid.model.KeyPair;
+import io.soramitsu.irohaandroid.security.Encryptor;
 
 /**
  * Iroha client.
@@ -29,6 +32,9 @@ public class Iroha {
     private Iroha() {
     }
 
+    public static void initIroha(Context context) {
+        Encryptor.initialize(context);
+    }
     /* ============ 【KeyPair】 from here ============  */
 
     /**
