@@ -1,64 +1,106 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+<layout>
 
-    <android.support.v4.widget.DrawerLayout
-        android:id="@+id/drawer_layout"
+    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        tools:context="jp.co.soramitsu.sample.MainActivity">
 
-        <android.support.design.widget.CoordinatorLayout
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.4" />
+
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/input"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:context=".presentation.view.activity.MainActivity">
+            android:layout_height="match_parent">
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+            <TextView
+                android:id="@+id/create_account_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="Username"
+                android:textSize="20sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-                <android.support.design.widget.AppBarLayout
-                    android:id="@+id/toolbar_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:theme="@style/AppTheme.AppBarOverlay">
+            <EditText
+                android:id="@+id/username"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                android:inputType="text"
+                android:maxLength="63"
+                android:maxLines="1"
+                app:layout_constraintEnd_toEndOf="@id/create_account_label"
+                app:layout_constraintStart_toStartOf="@id/create_account_label"
+                app:layout_constraintTop_toBottomOf="@id/create_account_label" />
 
-                    <android.support.v7.widget.Toolbar
-                        android:id="@+id/toolbar"
-                        android:layout_width="match_parent"
-                        android:layout_height="?attr/actionBarSize"
-                        android:background="?attr/colorPrimary"
-                        app:popupTheme="@style/AppTheme.PopupOverlay" />
+            <TextView
+                android:id="@+id/set_details_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="Account details"
+                android:textSize="20sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/username" />
 
-                </android.support.design.widget.AppBarLayout>
+            <EditText
+                android:id="@+id/details"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:inputType="text"
+                android:maxLength="63"
+                android:maxLines="1"
+                app:layout_constraintEnd_toEndOf="@id/set_details_label"
+                app:layout_constraintStart_toStartOf="@id/set_details_label"
+                app:layout_constraintTop_toBottomOf="@id/set_details_label" />
 
-                <android.support.design.widget.BottomNavigationView
-                    android:id="@+id/bottom_navigation"
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:layout_alignParentBottom="true"
-                    android:background="@color/grey200"
-                    app:menu="@menu/bottom_navigation_menu" />
+            <Button
+                android:id="@+id/send_details"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:alpha="0.5"
+                android:background="@color/colorPrimary"
+                android:enabled="false"
+                android:paddingEnd="8dp"
+                android:paddingStart="8dp"
+                android:text="Send"
+                android:textColor="#ffffff"
+                app:layout_constraintStart_toStartOf="@id/set_details_label"
+                app:layout_constraintTop_toBottomOf="@id/details" />
 
-                <FrameLayout
-                    android:id="@+id/container"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_above="@id/bottom_navigation"
-                    android:layout_below="@id/toolbar_container"
-                    android:focusableInTouchMode="true"
-                    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-                    tools:context=".presentation.view.activity.MainActivity"
-                    tools:showIn="@layout/activity_main" />
-            </RelativeLayout>
-        </android.support.design.widget.CoordinatorLayout>
+        </android.support.constraint.ConstraintLayout>
 
-        <android.support.design.widget.NavigationView
-            android:id="@+id/navigation"
-            android:layout_width="300dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            app:headerLayout="@layout/drawer_header"
-            app:menu="@menu/navigation_menu" />
-    </android.support.v4.widget.DrawerLayout>
+        <TextView
+            android:id="@+id/get_user_details"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:layout_marginTop="16dp"
+            android:textSize="20sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </android.support.constraint.ConstraintLayout>
 </layout>
