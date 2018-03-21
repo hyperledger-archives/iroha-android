@@ -7,8 +7,8 @@ ext {
     libraryName = 'bindings'
     artifact = 'iroha-android-bindings' // has to be same as your library module name
     libraryDescription = 'A set of methods used to manipulate time object'
-    siteUrl = 'https://github.com/hyperledger/iroha-android/'
-    gitUrl = 'https://github.com/hyperledger/iroha-android/.git'
+    siteUrl = 'https://github.com/hyperledger/iroha-android/tree/bindings'
+    gitUrl = 'https://github.com/hyperledger/iroha-android/tree/bindings.git'
     libraryVersion = '1.0'
     developerId = 'hyperledger'
     developerName = 'Bulat Mukhutdinov'

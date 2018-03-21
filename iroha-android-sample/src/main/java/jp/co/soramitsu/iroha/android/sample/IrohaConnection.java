@@ -33,6 +33,7 @@ import static jp.co.soramitsu.iroha.android.sample.Constants.DOMAIN_ID;
 import static jp.co.soramitsu.iroha.android.sample.Constants.PRIV_KEY;
 import static jp.co.soramitsu.iroha.android.sample.Constants.PUB_KEY;
 import static jp.co.soramitsu.iroha.android.sample.Constants.QUERY_COUNTER;
+import static jp.co.soramitsu.iroha.android.sample.Constants.CONNECTION_TIMEOUT_SECONDS;
 import static jp.co.soramitsu.iroha.android.sample.Constants.TX_COUNTER;
 
 
@@ -48,7 +49,6 @@ public class IrohaConnection {
     public IrohaConnection(Context context) {
         channel = ManagedChannelBuilder.forAddress(context.getString(R.string.iroha_url),
                 context.getResources().getInteger(R.integer.iroha_port)).usePlaintext(true).build();
-
     }
 
     public Single<String> execute(String username, String details) {
@@ -79,7 +79,7 @@ public class IrohaConnection {
 
             // Send transaction to iroha
             CommandServiceGrpc.CommandServiceBlockingStub stub = CommandServiceGrpc.newBlockingStub(channel)
-                    .withDeadlineAfter(5, TimeUnit.SECONDS);
+                    .withDeadlineAfter(CONNECTION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
             stub.torii(protoTx);
 
             // Check if it was successful

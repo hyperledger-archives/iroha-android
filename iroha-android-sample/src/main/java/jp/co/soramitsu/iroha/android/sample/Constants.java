@@ -7,4 +7,5 @@ public interface Constants {
     long TX_COUNTER = 1;
     long QUERY_COUNTER = 1;
     String DOMAIN_ID = "test";
+    int CONNECTION_TIMEOUT_SECONDS = 20;
 }
