@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">IrohaAndroidBindings</string>
+    <string name="bio">Any details such as age, profession.</string>
 </resources>

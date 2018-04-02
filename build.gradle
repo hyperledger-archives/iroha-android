@@ -21,6 +21,10 @@ allprojects {
     }
 }
 
+ext {
+    androidSupportLibraryVersion = "27.1.0"
+}
+
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
