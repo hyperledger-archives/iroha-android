@@ -6,4 +6,5 @@
 
     <color name="text">#000000</color>
     <color name="hint">#BDBDBD</color>
+    <color name="positiveAmount">#078B75</color>
 </resources>

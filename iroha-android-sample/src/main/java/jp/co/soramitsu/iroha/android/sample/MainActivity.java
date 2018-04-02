@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import jp.co.soramitsu.iroha.android.sample.databinding.ActivityMainBinding;
+import jp.co.soramitsu.iroha.android.sample.history.HistoryFragment;
 
 public class MainActivity extends AppCompatActivity {
 
