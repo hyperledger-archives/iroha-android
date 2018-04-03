@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.reactivex.Completable;
 import io.reactivex.Single;
 import iroha.protocol.BlockOuterClass;
 import iroha.protocol.CommandServiceGrpc;
@@ -51,8 +52,8 @@ public class IrohaConnection {
                 context.getResources().getInteger(R.integer.iroha_port)).usePlaintext(true).build();
     }
 
-    public Single<String> execute(String username, String details) {
-        return Single.create(emitter -> {
+    public Completable execute(String username, String details) {
+        return Completable.create(emitter -> {
             long currentTime = System.currentTimeMillis();
             Keypair userKeys = crypto.generateKeypair();
             Keypair adminKeys = crypto.convertFromExisting(PUB_KEY, PRIV_KEY);
@@ -132,7 +133,7 @@ public class IrohaConnection {
             QueryServiceGrpc.QueryServiceBlockingStub queryStub = QueryServiceGrpc.newBlockingStub(channel);
             Responses.QueryResponse queryResponse = queryStub.find(protoQuery);
 
-            emitter.onSuccess(queryResponse.getAccountDetailResponse().getDetail());
+            emitter.onComplete();
         });
     }
 
