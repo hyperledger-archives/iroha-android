@@ -27,6 +27,7 @@
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
                     android:src="@drawable/ic_logo"
+                    android:transitionName="profile"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:ignore="ContentDescription" />
