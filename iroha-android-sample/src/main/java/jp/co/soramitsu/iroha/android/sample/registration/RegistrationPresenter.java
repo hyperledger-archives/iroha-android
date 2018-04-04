@@ -17,11 +17,11 @@ public class RegistrationPresenter {
         this.createAccountInteractor = createAccountInteractor;
     }
 
-    public void createAccount(String username, String details) {
-        if (username.length() > 6) {
-            createAccountInteractor.execute(() -> view.didRegistrationSuccess(), error -> view.didRegistrationError(error), username, details);
+    public void createAccount(String username) {
+        if (!username.isEmpty()) {
+            createAccountInteractor.execute(username, () -> view.didRegistrationSuccess(), error -> view.didRegistrationError(error));
         } else {
-            view.didRegistrationError(new Throwable("Username should be at least 6 symbols"));
+            view.didRegistrationError(new Throwable("Username can't be empty"));
         }
     }
 

@@ -36,7 +36,7 @@ public class RegistrationActivity extends AppCompatActivity implements Registrat
         registrationPresenter.setView(this);
 
         RxView.clicks(binding.registerButton)
-                .subscribe(view -> registrationPresenter.createAccount(binding.username.getText().toString().trim(), ""));
+                .subscribe(view -> registrationPresenter.createAccount(binding.username.getText().toString().trim()));
     }
 
     @Override

@@ -10,11 +10,10 @@ import javax.inject.Named;
 
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
-import io.reactivex.functions.Consumer;
 import jp.co.soramitsu.iroha.android.sample.history.Transaction;
 import jp.co.soramitsu.iroha.android.sample.injection.ApplicationModule;
 
-public class GetTransactionsInteractor extends Interactor {
+public class GetTransactionsInteractor extends SingleInteractor<List<Transaction>, Void> {
 
     @Inject
     GetTransactionsInteractor(@Named(ApplicationModule.JOB) Scheduler jobScheduler,
@@ -22,15 +21,7 @@ public class GetTransactionsInteractor extends Interactor {
         super(jobScheduler, uiScheduler);
     }
 
-
-    public void execute(Consumer<List<Transaction>> onSuccess, Consumer<Throwable> onError) {
-        subscriptions.add(build()
-                .subscribeOn(jobScheduler)
-                .observeOn(uiScheduler)
-                .subscribe(onSuccess, onError));
-    }
-
-    protected Single<List<Transaction>> build() {
+    protected Single<List<Transaction>> build(Void v) {
         return Single.create(emitter -> {
             List<Transaction> transactions = new ArrayList<>();
             Calendar calendar = Calendar.getInstance();
