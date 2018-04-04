@@ -13,7 +13,7 @@ import io.reactivex.Single;
 import jp.co.soramitsu.iroha.android.sample.history.Transaction;
 import jp.co.soramitsu.iroha.android.sample.injection.ApplicationModule;
 
-public class GetTransactionsInteractor extends Interactor<List<Transaction>> {
+public class GetTransactionsInteractor extends SingleInteractor<List<Transaction>, Void> {
 
     @Inject
     GetTransactionsInteractor(@Named(ApplicationModule.JOB) Scheduler jobScheduler,
@@ -21,8 +21,7 @@ public class GetTransactionsInteractor extends Interactor<List<Transaction>> {
         super(jobScheduler, uiScheduler);
     }
 
-    @Override
-    protected Single<List<Transaction>> build() {
+    protected Single<List<Transaction>> build(Void v) {
         return Single.create(emitter -> {
             List<Transaction> transactions = new ArrayList<>();
             Calendar calendar = Calendar.getInstance();

@@ -1,8 +1,13 @@
 <resources>
     <string name="app_name">Sample</string>
+    <string name="iroha_ip">199.247.30.27</string>
     <string name="to">To</string>
     <string name="amount">Amount</string>
     <string name="or">OR</string>
     <string name="qr_hint">Send via QR code</string>
     <string name="send">send</string>
+    <string name="registration_title">I R O H A</string>
+    <string name="registration_subtitle">Blockchain technologies for business</string>
+    <string name="username_hint">Username</string>
+    <string name="button_register">Register</string>
 </resources>
