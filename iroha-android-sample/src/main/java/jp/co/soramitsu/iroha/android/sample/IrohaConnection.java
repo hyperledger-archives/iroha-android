@@ -48,7 +48,7 @@ public class IrohaConnection {
     private final ManagedChannel channel;
 
     public IrohaConnection(Context context) {
-        channel = ManagedChannelBuilder.forAddress(context.getString(R.string.iroha_url),
+        channel = ManagedChannelBuilder.forAddress(context.getString(R.string.iroha_ip),
                 context.getResources().getInteger(R.integer.iroha_port)).usePlaintext(true).build();
     }
 

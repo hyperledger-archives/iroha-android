@@ -18,8 +18,8 @@ public class RegistrationPresenter {
     }
 
     public void createAccount(String username, String details) {
-//        createAccountInteractor.execute(() -> view.didRegistrationSuccess(), error -> view.didRegistrationError(error), username , details);
-        view.didRegistrationSuccess();
+        createAccountInteractor.execute(() -> view.didRegistrationSuccess(), error -> view.didRegistrationError(error), username , details);
+//        view.didRegistrationSuccess();
     }
 
 }
