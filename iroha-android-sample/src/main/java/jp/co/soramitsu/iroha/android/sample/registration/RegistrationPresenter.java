@@ -18,8 +18,11 @@ public class RegistrationPresenter {
     }
 
     public void createAccount(String username, String details) {
-        createAccountInteractor.execute(() -> view.didRegistrationSuccess(), error -> view.didRegistrationError(error), username , details);
-//        view.didRegistrationSuccess();
+        if (username.length() > 6) {
+            createAccountInteractor.execute(() -> view.didRegistrationSuccess(), error -> view.didRegistrationError(error), username, details);
+        } else {
+            view.didRegistrationError(new Throwable("Username should be at least 6 symbols"));
+        }
     }
 
 }
