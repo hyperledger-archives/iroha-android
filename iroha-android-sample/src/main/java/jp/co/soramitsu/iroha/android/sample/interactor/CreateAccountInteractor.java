@@ -18,7 +18,6 @@ import jp.co.soramitsu.iroha.android.ByteVector;
 import jp.co.soramitsu.iroha.android.Keypair;
 import jp.co.soramitsu.iroha.android.ModelCrypto;
 import jp.co.soramitsu.iroha.android.ModelProtoTransaction;
-import jp.co.soramitsu.iroha.android.ModelQueryBuilder;
 import jp.co.soramitsu.iroha.android.ModelTransactionBuilder;
 import jp.co.soramitsu.iroha.android.UnsignedTx;
 import jp.co.soramitsu.iroha.android.sample.PreferencesUtil;
@@ -38,7 +37,6 @@ public class CreateAccountInteractor extends CompletableInteractor<String> {
     ModelCrypto crypto;
     private final ModelTransactionBuilder txBuilder = new ModelTransactionBuilder();
     private final ModelProtoTransaction protoTxHelper = new ModelProtoTransaction();
-    private final ModelQueryBuilder modelQueryBuilder = new ModelQueryBuilder();
     private final PreferencesUtil preferenceUtils;
 
     @Inject

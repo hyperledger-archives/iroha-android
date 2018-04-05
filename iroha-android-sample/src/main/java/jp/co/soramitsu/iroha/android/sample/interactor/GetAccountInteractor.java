@@ -3,87 +3,75 @@ package jp.co.soramitsu.iroha.android.sample.interactor;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import java.math.BigInteger;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
+import io.grpc.ManagedChannel;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
-import iroha.protocol.BlockOuterClass;
-import iroha.protocol.CommandServiceGrpc;
+import iroha.protocol.Queries;
+import iroha.protocol.QueryServiceGrpc;
+import iroha.protocol.Responses;
 import jp.co.soramitsu.iroha.android.ByteVector;
 import jp.co.soramitsu.iroha.android.Keypair;
 import jp.co.soramitsu.iroha.android.ModelCrypto;
+import jp.co.soramitsu.iroha.android.ModelProtoQuery;
 import jp.co.soramitsu.iroha.android.ModelQueryBuilder;
 import jp.co.soramitsu.iroha.android.UnsignedQuery;
-import jp.co.soramitsu.iroha.android.UnsignedTx;
+import jp.co.soramitsu.iroha.android.sample.injection.ApplicationModule;
 
-import static jp.co.soramitsu.iroha.android.sample.Constants.CONNECTION_TIMEOUT_SECONDS;
 import static jp.co.soramitsu.iroha.android.sample.Constants.CREATOR;
 import static jp.co.soramitsu.iroha.android.sample.Constants.DOMAIN_ID;
-import static jp.co.soramitsu.iroha.android.sample.Constants.PRIV_KEY;
-import static jp.co.soramitsu.iroha.android.sample.Constants.PUB_KEY;
-import static jp.co.soramitsu.iroha.android.sample.Constants.TX_COUNTER;
+import static jp.co.soramitsu.iroha.android.sample.Constants.QUERY_COUNTER;
 
-/**
- * Created by mrzizik on 4/5/18.
- */
+public class GetAccountInteractor extends SingleInteractor<Responses.Account, String> {
 
-public class GetAccountInteractor extends SingleInteractor<Object, String> {
-
-    @Inject
-    ModelQueryBuilder modelQueryBuilder;
-
+    private final ModelQueryBuilder modelQueryBuilder = new ModelQueryBuilder();
+    private final ModelProtoQuery protoQueryHelper = new ModelProtoQuery();
     @Inject
     ModelCrypto crypto;
+    @Inject
+    ManagedChannel channel;
 
-    public GetAccountInteractor(Scheduler jobScheduler, Scheduler uiScheduler) {
+    @Inject
+    public GetAccountInteractor(@Named(ApplicationModule.JOB) Scheduler jobScheduler,
+                                @Named(ApplicationModule.UI) Scheduler uiScheduler) {
         super(jobScheduler, uiScheduler);
     }
 
     @Override
-    protected Single<Object> build(String account_id) {
+    protected Single<Responses.Account> build(String account_id) {
         return Single.create(emitter -> {
             long currentTime = System.currentTimeMillis();
             Keypair userKeys = crypto.generateKeypair();
-            Keypair adminKeys = crypto.convertFromExisting(PUB_KEY, PRIV_KEY);
 
             // GetAccount
             UnsignedQuery query = modelQueryBuilder
-                    .getAccount(account_id)
+                    .createdTime(BigInteger.valueOf(currentTime))
+                    .queryCounter(BigInteger.valueOf(QUERY_COUNTER))
+                    .creatorAccountId(CREATOR)
+                    .getAccount(account_id+"@"+DOMAIN_ID)
                     .build();
 
 
 
 
             // sign transaction and get its binary representation (Blob)
-            ByteVector txblob = query.signAndAddSignature(adminKeys).blob().blob();
+            ByteVector queryBlob = protoQueryHelper.signAndAddSignature(query, userKeys).blob();
+            byte bquery[] = toByteArray(queryBlob);
 
-
-            // Convert ByteVector to byte array
-            byte bs[] = toByteArray(txblob);
-
-            // create proto object
-            BlockOuterClass.Transaction protoTx = null;
+            Queries.Query protoQuery = null;
             try {
-                protoTx = BlockOuterClass.Transaction.parseFrom(bs);
+                protoQuery = Queries.Query.parseFrom(bquery);
             } catch (InvalidProtocolBufferException e) {
                 emitter.onError(e);
             }
 
-            // Send transaction to iroha
-            CommandServiceGrpc.CommandServiceBlockingStub stub = CommandServiceGrpc.newBlockingStub(channel)
-                    .withDeadlineAfter(CONNECTION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-            stub.torii(protoTx);
+            QueryServiceGrpc.QueryServiceBlockingStub queryStub = QueryServiceGrpc.newBlockingStub(channel);
+            Responses.QueryResponse queryResponse = queryStub.find(protoQuery);
 
-            // Check if it was successful
-            if (!isTransactionSuccessful(stub, createAccount)) {
-                emitter.onError(new RuntimeException("Transaction failed"));
-            } else {
-                preferenceUtils.saveKeys(userKeys);
-                preferenceUtils.saveUsername(username);
-                emitter.onComplete();
-            }
+            emitter.onSuccess(queryResponse.getAccountResponse().getAccount());
         });
     }
 }
