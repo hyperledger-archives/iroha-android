@@ -9,4 +9,7 @@
     <string name="registration_subtitle">Blockchain technologies for business</string>
     <string name="username_hint">Username</string>
     <string name="button_register">Register</string>
+    <string name="error_dialog_title">Failure</string>
+    <string name="username_empty_error_dialog_message">Username can't be empty</string>
+    <string name="please_wait">Please, wait...</string>
 </resources>
