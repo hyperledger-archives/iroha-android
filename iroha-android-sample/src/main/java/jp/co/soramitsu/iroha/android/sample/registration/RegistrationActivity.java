@@ -9,7 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.jakewharton.rxbinding2.view.RxView;
-
 import javax.inject.Inject;
 
 import jp.co.soramitsu.iroha.android.sample.MainActivity;
@@ -63,9 +62,10 @@ public class RegistrationActivity extends AppCompatActivity implements Registrat
         dissmissProgressDialog();
         AlertDialog alertDialog = new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.error_dialog_title))
-                .setMessage(error.getMessage())
+                .setMessage(error.getMessage() == null?getString(R.string.general_error):error.getMessage())
                 .setCancelable(true)
-                .setPositiveButton(android.R.string.ok, (dialog, which) -> {}).create();
+                .setPositiveButton(android.R.string.ok, null)
+                .create();
         alertDialog.show();
     }
 

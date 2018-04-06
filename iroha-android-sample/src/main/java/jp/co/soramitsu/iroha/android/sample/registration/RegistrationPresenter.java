@@ -1,7 +1,5 @@
 package jp.co.soramitsu.iroha.android.sample.registration;
 
-import com.orhanobut.logger.Logger;
-
 import javax.inject.Inject;
 
 import jp.co.soramitsu.iroha.android.sample.PreferencesUtil;
@@ -35,7 +33,7 @@ public class RegistrationPresenter {
                 } else {
                     view.didRegistrationError(new Throwable(SampleApplication.instance.getString(R.string.username_already_exists_error_dialog_message)));
                 }
-            }, e -> Logger.e(e.getLocalizedMessage()));
+            }, e -> view.didRegistrationError(e));
         } else {
             view.didRegistrationError(new Throwable(SampleApplication.instance.getString(R.string.username_empty_error_dialog_message)));
         }
