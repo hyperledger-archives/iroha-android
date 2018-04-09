@@ -2,7 +2,8 @@
 <resources>
     <color name="colorPrimary">#fdfdfd</color>
     <color name="colorPrimaryDark">#757575</color>
-    <color name="colorAccent">#D13937</color>
+    <color name="colorAccent">#263238</color>
+    <color name="iroha">#D13937</color>
 
     <color name="text">#000000</color>
     <color name="hint">#BDBDBD</color>

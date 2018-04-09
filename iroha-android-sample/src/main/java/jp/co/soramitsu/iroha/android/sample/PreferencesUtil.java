@@ -47,4 +47,7 @@ public class PreferencesUtil {
         );
     }
 
+    public void clear() {
+        preferences.edit().clear().apply();
+    }
 }

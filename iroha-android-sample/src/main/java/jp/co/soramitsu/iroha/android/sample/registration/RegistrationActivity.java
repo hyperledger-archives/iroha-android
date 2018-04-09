@@ -23,6 +23,7 @@ public class RegistrationActivity extends AppCompatActivity implements Registrat
 
     @Inject
     RegistrationPresenter registrationPresenter;
+
     private ProgressDialog dialog;
 
     @Override
@@ -70,7 +71,7 @@ public class RegistrationActivity extends AppCompatActivity implements Registrat
         alertDialog.show();
     }
 
-    public void createProgressDialog() {
+    private void createProgressDialog() {
         dialog = new ProgressDialog(this);
         dialog.setCancelable(false);
         dialog.setMessage(getString(R.string.please_wait));

@@ -6,7 +6,7 @@
 
         <variable
             name="transaction"
-            type="jp.co.soramitsu.iroha.android.sample.history.TransactionVM" />
+            type="jp.co.soramitsu.iroha.android.sample.main.history.TransactionVM" />
     </data>
 
     <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"

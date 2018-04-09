@@ -1,9 +1,10 @@
 package jp.co.soramitsu.iroha.android.sample.interactor;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import java.math.BigInteger;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -16,49 +17,46 @@ import iroha.protocol.QueryServiceGrpc;
 import iroha.protocol.Responses;
 import jp.co.soramitsu.iroha.android.ByteVector;
 import jp.co.soramitsu.iroha.android.Keypair;
-import jp.co.soramitsu.iroha.android.ModelCrypto;
 import jp.co.soramitsu.iroha.android.ModelProtoQuery;
 import jp.co.soramitsu.iroha.android.ModelQueryBuilder;
 import jp.co.soramitsu.iroha.android.UnsignedQuery;
+import jp.co.soramitsu.iroha.android.sample.Constants;
+import jp.co.soramitsu.iroha.android.sample.PreferencesUtil;
 import jp.co.soramitsu.iroha.android.sample.injection.ApplicationModule;
 
-import static jp.co.soramitsu.iroha.android.sample.Constants.CONNECTION_TIMEOUT_SECONDS;
-import static jp.co.soramitsu.iroha.android.sample.Constants.CREATOR;
 import static jp.co.soramitsu.iroha.android.sample.Constants.DOMAIN_ID;
 import static jp.co.soramitsu.iroha.android.sample.Constants.QUERY_COUNTER;
 
-public class GetAccountInteractor extends SingleInteractor<Responses.Account, String> {
+public class GetAccountDetailsInteractor extends SingleInteractor<String, Void> {
 
     private final ModelQueryBuilder modelQueryBuilder = new ModelQueryBuilder();
     private final ModelProtoQuery protoQueryHelper = new ModelProtoQuery();
-    @Inject
-    ModelCrypto crypto;
+    private final PreferencesUtil preferenceUtils;
+
     @Inject
     ManagedChannel channel;
 
     @Inject
-    GetAccountInteractor(@Named(ApplicationModule.JOB) Scheduler jobScheduler,
-                         @Named(ApplicationModule.UI) Scheduler uiScheduler) {
+    GetAccountDetailsInteractor(@Named(ApplicationModule.JOB) Scheduler jobScheduler,
+                                @Named(ApplicationModule.UI) Scheduler uiScheduler,
+                                PreferencesUtil preferenceUtils) {
         super(jobScheduler, uiScheduler);
+        this.preferenceUtils = preferenceUtils;
     }
 
     @Override
-    protected Single<Responses.Account> build(String accountId) {
+    protected Single<String> build(Void v) {
         return Single.create(emitter -> {
             long currentTime = System.currentTimeMillis();
-            Keypair userKeys = crypto.generateKeypair();
+            Keypair userKeys = preferenceUtils.retrieveKeys();
+            String username = preferenceUtils.retrieveUsername();
 
-            // GetAccount
-            UnsignedQuery query = modelQueryBuilder
-                    .createdTime(BigInteger.valueOf(currentTime))
+            UnsignedQuery accountDetails = modelQueryBuilder.creatorAccountId(username + "@" + DOMAIN_ID)
                     .queryCounter(BigInteger.valueOf(QUERY_COUNTER))
-                    .creatorAccountId(CREATOR)
-                    .getAccount(accountId + "@" + DOMAIN_ID)
+                    .createdTime(BigInteger.valueOf(currentTime))
+                    .getAccountDetail(username + "@" + DOMAIN_ID)
                     .build();
-
-
-            // sign transaction and get its binary representation (Blob)
-            ByteVector queryBlob = protoQueryHelper.signAndAddSignature(query, userKeys).blob();
+            ByteVector queryBlob = protoQueryHelper.signAndAddSignature(accountDetails, userKeys).blob();
             byte bquery[] = toByteArray(queryBlob);
 
             Queries.Query protoQuery = null;
@@ -68,11 +66,13 @@ public class GetAccountInteractor extends SingleInteractor<Responses.Account, St
                 emitter.onError(e);
             }
 
-            QueryServiceGrpc.QueryServiceBlockingStub queryStub = QueryServiceGrpc.newBlockingStub(channel)
-                    .withDeadlineAfter(CONNECTION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            QueryServiceGrpc.QueryServiceBlockingStub queryStub = QueryServiceGrpc.newBlockingStub(channel);
             Responses.QueryResponse queryResponse = queryStub.find(protoQuery);
 
-            emitter.onSuccess(queryResponse.getAccountResponse().getAccount());
+            JsonObject jsonObject = new Gson().fromJson(queryResponse.getAccountDetailResponse().getDetail(), JsonObject.class);
+            String detail = jsonObject.get(username + "@" + DOMAIN_ID).getAsJsonObject().get(Constants.ACCOUNT_DETAILS).getAsString();
+
+            emitter.onSuccess(detail);
         });
     }
 }

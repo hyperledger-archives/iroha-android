@@ -50,8 +50,7 @@
                     android:layout_marginEnd="16dp"
                     android:layout_marginStart="16dp"
                     android:textColor="@color/text"
-                    android:textSize="13sp"
-                    app:layout_constraintBottom_toTopOf="@id/bio"
+                    android:textSize="16sp"
                     app:layout_constraintEnd_toStartOf="@id/logout"
                     app:layout_constraintStart_toEndOf="@id/logo"
                     app:layout_constraintTop_toTopOf="@id/logo"
@@ -60,9 +59,11 @@
                 <TextView
                     android:id="@+id/bio"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
+                    android:layout_height="0dp"
                     android:layout_marginStart="16dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:text="@string/bio"
                     android:textColor="@color/hint"
                     android:textSize="13sp"
@@ -104,6 +105,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/background"
                     app:tabGravity="fill"
+                    app:tabIndicatorColor="@color/iroha"
                     app:tabMode="fixed" />
             </android.support.constraint.ConstraintLayout>
         </android.support.v7.widget.CardView>

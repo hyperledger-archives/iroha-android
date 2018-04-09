@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/layout">
 
     <FrameLayout
@@ -15,9 +16,9 @@
                 android:id="@+id/background_image"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentTop="false"
                 android:scaleType="centerCrop"
-                android:src="@drawable/background" />
+                android:src="@drawable/background"
+                tools:ignore="ContentDescription" />
 
         </LinearLayout>
 
@@ -35,7 +36,8 @@
                 android:layout_height="128dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="116dp"
-                android:src="@drawable/ic_logo" />
+                android:src="@drawable/ic_logo"
+                tools:ignore="ContentDescription" />
 
             <TextView
                 android:id="@+id/title"
@@ -64,15 +66,16 @@
                 android:hint="@string/username_hint"
                 android:inputType="textPersonName"
                 android:maxLength="9"
-                android:maxLines="1" />
+                android:singleLine="true" />
 
-            <Button
+
+            <android.support.v7.widget.AppCompatButton
                 android:id="@+id/register_button"
-                android:layout_width="96dp"
+                android:layout_width="160dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="84dp"
-                android:backgroundTint="@color/colorAccent"
+                android:background="@color/iroha"
                 android:text="@string/button_register"
                 android:textColor="@android:color/white" />
         </LinearLayout>

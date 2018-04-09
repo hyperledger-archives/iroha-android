@@ -23,70 +23,59 @@ import jp.co.soramitsu.iroha.android.UnsignedTx;
 import jp.co.soramitsu.iroha.android.sample.PreferencesUtil;
 import jp.co.soramitsu.iroha.android.sample.injection.ApplicationModule;
 
+import static jp.co.soramitsu.iroha.android.sample.Constants.ACCOUNT_DETAILS;
 import static jp.co.soramitsu.iroha.android.sample.Constants.CONNECTION_TIMEOUT_SECONDS;
-import static jp.co.soramitsu.iroha.android.sample.Constants.CREATOR;
 import static jp.co.soramitsu.iroha.android.sample.Constants.DOMAIN_ID;
-import static jp.co.soramitsu.iroha.android.sample.Constants.PRIV_KEY;
-import static jp.co.soramitsu.iroha.android.sample.Constants.PUB_KEY;
 import static jp.co.soramitsu.iroha.android.sample.Constants.TX_COUNTER;
 
-public class CreateAccountInteractor extends CompletableInteractor<String> {
+public class SetAccountDetailsInteractor extends CompletableInteractor<String> {
 
     private final ManagedChannel channel;
-    @Inject
-    ModelCrypto crypto;
     private final ModelTransactionBuilder txBuilder = new ModelTransactionBuilder();
     private final ModelProtoTransaction protoTxHelper = new ModelProtoTransaction();
     private final PreferencesUtil preferenceUtils;
 
     @Inject
-    CreateAccountInteractor(@Named(ApplicationModule.JOB) Scheduler jobScheduler,
-                            @Named(ApplicationModule.UI) Scheduler uiScheduler,
-                            ManagedChannel managedChannel, PreferencesUtil preferencesUtil) {
+    SetAccountDetailsInteractor(@Named(ApplicationModule.JOB) Scheduler jobScheduler,
+                                @Named(ApplicationModule.UI) Scheduler uiScheduler,
+                                ManagedChannel managedChannel, PreferencesUtil preferencesUtil) {
         super(jobScheduler, uiScheduler);
         this.channel = managedChannel;
         this.preferenceUtils = preferencesUtil;
     }
 
     @Override
-    protected Completable build(String username) {
+    protected Completable build(String details) {
         return Completable.create(emitter -> {
             long currentTime = System.currentTimeMillis();
-            Keypair userKeys = crypto.generateKeypair();
-            Keypair adminKeys = crypto.convertFromExisting(PUB_KEY, PRIV_KEY);
+            Keypair userKeys = preferenceUtils.retrieveKeys();
+            String username = preferenceUtils.retrieveUsername();
 
-            // Create account
-            UnsignedTx createAccount = txBuilder.creatorAccountId(CREATOR)
+            UnsignedTx setDetailsTransaction = txBuilder.creatorAccountId(username + "@" + DOMAIN_ID)
                     .createdTime(BigInteger.valueOf(currentTime))
                     .txCounter(BigInteger.valueOf(TX_COUNTER))
-                    .createAccount(username, DOMAIN_ID, userKeys.publicKey())
+                    .setAccountDetail(username + "@" + DOMAIN_ID, ACCOUNT_DETAILS, details)
                     .build();
 
-            // sign transaction and get its binary representation (Blob)
-            ByteVector txblob = protoTxHelper.signAndAddSignature(createAccount, adminKeys).blob();
-
-            // Convert ByteVector to byte array
-            byte bs[] = toByteArray(txblob);
-
-            // create proto object
+            ByteVector txblob = protoTxHelper.signAndAddSignature(setDetailsTransaction, userKeys).blob();
+            byte[] bs = toByteArray(txblob);
             BlockOuterClass.Transaction protoTx = null;
+
             try {
                 protoTx = BlockOuterClass.Transaction.parseFrom(bs);
             } catch (InvalidProtocolBufferException e) {
                 emitter.onError(e);
             }
 
-            // Send transaction to iroha
             CommandServiceGrpc.CommandServiceBlockingStub stub = CommandServiceGrpc.newBlockingStub(channel)
                     .withDeadlineAfter(CONNECTION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+
             stub.torii(protoTx);
 
             // Check if it was successful
-            if (!isTransactionSuccessful(stub, createAccount)) {
+            if (!isTransactionSuccessful(stub, setDetailsTransaction)) {
                 emitter.onError(new RuntimeException("Transaction failed"));
             } else {
-                preferenceUtils.saveKeys(userKeys);
-                preferenceUtils.saveUsername(username);
                 emitter.onComplete();
             }
         });
