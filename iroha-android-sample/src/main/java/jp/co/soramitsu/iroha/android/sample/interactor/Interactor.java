@@ -1,32 +1,52 @@
 package jp.co.soramitsu.iroha.android.sample.interactor;
 
 
-import io.reactivex.Scheduler;
-import io.reactivex.Single;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.Consumer;
+import com.google.protobuf.ByteString;
 
-public abstract class Interactor<ResultType> {
+import java.util.Iterator;
+
+import io.reactivex.Scheduler;
+import io.reactivex.disposables.CompositeDisposable;
+import iroha.protocol.CommandServiceGrpc;
+import iroha.protocol.Endpoint;
+import jp.co.soramitsu.iroha.android.ByteVector;
+import jp.co.soramitsu.iroha.android.UnsignedTx;
+
+class Interactor {
 
     private final CompositeDisposable subscriptions = new CompositeDisposable();
-    private final Scheduler jobScheduler;
-    private final Scheduler uiScheduler;
+    final Scheduler jobScheduler;
+    final Scheduler uiScheduler;
 
-    protected Interactor(Scheduler jobScheduler, Scheduler uiScheduler) {
+    Interactor(Scheduler jobScheduler, Scheduler uiScheduler) {
         this.jobScheduler = jobScheduler;
         this.uiScheduler = uiScheduler;
     }
 
-    protected abstract Single<ResultType> build();
-
-    public void execute(Consumer<ResultType> onSuccess, Consumer<Throwable> onError) {
-        subscriptions.add(build()
-                .subscribeOn(jobScheduler)
-                .observeOn(uiScheduler)
-                .subscribe(onSuccess, onError));
-    }
-
     public void unsubscribe() {
         subscriptions.clear();
+    }
+
+    static byte[] toByteArray(ByteVector blob) {
+        byte bs[] = new byte[(int) blob.size()];
+        for (int i = 0; i < blob.size(); ++i) {
+            bs[i] = (byte) blob.get(i);
+        }
+        return bs;
+    }
+
+    static boolean isTransactionSuccessful(CommandServiceGrpc.CommandServiceBlockingStub stub, UnsignedTx utx) {
+        ByteVector txhash = utx.hash().blob();
+        byte bshash[] = toByteArray(txhash);
+
+        Endpoint.TxStatusRequest request = Endpoint.TxStatusRequest.newBuilder().setTxHash(ByteString.copyFrom(bshash)).build();
+
+        Iterator<Endpoint.ToriiResponse> features = stub.statusStream(request);
+
+        Endpoint.ToriiResponse response = null;
+        while (features.hasNext()) {
+            response = features.next();
+        }
+        return response.getTxStatus() == Endpoint.TxStatus.COMMITTED;
     }
 }
