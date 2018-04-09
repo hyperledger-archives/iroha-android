@@ -19,17 +19,21 @@ public class RegistrationPresenter {
     private final GetAccountInteractor getAccountInteractor;
 
     @Inject
-    public RegistrationPresenter(CreateAccountInteractor createAccountInteractor, GetAccountInteractor getAccountInteractor, PreferencesUtil preferencesUtil) {
+    public RegistrationPresenter(CreateAccountInteractor createAccountInteractor,
+                                 GetAccountInteractor getAccountInteractor,
+                                 PreferencesUtil preferencesUtil) {
         this.createAccountInteractor = createAccountInteractor;
         this.getAccountInteractor = getAccountInteractor;
         this.preferencesUtil = preferencesUtil;
     }
 
-    public void createAccount(String username) {
+    void createAccount(String username) {
         if (!username.isEmpty()) {
             getAccountInteractor.execute(username, account -> {
                 if (account.getAccountId().isEmpty()) {
-                    createAccountInteractor.execute(username, () -> view.didRegistrationSuccess(), error -> view.didRegistrationError(error));
+                    createAccountInteractor.execute(username,
+                            () -> view.didRegistrationSuccess(),
+                            error -> view.didRegistrationError(error));
                 } else {
                     view.didRegistrationError(new Throwable(SampleApplication.instance.getString(R.string.username_already_exists_error_dialog_message)));
                 }
@@ -39,7 +43,7 @@ public class RegistrationPresenter {
         }
     }
 
-    public boolean isRegistered() {
+    boolean isRegistered() {
         return !preferencesUtil.retrieveUsername().isEmpty();
     }
 

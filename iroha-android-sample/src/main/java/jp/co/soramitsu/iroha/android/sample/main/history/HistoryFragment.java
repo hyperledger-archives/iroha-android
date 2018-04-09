@@ -1,4 +1,4 @@
-package jp.co.soramitsu.iroha.android.sample.history;
+package jp.co.soramitsu.iroha.android.sample.main.history;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
@@ -24,8 +24,6 @@ public class HistoryFragment extends Fragment {
     @Inject
     HistoryPresenter presenter;
 
-    private TransactionsViewModel transactionsViewModel;
-
     private TransactionsAdapter adapter;
 
     @Nullable
@@ -38,7 +36,7 @@ public class HistoryFragment extends Fragment {
         presenter.setFragment(this);
         presenter.onCreateView();
 
-        transactionsViewModel = ViewModelProviders.of(this).get(TransactionsViewModel.class);
+        TransactionsViewModel transactionsViewModel = ViewModelProviders.of(this).get(TransactionsViewModel.class);
         transactionsViewModel.getTransactions().observe(this, transactions -> {
             DiffUtil.Callback transactionDiffChecker =
                     new TransactionDiffChecker(adapter.getTransactions(), transactions);

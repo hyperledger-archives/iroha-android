@@ -10,8 +10,8 @@ import javax.inject.Named;
 
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
-import jp.co.soramitsu.iroha.android.sample.history.Transaction;
 import jp.co.soramitsu.iroha.android.sample.injection.ApplicationModule;
+import jp.co.soramitsu.iroha.android.sample.main.history.Transaction;
 
 public class GetTransactionsInteractor extends SingleInteractor<List<Transaction>, Void> {
 

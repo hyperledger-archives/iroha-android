@@ -14,7 +14,7 @@ import jp.co.soramitsu.iroha.android.UnsignedTx;
 
 class Interactor {
 
-    protected final CompositeDisposable subscriptions = new CompositeDisposable();
+    private final CompositeDisposable subscriptions = new CompositeDisposable();
     final Scheduler jobScheduler;
     final Scheduler uiScheduler;
 
@@ -27,7 +27,7 @@ class Interactor {
         subscriptions.clear();
     }
 
-    public static byte[] toByteArray(ByteVector blob) {
+    static byte[] toByteArray(ByteVector blob) {
         byte bs[] = new byte[(int) blob.size()];
         for (int i = 0; i < blob.size(); ++i) {
             bs[i] = (byte) blob.get(i);
@@ -35,7 +35,7 @@ class Interactor {
         return bs;
     }
 
-    public static boolean isTransactionSuccessful(CommandServiceGrpc.CommandServiceBlockingStub stub, UnsignedTx utx) {
+    static boolean isTransactionSuccessful(CommandServiceGrpc.CommandServiceBlockingStub stub, UnsignedTx utx) {
         ByteVector txhash = utx.hash().blob();
         byte bshash[] = toByteArray(txhash);
 

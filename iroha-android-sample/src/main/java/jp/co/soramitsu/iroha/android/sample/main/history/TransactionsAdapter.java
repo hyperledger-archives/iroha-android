@@ -1,4 +1,4 @@
-package jp.co.soramitsu.iroha.android.sample.history;
+package jp.co.soramitsu.iroha.android.sample.main.history;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;

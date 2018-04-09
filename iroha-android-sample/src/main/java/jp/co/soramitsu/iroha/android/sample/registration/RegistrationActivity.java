@@ -3,15 +3,16 @@ package jp.co.soramitsu.iroha.android.sample.registration;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.os.Bundle;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 
 import com.jakewharton.rxbinding2.view.RxView;
+
 import javax.inject.Inject;
 
-import jp.co.soramitsu.iroha.android.sample.MainActivity;
+import jp.co.soramitsu.iroha.android.sample.main.MainActivity;
 import jp.co.soramitsu.iroha.android.sample.R;
 import jp.co.soramitsu.iroha.android.sample.SampleApplication;
 import jp.co.soramitsu.iroha.android.sample.databinding.ActivityRegistrationBinding;
@@ -49,7 +50,7 @@ public class RegistrationActivity extends AppCompatActivity implements Registrat
 
     @Override
     public void didRegistrationSuccess() {
-        dissmissProgressDialog();
+        dismissProgressDialog();
         Intent intent = new Intent(this, MainActivity.class);
         ActivityOptionsCompat options = ActivityOptionsCompat.
                 makeSceneTransitionAnimation(this, binding.logoImage, "profile");
@@ -59,10 +60,10 @@ public class RegistrationActivity extends AppCompatActivity implements Registrat
 
     @Override
     public void didRegistrationError(Throwable error) {
-        dissmissProgressDialog();
+        dismissProgressDialog();
         AlertDialog alertDialog = new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.error_dialog_title))
-                .setMessage(error.getMessage() == null?getString(R.string.general_error):error.getMessage())
+                .setMessage(error.getMessage() == null ? getString(R.string.general_error) : error.getMessage())
                 .setCancelable(true)
                 .setPositiveButton(android.R.string.ok, null)
                 .create();
@@ -81,7 +82,7 @@ public class RegistrationActivity extends AppCompatActivity implements Registrat
     }
 
     @Override
-    public void dissmissProgressDialog() {
+    public void dismissProgressDialog() {
         dialog.dismiss();
     }
 }

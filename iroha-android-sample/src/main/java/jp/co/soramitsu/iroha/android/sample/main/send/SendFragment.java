@@ -1,4 +1,4 @@
-package jp.co.soramitsu.iroha.android.sample;
+package jp.co.soramitsu.iroha.android.sample.main.send;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -9,16 +9,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import jp.co.soramitsu.iroha.android.sample.databinding.FragmentReceiveBinding;
+import jp.co.soramitsu.iroha.android.sample.R;
+import jp.co.soramitsu.iroha.android.sample.databinding.FragmentSendBinding;
 
-public class ReceiveFragment extends Fragment {
-    private FragmentReceiveBinding binding;
+public class SendFragment extends Fragment {
+    private FragmentSendBinding binding;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_receive, container, false);
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_send, container, false);
         return binding.getRoot();
     }
 }

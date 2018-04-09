@@ -3,6 +3,7 @@ package jp.co.soramitsu.iroha.android.sample.interactor;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import java.math.BigInteger;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -21,6 +22,7 @@ import jp.co.soramitsu.iroha.android.ModelQueryBuilder;
 import jp.co.soramitsu.iroha.android.UnsignedQuery;
 import jp.co.soramitsu.iroha.android.sample.injection.ApplicationModule;
 
+import static jp.co.soramitsu.iroha.android.sample.Constants.CONNECTION_TIMEOUT_SECONDS;
 import static jp.co.soramitsu.iroha.android.sample.Constants.CREATOR;
 import static jp.co.soramitsu.iroha.android.sample.Constants.DOMAIN_ID;
 import static jp.co.soramitsu.iroha.android.sample.Constants.QUERY_COUNTER;
@@ -35,8 +37,8 @@ public class GetAccountInteractor extends SingleInteractor<Responses.Account, St
     ManagedChannel channel;
 
     @Inject
-    public GetAccountInteractor(@Named(ApplicationModule.JOB) Scheduler jobScheduler,
-                                @Named(ApplicationModule.UI) Scheduler uiScheduler) {
+    GetAccountInteractor(@Named(ApplicationModule.JOB) Scheduler jobScheduler,
+                         @Named(ApplicationModule.UI) Scheduler uiScheduler) {
         super(jobScheduler, uiScheduler);
     }
 
@@ -51,10 +53,8 @@ public class GetAccountInteractor extends SingleInteractor<Responses.Account, St
                     .createdTime(BigInteger.valueOf(currentTime))
                     .queryCounter(BigInteger.valueOf(QUERY_COUNTER))
                     .creatorAccountId(CREATOR)
-                    .getAccount(account_id+"@"+DOMAIN_ID)
+                    .getAccount(account_id + "@" + DOMAIN_ID)
                     .build();
-
-
 
 
             // sign transaction and get its binary representation (Blob)
@@ -68,7 +68,8 @@ public class GetAccountInteractor extends SingleInteractor<Responses.Account, St
                 emitter.onError(e);
             }
 
-            QueryServiceGrpc.QueryServiceBlockingStub queryStub = QueryServiceGrpc.newBlockingStub(channel);
+            QueryServiceGrpc.QueryServiceBlockingStub queryStub = QueryServiceGrpc.newBlockingStub(channel)
+                    .withDeadlineAfter(CONNECTION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
             Responses.QueryResponse queryResponse = queryStub.find(protoQuery);
 
             emitter.onSuccess(queryResponse.getAccountResponse().getAccount());

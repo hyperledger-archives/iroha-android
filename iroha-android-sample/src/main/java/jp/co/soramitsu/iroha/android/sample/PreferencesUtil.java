@@ -2,8 +2,10 @@ package jp.co.soramitsu.iroha.android.sample;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import jp.co.soramitsu.iroha.android.Keypair;
+
 import javax.inject.Inject;
+
+import jp.co.soramitsu.iroha.android.Keypair;
 import jp.co.soramitsu.iroha.android.ModelCrypto;
 import lombok.Getter;
 
