@@ -1,4 +1,6 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.github.dcendents.android-maven'
 
 ext {
     bintrayRepo = 'maven' // your repo name
@@ -6,11 +8,11 @@ ext {
     publishedGroupId = 'jp.co.soramitsu.iroha.android' // your module package name
     libraryName = 'bindings'
     artifact = 'iroha-android-bindings' // has to be same as your library module name
-    libraryDescription = 'A set of methods used to manipulate time object'
-    siteUrl = 'https://github.com/hyperledger/iroha-android/tree/bindings'
-    gitUrl = 'https://github.com/hyperledger/iroha-android/tree/bindings.git'
+    libraryDescription = 'A set of methods used to manipulate Iroha'
+    siteUrl = 'https://github.com/hyperledger/iroha-android'
+    gitUrl = 'https://github.com/hyperledger/iroha-android/bindings.git'
     libraryVersion = '1.0'
-    developerId = 'hyperledger'
+    developerId = 'bulatmukhutdinov'
     developerName = 'Bulat Mukhutdinov'
     developerEmail = 'bulat.m@soramitsu.co.jp'
     licenseName = 'The Apache Software License, Version 2.0'
@@ -44,5 +46,5 @@ dependencies {
 }
 
 
-apply from: 'https://raw.githubusercontent.com/numetriclabz/jcenter/master/installv.gradle'
-apply from: 'https://raw.githubusercontent.com/numetriclabz/jcenter/master/bintrayv.gradle'
+apply from: 'install.gradle'
+apply from: 'bintray.gradle'
