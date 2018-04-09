@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Sample</string>
+    <string name="app_name">Iroha-Android</string>
     <string name="to">To</string>
     <string name="amount">Amount</string>
     <string name="or">OR</string>
