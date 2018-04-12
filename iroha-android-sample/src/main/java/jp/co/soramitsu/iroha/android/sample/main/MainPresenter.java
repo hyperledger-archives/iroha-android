@@ -43,14 +43,24 @@ public class MainPresenter {
                 account -> SampleApplication.instance.account = account,
                 throwable -> {});
 
-        getAccountBalanceInteractor.execute(
-                balance -> view.setAccountBalance(balance),
-                throwable -> {});
+        updateData(false);
 
         getAccountDetails.execute(details -> {
                 view.setAccountDetails(details);
             }, throwable -> {
         });
+    }
+
+
+    void updateData(boolean fromRefresh) {
+        getAccountBalanceInteractor.execute(
+                balance -> {
+                    if (fromRefresh) {
+                        view.hideRefresh();
+                    }
+                    view.setAccountBalance(balance);
+                },
+                throwable -> view.showError(throwable));
     }
 
     void logout() {
@@ -64,7 +74,7 @@ public class MainPresenter {
             view.hideProgress();
             view.setAccountDetails(details);
         }, throwable -> {
-            view.showSetDetailsAccountError();
+            view.showError(throwable);
             view.hideProgress();
         });
     }

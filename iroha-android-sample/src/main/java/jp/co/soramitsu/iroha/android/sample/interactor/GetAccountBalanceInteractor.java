@@ -1,7 +1,5 @@
 package jp.co.soramitsu.iroha.android.sample.interactor;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import java.math.BigInteger;
@@ -20,7 +18,6 @@ import jp.co.soramitsu.iroha.android.Keypair;
 import jp.co.soramitsu.iroha.android.ModelProtoQuery;
 import jp.co.soramitsu.iroha.android.ModelQueryBuilder;
 import jp.co.soramitsu.iroha.android.UnsignedQuery;
-import jp.co.soramitsu.iroha.android.sample.Constants;
 import jp.co.soramitsu.iroha.android.sample.PreferencesUtil;
 import jp.co.soramitsu.iroha.android.sample.injection.ApplicationModule;
 
@@ -70,7 +67,7 @@ public class GetAccountBalanceInteractor extends SingleInteractor<String, Void> 
             Responses.QueryResponse queryResponse = queryStub.find(protoQuery);
 
 
-            emitter.onSuccess(queryResponse.getAccountAssetsResponse().getAccountAsset().getBalance().getValue().toString());
+            emitter.onSuccess(getIntBalance(queryResponse.getAccountAssetsResponse().getAccountAsset().getBalance()));
         });
     }
 }

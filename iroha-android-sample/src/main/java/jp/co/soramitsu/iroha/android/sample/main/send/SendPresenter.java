@@ -1,7 +1,5 @@
 package jp.co.soramitsu.iroha.android.sample.main.send;
 
-import com.orhanobut.logger.Logger;
-
 import javax.inject.Inject;
 
 import jp.co.soramitsu.iroha.android.sample.interactor.SendAssetInteractor;
@@ -22,12 +20,9 @@ public class SendPresenter {
     void sendTransaction(String username, String amount) {
         String[] data = {username, amount};
         sendAssetInteractor.execute(data,
-                () -> {
-                    Logger.e("Success");
-                },
-                error -> {
-                    Logger.e("error" + error.getLocalizedMessage());
-                });
+                () -> fragment.didSendSuccess(),
+                error -> fragment.didSendError(error)
+        );
     }
 
 }

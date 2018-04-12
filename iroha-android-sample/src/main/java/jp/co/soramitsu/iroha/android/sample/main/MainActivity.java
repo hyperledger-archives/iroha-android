@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
         presenter.onCreate();
 
         createProgressDialog();
+        configureRefreshLayout();
 
         RxView.clicks(binding.logout)
                 .subscribe(v -> {
@@ -88,9 +89,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
                             .setTitle(getString(R.string.account_details))
                             .setMessage(getString(R.string.bio))
                             .setCancelable(true)
-                            .setPositiveButton(android.R.string.ok, (dialog, which) -> {
-                                presenter.setAccountDetails(details.getText().toString());
-                            })
+                            .setPositiveButton(android.R.string.ok, (dialog, which) -> presenter.setAccountDetails(details.getText().toString()))
                             .setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss())
                             .create();
 
@@ -108,6 +107,10 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
         setupViewPager();
         binding.tabs.setupWithViewPager(binding.content);
+    }
+
+    private void configureRefreshLayout() {
+        binding.swiperefresh.setOnRefreshListener(() -> presenter.updateData(true));
     }
 
     private void setupViewPager() {
@@ -151,14 +154,25 @@ public class MainActivity extends AppCompatActivity implements MainView {
     }
 
     @Override
-    public void showSetDetailsAccountError() {
+    public void showError(Throwable throwable) {
         AlertDialog alertDialog = new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.error_dialog_title))
-                .setMessage(getString(R.string.account_details))
+                .setMessage(throwable.getLocalizedMessage())
                 .setCancelable(true)
                 .setPositiveButton(android.R.string.ok, null)
                 .create();
         alertDialog.show();
+    }
+
+    @Override
+    public void hideRefresh() {
+        binding.swiperefresh.setRefreshing(false);
+    }
+
+    @Override
+    public void refreshData(boolean animate) {
+        binding.swiperefresh.setRefreshing(animate);
+        presenter.updateData(animate);
     }
 
     private void createProgressDialog() {

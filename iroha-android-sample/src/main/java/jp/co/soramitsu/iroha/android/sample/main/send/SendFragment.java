@@ -16,6 +16,7 @@ import javax.inject.Inject;
 import jp.co.soramitsu.iroha.android.sample.R;
 import jp.co.soramitsu.iroha.android.sample.SampleApplication;
 import jp.co.soramitsu.iroha.android.sample.databinding.FragmentSendBinding;
+import jp.co.soramitsu.iroha.android.sample.main.MainActivity;
 
 public class SendFragment extends Fragment implements SendView {
     private FragmentSendBinding binding;
@@ -33,21 +34,26 @@ public class SendFragment extends Fragment implements SendView {
         presenter.setFragment(this);
 
         RxView.clicks(binding.send)
-                .subscribe(view -> presenter.sendTransaction(
-                        binding.to.getText().toString().trim(),
-                        binding.amount.getText().toString().trim()
-                ));
+                .subscribe(view -> {
+                    ((MainActivity) getActivity()).showProgress();
+                    presenter.sendTransaction(
+                            binding.to.getText().toString().trim(),
+                            binding.amount.getText().toString().trim()
+                    );
+                });
 
         return binding.getRoot();
     }
 
     @Override
     public void didSendSuccess() {
-
+        ((MainActivity) getActivity()).refreshData(false);
+        ((MainActivity) getActivity()).hideProgress();
     }
 
     @Override
     public void didSendError(Throwable error) {
-
+        ((MainActivity) getActivity()).hideProgress();
+        ((MainActivity)getActivity()).showError(error);
     }
 }

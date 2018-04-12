@@ -13,5 +13,9 @@ interface MainView {
 
     void hideProgress();
 
-    void showSetDetailsAccountError();
+    void showError(Throwable throwable);
+
+    void hideRefresh();
+
+    void refreshData(boolean animate);
 }
