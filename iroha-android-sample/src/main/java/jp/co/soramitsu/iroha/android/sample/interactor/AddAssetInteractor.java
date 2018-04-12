@@ -2,10 +2,10 @@ package jp.co.soramitsu.iroha.android.sample.interactor;
 
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.orhanobut.logger.Logger;
 
 import java.math.BigInteger;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -20,7 +20,6 @@ import jp.co.soramitsu.iroha.android.Keypair;
 import jp.co.soramitsu.iroha.android.ModelCrypto;
 import jp.co.soramitsu.iroha.android.ModelProtoTransaction;
 import jp.co.soramitsu.iroha.android.ModelTransactionBuilder;
-import jp.co.soramitsu.iroha.android.StringVector;
 import jp.co.soramitsu.iroha.android.UnsignedTx;
 import jp.co.soramitsu.iroha.android.sample.PreferencesUtil;
 import jp.co.soramitsu.iroha.android.sample.injection.ApplicationModule;
@@ -32,63 +31,59 @@ import static jp.co.soramitsu.iroha.android.sample.Constants.PRIV_KEY;
 import static jp.co.soramitsu.iroha.android.sample.Constants.PUB_KEY;
 import static jp.co.soramitsu.iroha.android.sample.Constants.TX_COUNTER;
 
-public class CreateAccountInteractor extends CompletableInteractor<String> {
+public class AddAssetInteractor extends CompletableInteractor<String> {
 
     private final ManagedChannel channel;
-    @Inject
-    ModelCrypto crypto;
     private final ModelTransactionBuilder txBuilder = new ModelTransactionBuilder();
     private final ModelProtoTransaction protoTxHelper = new ModelProtoTransaction();
     private final PreferencesUtil preferenceUtils;
+    private final ModelCrypto crypto;
 
     @Inject
-    CreateAccountInteractor(@Named(ApplicationModule.JOB) Scheduler jobScheduler,
-                            @Named(ApplicationModule.UI) Scheduler uiScheduler,
-                            ManagedChannel managedChannel, PreferencesUtil preferencesUtil) {
+    AddAssetInteractor(@Named(ApplicationModule.JOB) Scheduler jobScheduler,
+                       @Named(ApplicationModule.UI) Scheduler uiScheduler,
+                       ManagedChannel managedChannel, PreferencesUtil preferencesUtil, ModelCrypto crypto) {
         super(jobScheduler, uiScheduler);
         this.channel = managedChannel;
         this.preferenceUtils = preferencesUtil;
+        this.crypto = crypto;
     }
 
     @Override
-    protected Completable build(String username) {
+    protected Completable build(String details) {
         return Completable.create(emitter -> {
             long currentTime = System.currentTimeMillis();
-            Keypair userKeys = crypto.generateKeypair();
+            Keypair userKeys = preferenceUtils.retrieveKeys();
             Keypair adminKeys = crypto.convertFromExisting(PUB_KEY, PRIV_KEY);
+            String username = preferenceUtils.retrieveUsername();
 
-            // Create account
-            UnsignedTx createAccount = txBuilder.creatorAccountId(CREATOR)
+            //Adding asset
+            UnsignedTx addAssetTx = txBuilder.creatorAccountId(CREATOR)
                     .createdTime(BigInteger.valueOf(currentTime))
                     .txCounter(BigInteger.valueOf(TX_COUNTER))
-                    .createAccount(username, DOMAIN_ID, userKeys.publicKey())
+                    .addAssetQuantity(CREATOR, "irh#" + DOMAIN_ID, "100")
+                    .transferAsset(CREATOR, username + "@" + DOMAIN_ID, "irh#" + DOMAIN_ID, "initial" ,"100")
                     .build();
 
-            // sign transaction and get its binary representation (Blob)
-            ByteVector txblob = protoTxHelper.signAndAddSignature(createAccount, adminKeys).blob();
-
-            // Convert ByteVector to byte array
-            byte bs[] = toByteArray(txblob);
-
-            // create proto object
+            ByteVector txblob = protoTxHelper.signAndAddSignature(addAssetTx, adminKeys).blob();
+            byte[] bsq = toByteArray(txblob);
             BlockOuterClass.Transaction protoTx = null;
+
             try {
-                protoTx = BlockOuterClass.Transaction.parseFrom(bs);
+                protoTx = BlockOuterClass.Transaction.parseFrom(bsq);
             } catch (InvalidProtocolBufferException e) {
                 emitter.onError(e);
             }
 
-            // Send transaction to iroha
             CommandServiceGrpc.CommandServiceBlockingStub stub = CommandServiceGrpc.newBlockingStub(channel)
                     .withDeadlineAfter(CONNECTION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+
             stub.torii(protoTx);
 
             // Check if it was successful
-            if (!isTransactionSuccessful(stub, createAccount)) {
+            if (!isTransactionSuccessful(stub, addAssetTx)) {
                 emitter.onError(new RuntimeException("Transaction failed"));
             } else {
-                preferenceUtils.saveKeys(userKeys);
-                preferenceUtils.saveUsername(username);
                 emitter.onComplete();
             }
         });

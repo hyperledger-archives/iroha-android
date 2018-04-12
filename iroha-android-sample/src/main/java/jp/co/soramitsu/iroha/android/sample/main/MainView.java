@@ -5,6 +5,8 @@ interface MainView {
 
     void setAccountDetails(String details);
 
+    void setAccountBalance(String balance);
+
     void showRegistrationScreen();
 
     void showProgress();

@@ -2,6 +2,7 @@ package jp.co.soramitsu.iroha.android.sample.interactor;
 
 
 import com.google.protobuf.ByteString;
+import com.orhanobut.logger.Logger;
 
 import java.util.Iterator;
 
@@ -47,6 +48,7 @@ class Interactor {
         while (features.hasNext()) {
             response = features.next();
         }
+        Logger.e(response.toString());
         return response.getTxStatus() == Endpoint.TxStatus.COMMITTED;
     }
 }
