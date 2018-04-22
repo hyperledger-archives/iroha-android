@@ -43,10 +43,6 @@ public class Transaction {
     return irohaJNI.Transaction_creatorAccountId(swigCPtr, this);
   }
 
-  public java.math.BigInteger transactionCounter() {
-    return irohaJNI.Transaction_transactionCounter(swigCPtr, this);
-  }
-
   public SWIGTYPE_p_shared_model__proto__Transaction__CommandsType commands() {
     return new SWIGTYPE_p_shared_model__proto__Transaction__CommandsType(irohaJNI.Transaction_commands(swigCPtr, this), false);
   }
@@ -59,16 +55,12 @@ public class Transaction {
     return new Blob(irohaJNI.Transaction_payload(swigCPtr, this), false);
   }
 
-  public Hash hash() {
-    return new Hash(irohaJNI.Transaction_hash(swigCPtr, this), false);
-  }
-
   public SWIGTYPE_p_shared_model__interface__SignatureSetType signatures() {
     return new SWIGTYPE_p_shared_model__interface__SignatureSetType(irohaJNI.Transaction_signatures(swigCPtr, this), false);
   }
 
-  public boolean addSignature(SWIGTYPE_p_detail__PolymorphicWrapperT_shared_model__interface__Signature_t signature) {
-    return irohaJNI.Transaction_addSignature(swigCPtr, this, SWIGTYPE_p_detail__PolymorphicWrapperT_shared_model__interface__Signature_t.getCPtr(signature));
+  public boolean addSignature(Signed signed_blob, PublicKey public_key) {
+    return irohaJNI.Transaction_addSignature(swigCPtr, this, Signed.getCPtr(signed_blob), signed_blob, PublicKey.getCPtr(public_key), public_key);
   }
 
   public boolean clearSignatures() {

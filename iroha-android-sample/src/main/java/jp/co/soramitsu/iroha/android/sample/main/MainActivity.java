@@ -48,7 +48,6 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
         SampleApplication.instance.getApplicationComponent().inject(this);
         presenter.setView(this);
-        presenter.onCreate();
 
         createProgressDialog();
         configureRefreshLayout();
@@ -107,6 +106,8 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
         setupViewPager();
         binding.tabs.setupWithViewPager(binding.content);
+
+        presenter.onCreate();
     }
 
     private void configureRefreshLayout() {
@@ -133,7 +134,6 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
     @Override
     public void setAccountBalance(String balance) {
-        Logger.e("IRH" + balance);
         binding.balance.setText(balance);
     }
 
@@ -155,6 +155,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
     @Override
     public void showError(Throwable throwable) {
+        throwable.printStackTrace();
         AlertDialog alertDialog = new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.error_dialog_title))
                 .setMessage(throwable.getLocalizedMessage())

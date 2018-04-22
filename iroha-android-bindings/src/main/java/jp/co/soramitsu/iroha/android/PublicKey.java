@@ -47,9 +47,4 @@ public class PublicKey extends Blob {
     return irohaJNI.PublicKey_toString(swigCPtr, this);
   }
 
-  public PublicKey copy() {
-    long cPtr = irohaJNI.PublicKey_copy(swigCPtr, this);
-    return (cPtr == 0) ? null : new PublicKey(cPtr, false);
-  }
-
 }

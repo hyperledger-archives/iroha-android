@@ -5,6 +5,7 @@ import javax.inject.Inject;
 
 import jp.co.soramitsu.iroha.android.sample.PreferencesUtil;
 import jp.co.soramitsu.iroha.android.sample.SampleApplication;
+import jp.co.soramitsu.iroha.android.sample.data.Account;
 import jp.co.soramitsu.iroha.android.sample.interactor.GetAccountBalanceInteractor;
 import jp.co.soramitsu.iroha.android.sample.interactor.GetAccountDetailsInteractor;
 import jp.co.soramitsu.iroha.android.sample.interactor.GetAccountInteractor;
@@ -33,34 +34,38 @@ public class MainPresenter {
         this.getAccountDetails = getAccountDetails;
         this.getAccountInteractor = getAccountInteractor;
         this.getAccountBalanceInteractor = getAccountBalanceInteractor;
-
     }
 
     void onCreate() {
-        view.setUsername(preferencesUtil.retrieveUsername());
-
-        getAccountInteractor.execute(
-                account -> SampleApplication.instance.account = account,
-                throwable -> {});
-
         updateData(false);
-
-        getAccountDetails.execute(details -> {
-                view.setAccountDetails(details);
-            }, throwable -> {
-        });
     }
 
 
     void updateData(boolean fromRefresh) {
-        getAccountBalanceInteractor.execute(
-                balance -> {
-                    if (fromRefresh) {
-                        view.hideRefresh();
-                    }
-                    view.setAccountBalance(balance);
+        view.hideRefresh();
+        String username = preferencesUtil.retrieveUsername();
+        view.setUsername(username);
+
+        getAccountInteractor.execute(username,
+                account -> {
+                    SampleApplication.instance.account = new Account(account, -1);
+                    getAccountBalanceInteractor.execute(
+                            balance -> {
+                                if (fromRefresh) {
+                                    view.hideRefresh();
+                                }
+                                view.setAccountBalance(balance + " IRH");
+                                SampleApplication.instance.account.setBalance(Long.parseLong(balance));
+                            },
+                            throwable -> view.showError(throwable));
                 },
-                throwable -> view.showError(throwable));
+                throwable -> view.showError(throwable)
+        );
+
+        getAccountDetails.execute(
+                details -> view.setAccountDetails(details),
+                throwable -> view.showError(throwable)
+        );
     }
 
     void logout() {

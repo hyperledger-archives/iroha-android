@@ -1,8 +1,8 @@
 package jp.co.soramitsu.iroha.android.sample;
 
 public interface Constants {
-    String PUB_KEY = "407e57f50ca48969b08ba948171bb2435e035d82cec417e18e4a38f5fb113f83";
-    String PRIV_KEY = "1d7e0a32ee0affeb4d22acd73c2c6fb6bd58e266c8c2ce4fa0ffe3dd6a253ffb";
+    String PUB_KEY = "889f6b881e331be21487db77dcf32c5f8d3d5e8066e78d2feac4239fe91d416f";
+    String PRIV_KEY = "0f0ce16d2afbb8eca23c7d8c2724f0c257a800ee2bbd54688cec6b898e3f7e33";
     String CREATOR = "admin@test";
     long TX_COUNTER = 1;
     long QUERY_COUNTER = 1;

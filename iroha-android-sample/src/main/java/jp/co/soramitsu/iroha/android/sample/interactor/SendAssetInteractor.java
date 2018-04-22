@@ -60,7 +60,6 @@ public class SendAssetInteractor extends CompletableInteractor<String[]> {
             //Sending asset
             UnsignedTx sendAssetTx = txBuilder.creatorAccountId(username + "@" + DOMAIN_ID)
                     .createdTime(BigInteger.valueOf(currentTime))
-                    .txCounter(BigInteger.valueOf(TX_COUNTER))
                     .transferAsset(username + "@" + DOMAIN_ID, data[0] + "@" + DOMAIN_ID, "irh#" + DOMAIN_ID, "initial" , data[1])
                     .build();
 
@@ -76,7 +75,6 @@ public class SendAssetInteractor extends CompletableInteractor<String[]> {
 
             CommandServiceGrpc.CommandServiceBlockingStub stub = CommandServiceGrpc.newBlockingStub(channel)
                     .withDeadlineAfter(CONNECTION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-
             stub.torii(protoTx);
 
             // Check if it was successful

@@ -36,7 +36,11 @@ public class Signed extends Blob {
   }
 
   public Signed(String blob) {
-    this(irohaJNI.new_Signed(blob), true);
+    this(irohaJNI.new_Signed__SWIG_0(blob), true);
+  }
+
+  public Signed(ByteVector blob) {
+    this(irohaJNI.new_Signed__SWIG_1(ByteVector.getCPtr(blob), blob), true);
   }
 
   public String toString() {

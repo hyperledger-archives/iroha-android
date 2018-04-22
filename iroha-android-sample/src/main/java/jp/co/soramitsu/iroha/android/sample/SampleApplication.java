@@ -6,9 +6,11 @@ import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.Logger;
 
 import iroha.protocol.Responses;
+import jp.co.soramitsu.iroha.android.sample.data.Account;
 import jp.co.soramitsu.iroha.android.sample.injection.ApplicationComponent;
 import jp.co.soramitsu.iroha.android.sample.injection.DaggerApplicationComponent;
 import lombok.Getter;
+import lombok.Setter;
 
 public class SampleApplication extends Application {
     static {
@@ -20,7 +22,8 @@ public class SampleApplication extends Application {
     }
 
     public static SampleApplication instance;
-    public Responses.Account account;
+
+    public Account account;
 
 
     @Getter

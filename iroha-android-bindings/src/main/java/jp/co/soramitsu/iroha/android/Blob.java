@@ -71,9 +71,4 @@ public class Blob {
     return irohaJNI.Blob_b_equal(swigCPtr, this, Blob.getCPtr(rhs), rhs);
   }
 
-  public Blob copy() {
-    long cPtr = irohaJNI.Blob_copy(swigCPtr, this);
-    return (cPtr == 0) ? null : new Blob(cPtr, false);
-  }
-
 }

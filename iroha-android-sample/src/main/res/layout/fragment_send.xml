@@ -22,6 +22,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/to"
+                android:digits="abcdefghijklmnopqrstuvwxyz"
+                android:maxLength="9"
                 android:inputType="text"
                 android:maxLines="1" />
 

@@ -66,11 +66,7 @@ class Interactor {
             stringBuilder.append(amount.getValue().getThird());
         }
 
-        if (amount.getValue().getFourth() != 0) {
-            stringBuilder.append(amount.getValue().getFourth());
-        }
-
-        stringBuilder.append(" IRH");
+        stringBuilder.append(amount.getValue().getFourth());
 
         return stringBuilder.toString();
     }

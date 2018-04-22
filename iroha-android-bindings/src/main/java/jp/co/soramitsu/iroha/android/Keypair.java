@@ -55,9 +55,4 @@ public class Keypair {
     return irohaJNI.Keypair_toString(swigCPtr, this);
   }
 
-  public Keypair copy() {
-    long cPtr = irohaJNI.Keypair_copy(swigCPtr, this);
-    return (cPtr == 0) ? null : new Keypair(cPtr, false);
-  }
-
 }

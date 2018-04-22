@@ -1,7 +1,6 @@
 package jp.co.soramitsu.iroha.android.sample.interactor;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.orhanobut.logger.Logger;
 
 import java.math.BigInteger;
 import java.util.concurrent.TimeUnit;
@@ -26,6 +25,8 @@ import jp.co.soramitsu.iroha.android.sample.injection.ApplicationModule;
 import static jp.co.soramitsu.iroha.android.sample.Constants.CONNECTION_TIMEOUT_SECONDS;
 import static jp.co.soramitsu.iroha.android.sample.Constants.CREATOR;
 import static jp.co.soramitsu.iroha.android.sample.Constants.DOMAIN_ID;
+import static jp.co.soramitsu.iroha.android.sample.Constants.PRIV_KEY;
+import static jp.co.soramitsu.iroha.android.sample.Constants.PUB_KEY;
 import static jp.co.soramitsu.iroha.android.sample.Constants.QUERY_COUNTER;
 
 public class GetAccountInteractor extends SingleInteractor<Responses.Account, String> {
@@ -47,7 +48,7 @@ public class GetAccountInteractor extends SingleInteractor<Responses.Account, St
     protected Single<Responses.Account> build(String accountId) {
         return Single.create(emitter -> {
             long currentTime = System.currentTimeMillis();
-            Keypair userKeys = crypto.generateKeypair();
+            Keypair adminKeys = crypto.convertFromExisting(PUB_KEY, PRIV_KEY);
 
             // GetAccount
             UnsignedQuery query = modelQueryBuilder
@@ -59,7 +60,7 @@ public class GetAccountInteractor extends SingleInteractor<Responses.Account, St
 
 
             // sign transaction and get its binary representation (Blob)
-            ByteVector queryBlob = protoQueryHelper.signAndAddSignature(query, userKeys).blob();
+            ByteVector queryBlob = protoQueryHelper.signAndAddSignature(query, adminKeys).blob();
             byte bquery[] = toByteArray(queryBlob);
 
             Queries.Query protoQuery = null;
@@ -72,9 +73,6 @@ public class GetAccountInteractor extends SingleInteractor<Responses.Account, St
             QueryServiceGrpc.QueryServiceBlockingStub queryStub = QueryServiceGrpc.newBlockingStub(channel)
                     .withDeadlineAfter(CONNECTION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
             Responses.QueryResponse queryResponse = queryStub.find(protoQuery);
-            for (String role: queryResponse.getAccountResponse().getAccountRolesList()) {
-                Logger.e("ROLES " + accountId + " " + role);
-            }
             emitter.onSuccess(queryResponse.getAccountResponse().getAccount());
         });
     }

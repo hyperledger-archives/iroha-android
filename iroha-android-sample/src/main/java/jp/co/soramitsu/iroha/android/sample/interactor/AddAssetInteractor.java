@@ -5,7 +5,6 @@ import com.google.protobuf.InvalidProtocolBufferException;
 
 import java.math.BigInteger;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -60,7 +59,6 @@ public class AddAssetInteractor extends CompletableInteractor<String> {
             //Adding asset
             UnsignedTx addAssetTx = txBuilder.creatorAccountId(CREATOR)
                     .createdTime(BigInteger.valueOf(currentTime))
-                    .txCounter(BigInteger.valueOf(TX_COUNTER))
                     .addAssetQuantity(CREATOR, "irh#" + DOMAIN_ID, "100")
                     .transferAsset(CREATOR, username + "@" + DOMAIN_ID, "irh#" + DOMAIN_ID, "initial" ,"100")
                     .build();
