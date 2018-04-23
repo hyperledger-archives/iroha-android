@@ -1,6 +1,7 @@
 package jp.co.soramitsu.iroha.android.sample.interactor;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.protobuf.InvalidProtocolBufferException;
 
@@ -69,8 +70,8 @@ public class GetAccountDetailsInteractor extends SingleInteractor<String, Void> 
             QueryServiceGrpc.QueryServiceBlockingStub queryStub = QueryServiceGrpc.newBlockingStub(channel);
             Responses.QueryResponse queryResponse = queryStub.find(protoQuery);
 
-            JsonObject jsonObject = new Gson().fromJson(queryResponse.getAccountDetailResponse().getDetail(), JsonObject.class);
-            String detail = jsonObject.get(username + "@" + DOMAIN_ID).getAsJsonObject().get(Constants.ACCOUNT_DETAILS).getAsString();
+            JsonElement jsonElement = new Gson().fromJson(queryResponse.getAccountDetailResponse().getDetail(), JsonObject.class).get(username + "@" + DOMAIN_ID);;
+            String detail = jsonElement != null ? jsonElement.getAsJsonObject().get(Constants.ACCOUNT_DETAILS).getAsString() : "";
 
             emitter.onSuccess(detail);
         });

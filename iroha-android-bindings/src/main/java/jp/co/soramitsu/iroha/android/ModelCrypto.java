@@ -36,11 +36,11 @@ public class ModelCrypto {
   }
 
   public Keypair generateKeypair() {
-    return new Keypair(irohaJNI.ModelCrypto_generateKeypair__SWIG_0(swigCPtr, this), true);
+    return new Keypair(irohaJNI.ModelCrypto_generateKeypair(swigCPtr, this), true);
   }
 
-  public Keypair generateKeypair(String seed) {
-    return new Keypair(irohaJNI.ModelCrypto_generateKeypair__SWIG_1(swigCPtr, this, seed), true);
+  public Keypair fromPrivateKey(String private_key) {
+    return new Keypair(irohaJNI.ModelCrypto_fromPrivateKey(swigCPtr, this, private_key), true);
   }
 
   public Keypair convertFromExisting(String public_key, String private_key) {

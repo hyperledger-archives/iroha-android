@@ -43,10 +43,6 @@ public class ModelTransactionBuilder {
     return new ModelTransactionBuilder(irohaJNI.ModelTransactionBuilder_creatorAccountId(swigCPtr, this, account_id), true);
   }
 
-  public ModelTransactionBuilder txCounter(java.math.BigInteger tx_counter) {
-    return new ModelTransactionBuilder(irohaJNI.ModelTransactionBuilder_txCounter(swigCPtr, this, tx_counter), true);
-  }
-
   public ModelTransactionBuilder createdTime(java.math.BigInteger created_time) {
     return new ModelTransactionBuilder(irohaJNI.ModelTransactionBuilder_createdTime(swigCPtr, this, created_time), true);
   }

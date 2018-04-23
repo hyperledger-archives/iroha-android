@@ -1,6 +1,5 @@
 package jp.co.soramitsu.iroha.android.sample.interactor;
 
-
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import java.math.BigInteger;
@@ -16,7 +15,6 @@ import iroha.protocol.BlockOuterClass;
 import iroha.protocol.CommandServiceGrpc;
 import jp.co.soramitsu.iroha.android.ByteVector;
 import jp.co.soramitsu.iroha.android.Keypair;
-import jp.co.soramitsu.iroha.android.ModelCrypto;
 import jp.co.soramitsu.iroha.android.ModelProtoTransaction;
 import jp.co.soramitsu.iroha.android.ModelTransactionBuilder;
 import jp.co.soramitsu.iroha.android.UnsignedTx;
@@ -26,7 +24,6 @@ import jp.co.soramitsu.iroha.android.sample.injection.ApplicationModule;
 import static jp.co.soramitsu.iroha.android.sample.Constants.ACCOUNT_DETAILS;
 import static jp.co.soramitsu.iroha.android.sample.Constants.CONNECTION_TIMEOUT_SECONDS;
 import static jp.co.soramitsu.iroha.android.sample.Constants.DOMAIN_ID;
-import static jp.co.soramitsu.iroha.android.sample.Constants.TX_COUNTER;
 
 public class SetAccountDetailsInteractor extends CompletableInteractor<String> {
 
@@ -53,7 +50,6 @@ public class SetAccountDetailsInteractor extends CompletableInteractor<String> {
 
             UnsignedTx setDetailsTransaction = txBuilder.creatorAccountId(username + "@" + DOMAIN_ID)
                     .createdTime(BigInteger.valueOf(currentTime))
-                    .txCounter(BigInteger.valueOf(TX_COUNTER))
                     .setAccountDetail(username + "@" + DOMAIN_ID, ACCOUNT_DETAILS, details)
                     .build();
 

@@ -2,6 +2,7 @@ package jp.co.soramitsu.iroha.android.sample.interactor;
 
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.orhanobut.logger.Logger;
 
 import java.math.BigInteger;
 import java.util.concurrent.TimeUnit;
@@ -19,6 +20,7 @@ import jp.co.soramitsu.iroha.android.Keypair;
 import jp.co.soramitsu.iroha.android.ModelCrypto;
 import jp.co.soramitsu.iroha.android.ModelProtoTransaction;
 import jp.co.soramitsu.iroha.android.ModelTransactionBuilder;
+import jp.co.soramitsu.iroha.android.StringVector;
 import jp.co.soramitsu.iroha.android.UnsignedTx;
 import jp.co.soramitsu.iroha.android.sample.PreferencesUtil;
 import jp.co.soramitsu.iroha.android.sample.injection.ApplicationModule;
@@ -58,13 +60,11 @@ public class CreateAccountInteractor extends CompletableInteractor<String> {
             // Create account
             UnsignedTx createAccount = txBuilder.creatorAccountId(CREATOR)
                     .createdTime(BigInteger.valueOf(currentTime))
-                    .txCounter(BigInteger.valueOf(TX_COUNTER))
                     .createAccount(username, DOMAIN_ID, userKeys.publicKey())
                     .build();
 
             // sign transaction and get its binary representation (Blob)
             ByteVector txblob = protoTxHelper.signAndAddSignature(createAccount, adminKeys).blob();
-
             // Convert ByteVector to byte array
             byte bs[] = toByteArray(txblob);
 

@@ -5,11 +5,17 @@ interface MainView {
 
     void setAccountDetails(String details);
 
+    void setAccountBalance(String balance);
+
     void showRegistrationScreen();
 
     void showProgress();
 
     void hideProgress();
 
-    void showSetDetailsAccountError();
+    void showError(Throwable throwable);
+
+    void hideRefresh();
+
+    void refreshData(boolean animate);
 }

@@ -8,18 +8,56 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
+
+import com.jakewharton.rxbinding2.view.RxView;
+
+import javax.inject.Inject;
 
 import jp.co.soramitsu.iroha.android.sample.R;
+import jp.co.soramitsu.iroha.android.sample.SampleApplication;
 import jp.co.soramitsu.iroha.android.sample.databinding.FragmentSendBinding;
+import jp.co.soramitsu.iroha.android.sample.main.MainActivity;
 
-public class SendFragment extends Fragment {
+public class SendFragment extends Fragment implements SendView {
     private FragmentSendBinding binding;
+
+    @Inject
+    SendPresenter presenter;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_send, container, false);
+        SampleApplication.instance.getApplicationComponent().inject(this);
+
+        presenter.setFragment(this);
+
+        RxView.clicks(binding.send)
+                .subscribe(view -> {
+                    ((MainActivity) getActivity()).showProgress();
+                    presenter.sendTransaction(
+                            binding.to.getText().toString().trim(),
+                            binding.amount.getText().toString().trim()
+                    );
+                });
+
         return binding.getRoot();
+    }
+
+    @Override
+    public void didSendSuccess() {
+        ((MainActivity) getActivity()).refreshData(false);
+        binding.amount.setText("");
+        binding.to.setText("");
+        ((MainActivity) getActivity()).hideProgress();
+        Toast.makeText(getActivity(), getString(R.string.transaction_successful), Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void didSendError(Throwable error) {
+        ((MainActivity) getActivity()).hideProgress();
+        ((MainActivity)getActivity()).showError(error);
     }
 }
