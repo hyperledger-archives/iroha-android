@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.jakewharton.rxbinding2.view.RxView;
 
@@ -48,7 +49,10 @@ public class SendFragment extends Fragment implements SendView {
     @Override
     public void didSendSuccess() {
         ((MainActivity) getActivity()).refreshData(false);
+        binding.amount.setText("");
+        binding.to.setText("");
         ((MainActivity) getActivity()).hideProgress();
+        Toast.makeText(getActivity(), getString(R.string.transaction_successful), Toast.LENGTH_LONG).show();
     }
 
     @Override

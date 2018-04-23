@@ -16,7 +16,6 @@ import android.widget.TextView;
 
 import com.jakewharton.rxbinding2.view.RxView;
 import com.jakewharton.rxbinding2.widget.RxTextView;
-import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -129,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
     @Override
     public void setAccountDetails(String details) {
-        binding.bio.setText(details);
+        binding.bio.setText(details.isEmpty() ? getString(R.string.bio) : details);
     }
 
     @Override
