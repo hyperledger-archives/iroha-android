@@ -1,16 +1,29 @@
 package jp.co.soramitsu.iroha.android.sample.main.send;
 
+import android.Manifest;
+import android.app.Activity;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.jakewharton.rxbinding2.view.RxView;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.orhanobut.logger.Logger;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -18,6 +31,8 @@ import jp.co.soramitsu.iroha.android.sample.R;
 import jp.co.soramitsu.iroha.android.sample.SampleApplication;
 import jp.co.soramitsu.iroha.android.sample.databinding.FragmentSendBinding;
 import jp.co.soramitsu.iroha.android.sample.main.MainActivity;
+
+import static jp.co.soramitsu.iroha.android.sample.main.send.SendPresenter.REQUEST_CODE_QR_SCAN;
 
 public class SendFragment extends Fragment implements SendView {
     private FragmentSendBinding binding;
@@ -35,12 +50,28 @@ public class SendFragment extends Fragment implements SendView {
         presenter.setFragment(this);
 
         RxView.clicks(binding.send)
+                .subscribe(view -> sendTransaction(binding.to.getText().toString().trim(), binding.amount.getText().toString().trim()));
+
+        RxView.clicks(binding.qr)
                 .subscribe(view -> {
-                    ((MainActivity) getActivity()).showProgress();
-                    presenter.sendTransaction(
-                            binding.to.getText().toString().trim(),
-                            binding.amount.getText().toString().trim()
-                    );
+                    Dexter.withActivity(getActivity())
+                            .withPermissions(Manifest.permission.CAMERA,
+                                    Manifest.permission.READ_EXTERNAL_STORAGE)
+                            .withListener(new MultiplePermissionsListener() {
+                                @Override
+                                public void onPermissionsChecked(MultiplePermissionsReport report) {
+                                    if (report.areAllPermissionsGranted()) {
+                                        presenter.doScanQr();
+                                    } else {
+                                        didSendError(new Throwable("Permissions weren't granted"));
+                                    }
+                                }
+
+                                @Override
+                                public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                                    token.continuePermissionRequest();
+                                }
+                            }).check();
                 });
 
         return binding.getRoot();
@@ -55,9 +86,47 @@ public class SendFragment extends Fragment implements SendView {
         Toast.makeText(getActivity(), getString(R.string.transaction_successful), Toast.LENGTH_LONG).show();
     }
 
+    private void sendTransaction(String username, String amount) {
+        ((MainActivity) getActivity()).showProgress();
+        presenter.sendTransaction(username, amount);
+    }
+
     @Override
     public void didSendError(Throwable error) {
         ((MainActivity) getActivity()).hideProgress();
         ((MainActivity)getActivity()).showError(error);
     }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(resultCode != Activity.RESULT_OK)
+        {
+            if(data==null)
+                return;
+
+            String result = data.getStringExtra("com.blikoon.qrcodescanner.error_decoding_image");
+            if( result!=null)
+            {
+                didSendError(new Throwable("QR can't be decoded"));
+            }
+            return;
+
+        } else {
+            if (requestCode == REQUEST_CODE_QR_SCAN) {
+                if (data == null)
+                    return;
+                //Getting the passed result
+                String result = data.getStringExtra("com.blikoon.qrcodescanner.got_qr_scan_relult");
+                if (result.indexOf(",") != -1) {
+                    binding.to.setText(result.split(",")[0]);
+                    binding.amount.setText(result.split(",")[1]);
+                    Toast.makeText(getActivity(), getString(R.string.qr_decode_successful), Toast.LENGTH_LONG).show();
+                } else {
+                    didSendError(new Throwable("QR can't be decoded."));
+                }
+
+            }
+        }
+    }
+
 }

@@ -1,11 +1,16 @@
 package jp.co.soramitsu.iroha.android.sample.main.send;
 
+import android.content.Intent;
+
+import com.blikoon.qrcodescanner.QrCodeActivity;
+
 import javax.inject.Inject;
 
 import jp.co.soramitsu.iroha.android.sample.R;
 import jp.co.soramitsu.iroha.android.sample.SampleApplication;
 import jp.co.soramitsu.iroha.android.sample.interactor.GetAccountInteractor;
 import jp.co.soramitsu.iroha.android.sample.interactor.SendAssetInteractor;
+import jp.co.soramitsu.iroha.android.sample.main.MainActivity;
 import lombok.Setter;
 
 public class SendPresenter {
@@ -15,6 +20,8 @@ public class SendPresenter {
 
     private final SendAssetInteractor sendAssetInteractor;
     private final GetAccountInteractor getAccountInteractor;
+
+    public static final int REQUEST_CODE_QR_SCAN = 101;
 
     @Inject
     public SendPresenter(SendAssetInteractor sendAssetInteractor, GetAccountInteractor getAccountInteractor) {
@@ -48,6 +55,11 @@ public class SendPresenter {
 
     private boolean isEnoughBalance(long amount) {
         return SampleApplication.instance.account.getBalance() >= amount;
+    }
+
+    public void doScanQr() {
+        Intent i = new Intent(fragment.getActivity(), QrCodeActivity.class);
+        fragment.startActivityForResult(i, REQUEST_CODE_QR_SCAN);
     }
 
 }
