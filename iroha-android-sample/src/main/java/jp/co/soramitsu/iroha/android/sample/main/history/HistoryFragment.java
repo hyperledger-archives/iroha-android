@@ -12,8 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.orhanobut.logger.Logger;
-
 import javax.inject.Inject;
 
 import jp.co.soramitsu.iroha.android.sample.R;
@@ -38,7 +36,7 @@ public class HistoryFragment extends Fragment implements HistoryView {
 
         presenter.setFragment(this);
         presenter.onCreateView();
-        presenter.getTransactoins();
+        presenter.getTransactions();
 
         TransactionsViewModel transactionsViewModel = ViewModelProviders.of(this).get(TransactionsViewModel.class);
         transactionsViewModel.getTransactions().observe(this, transactions -> {
@@ -50,7 +48,7 @@ public class HistoryFragment extends Fragment implements HistoryView {
         });
 
         configureRecycler();
-        binding.refresh.setOnRefreshListener(() -> presenter.getTransactoins());
+        binding.refresh.setOnRefreshListener(() -> presenter.getTransactions());
         return binding.getRoot();
     }
 
@@ -59,6 +57,12 @@ public class HistoryFragment extends Fragment implements HistoryView {
         binding.transactions.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new TransactionsAdapter();
         binding.transactions.setAdapter(adapter);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        presenter.setFragment(this);
     }
 
     @Override

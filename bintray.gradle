@@ -1,0 +1,1 @@
+include ':iroha-android-bindings', ':iroha-android-sample'

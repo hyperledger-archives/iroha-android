@@ -10,9 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.jakewharton.rxbinding2.view.RxView;
 import com.jakewharton.rxbinding2.widget.RxTextView;
-import com.orhanobut.logger.Logger;
 
 import javax.inject.Inject;
 
@@ -35,19 +33,16 @@ public class ReceiveFragment extends Fragment implements ReceiveView {
         SampleApplication.instance.getApplicationComponent().inject(this);
 
         presenter.setFragment(this);
-
-        RxTextView.textChangeEvents(binding.amount).subscribe(text -> presenter.generateQR(text.text().toString()), throwable -> didError(throwable));
+        presenter.generateQR(binding.amount.getText().toString());
+        RxTextView.textChangeEvents(binding.amount)
+                .subscribe(text -> presenter.generateQR(text.text().toString()),
+                        this::didError);
         return binding.getRoot();
     }
 
     @Override
     public void didGenerateSuccess(Bitmap bitmap) {
         binding.qrCodeImageView.setImageBitmap(bitmap);
-    }
-
-    @Override
-    public void resetQR() {
-        binding.qrCodeImageView.setImageResource(R.drawable.qr_temlate);
     }
 
     @Override

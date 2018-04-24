@@ -1,13 +1,10 @@
 package jp.co.soramitsu.iroha.android.sample.main.receive;
 
+import com.orhanobut.logger.Logger;
+
 import javax.inject.Inject;
 
-import jp.co.soramitsu.iroha.android.sample.R;
-import jp.co.soramitsu.iroha.android.sample.SampleApplication;
 import jp.co.soramitsu.iroha.android.sample.interactor.GenerateQRInteractor;
-import jp.co.soramitsu.iroha.android.sample.interactor.GetAccountInteractor;
-import jp.co.soramitsu.iroha.android.sample.interactor.SendAssetInteractor;
-import jp.co.soramitsu.iroha.android.sample.main.send.SendFragment;
 import lombok.Setter;
 
 public class ReceivePresenter {
@@ -23,10 +20,13 @@ public class ReceivePresenter {
     }
 
     void generateQR(String amount) {
-        if (!amount.isEmpty()) {
-            generateQRInteractor.execute(amount, bitmap -> {fragment.didGenerateSuccess(bitmap);}, throwable -> {});
-        } else {
-            fragment.resetQR();
+        if (amount.isEmpty()) {
+            amount = "0";
         }
+        generateQRInteractor.execute(amount, bitmap -> {
+            fragment.didGenerateSuccess(bitmap);
+        }, throwable -> {
+            Logger.e(throwable.getMessage());
+        });
     }
 }

@@ -6,8 +6,5 @@ public interface ReceiveView {
 
     void didGenerateSuccess(Bitmap bitmap);
 
-    void resetQR();
-
     void didError(Throwable error);
-
 }

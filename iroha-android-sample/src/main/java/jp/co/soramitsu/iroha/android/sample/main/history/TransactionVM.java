@@ -8,5 +8,4 @@ public class TransactionVM {
     public final String prettyDate;
     public final String username;
     public final String prettyAmount;
-    public final boolean isGreaterThanZero;
 }

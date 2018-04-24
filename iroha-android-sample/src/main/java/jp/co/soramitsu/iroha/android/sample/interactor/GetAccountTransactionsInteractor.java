@@ -1,7 +1,6 @@
 package jp.co.soramitsu.iroha.android.sample.interactor;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.orhanobut.logger.Logger;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -41,8 +40,8 @@ public class GetAccountTransactionsInteractor extends SingleInteractor<List<Tran
 
     @Inject
     GetAccountTransactionsInteractor(@Named(ApplicationModule.JOB) Scheduler jobScheduler,
-                                    @Named(ApplicationModule.UI) Scheduler uiScheduler,
-                                    PreferencesUtil preferenceUtils) {
+                                     @Named(ApplicationModule.UI) Scheduler uiScheduler,
+                                     PreferencesUtil preferenceUtils) {
         super(jobScheduler, uiScheduler);
         this.preferenceUtils = preferenceUtils;
     }
@@ -74,23 +73,26 @@ public class GetAccountTransactionsInteractor extends SingleInteractor<List<Tran
 
             List<Transaction> transactions = new ArrayList<>();
 
-            for (BlockOuterClass.Transaction transaction: queryResponse.getTransactionsResponse().getTransactionsList()) {
+            for (BlockOuterClass.Transaction transaction : queryResponse.getTransactionsResponse().getTransactionsList()) {
                 Date date = new Date();
                 date.setTime(transaction.getPayload().getCreatedTime());
 
-                String accountName;
                 Long amount = Long.parseLong(getIntBalance(transaction.getPayload().getCommands(0).getTransferAsset().getAmount()));
 
-                if (transaction.getPayload().getCommands(0).getTransferAsset().getDestAccountId().equals(transaction.getPayload().getCreatorAccountId())) {
-                    accountName = transaction.getPayload().getCommands(0).getTransferAsset().getSrcAccountId();
-                    amount = - amount;
-                } else {
-                    accountName = transaction.getPayload().getCommands(0).getTransferAsset().getDestAccountId();
+                String sender = transaction.getPayload().getCreatorAccountId();
+                String receiver = transaction.getPayload().getCommands(0).getTransferAsset().getDestAccountId();
+                String currentAccount = username + "@" + DOMAIN_ID;
+
+                if (sender.equals(currentAccount)) {
+                    amount = -amount;
                 }
 
-                accountName = accountName.split("@")[0];
+                String user = sender;
+                if (sender.equals(currentAccount)) {
+                    user = receiver;
+                }
 
-                transactions.add(new Transaction(0, date, accountName, amount));
+                transactions.add(new Transaction(0, date, user.split("@")[0], amount));
             }
             emitter.onSuccess(transactions);
         });

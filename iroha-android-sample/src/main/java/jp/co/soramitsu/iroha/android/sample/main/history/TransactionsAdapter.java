@@ -48,11 +48,12 @@ public class TransactionsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             TransactionVM transaction = (TransactionVM) transactions.get(position);
             TransactionItem transactionItem = (TransactionItem) holder;
             transactionItem.username.setText(transaction.username);
-            if (transaction.isGreaterThanZero) {
+            if (transaction.prettyAmount.contains("-")) {
+                transactionItem.amount.setText(transaction.prettyAmount);
+                transactionItem.amount.setTextColor(SampleApplication.instance.getResources().getColor(R.color.text));
+            } else {
                 transactionItem.amount.setText("+ " + transaction.prettyAmount);
                 transactionItem.amount.setTextColor(SampleApplication.instance.getResources().getColor(R.color.positiveAmount));
-            } else {
-                transactionItem.amount.setText("- " + transaction.prettyAmount);
             }
             transactionItem.date.setText(transaction.prettyDate);
         } else if (holder instanceof TransactionHeaderItem) {

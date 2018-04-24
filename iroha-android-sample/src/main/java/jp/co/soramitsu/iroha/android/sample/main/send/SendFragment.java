@@ -2,14 +2,12 @@ package jp.co.soramitsu.iroha.android.sample.main.send;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +19,6 @@ import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
-import com.orhanobut.logger.Logger;
 
 import java.util.List;
 
@@ -94,39 +91,32 @@ public class SendFragment extends Fragment implements SendView {
     @Override
     public void didSendError(Throwable error) {
         ((MainActivity) getActivity()).hideProgress();
-        ((MainActivity)getActivity()).showError(error);
+        ((MainActivity) getActivity()).showError(error);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(resultCode != Activity.RESULT_OK)
-        {
-            if(data==null)
+        if (resultCode != Activity.RESULT_OK) {
+            if (data == null)
                 return;
 
             String result = data.getStringExtra("com.blikoon.qrcodescanner.error_decoding_image");
-            if( result!=null)
-            {
+            if (result != null) {
                 didSendError(new Throwable("QR can't be decoded"));
             }
-            return;
-
         } else {
             if (requestCode == REQUEST_CODE_QR_SCAN) {
                 if (data == null)
                     return;
                 //Getting the passed result
                 String result = data.getStringExtra("com.blikoon.qrcodescanner.got_qr_scan_relult");
-                if (result.indexOf(",") != -1) {
+                if (result.contains(",") && result.split(",").length == 2) {
                     binding.to.setText(result.split(",")[0]);
                     binding.amount.setText(result.split(",")[1]);
-                    Toast.makeText(getActivity(), getString(R.string.qr_decode_successful), Toast.LENGTH_LONG).show();
                 } else {
                     didSendError(new Throwable("QR can't be decoded."));
                 }
-
             }
         }
     }
-
 }

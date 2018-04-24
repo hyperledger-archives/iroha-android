@@ -3,11 +3,11 @@ package jp.co.soramitsu.iroha.android.sample.main.history;
 import android.arch.lifecycle.ViewModelProviders;
 import android.text.format.DateUtils;
 
-
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -36,7 +36,7 @@ public class HistoryPresenter {
         transactionsViewModel = ViewModelProviders.of(fragment).get(TransactionsViewModel.class);
     }
 
-    public void getTransactoins() {
+    void getTransactions() {
         getAccountTransactionsInteractor.execute(
                 transactions -> {
                     transactionsViewModel.getTransactions().postValue(transformTransactions(transactions));
@@ -46,6 +46,9 @@ public class HistoryPresenter {
     }
 
     private List transformTransactions(List<Transaction> transactions) {
+        if (transactions.isEmpty()) {
+            return Collections.emptyList();
+        }
         List listItems = new ArrayList();
 
         Calendar c = Calendar.getInstance();
@@ -95,8 +98,7 @@ public class HistoryPresenter {
             }
 
 
-            TransactionVM vm = new TransactionVM(transaction.id, prettyDate,
-                    transaction.username, prettyAmount, transaction.amount > 0);
+            TransactionVM vm = new TransactionVM(transaction.id, prettyDate, transaction.username, prettyAmount);
 
             listItems.add(vm);
         }
