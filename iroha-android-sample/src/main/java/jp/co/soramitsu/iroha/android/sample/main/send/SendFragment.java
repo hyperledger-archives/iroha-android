@@ -96,25 +96,18 @@ public class SendFragment extends Fragment implements SendView {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode != Activity.RESULT_OK) {
-            if (data == null)
-                return;
-
-            String result = data.getStringExtra("com.blikoon.qrcodescanner.error_decoding_image");
-            if (result != null) {
-                didSendError(new Throwable("QR can't be decoded"));
-            }
-        } else {
+        if (resultCode == Activity.RESULT_OK) {
             if (requestCode == REQUEST_CODE_QR_SCAN) {
-                if (data == null)
-                    return;
-                //Getting the passed result
-                String result = data.getStringExtra("com.blikoon.qrcodescanner.got_qr_scan_relult");
-                if (result.contains(",") && result.split(",").length == 2) {
-                    binding.to.setText(result.split(",")[0]);
-                    binding.amount.setText(result.split(",")[1]);
-                } else {
+                if (data == null) {
                     didSendError(new Throwable("QR can't be decoded."));
+                } else {
+                    String result = data.getData().toString();
+                    if (result.contains(",") && result.split(",").length == 2) {
+                        binding.to.setText(result.split(",")[0]);
+                        binding.amount.setText(result.split(",")[1]);
+                    } else {
+                        didSendError(new Throwable("QR can't be decoded."));
+                    }
                 }
             }
         }

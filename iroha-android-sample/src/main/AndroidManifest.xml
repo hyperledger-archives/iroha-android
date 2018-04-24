@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright Soramitsu Co., Ltd. 2016 All Rights Reserved.
   ~ http://soramitsu.co.jp
   ~
@@ -15,8 +13,7 @@
   ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
-  -->
-
+-->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="jp.co.soramitsu.iroha.android.sample">
 
@@ -36,9 +33,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".main.MainActivity"
-            android:screenOrientation="portrait">
-
-        </activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".registration.RegistrationActivity"
             android:screenOrientation="portrait">
@@ -48,6 +43,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".qrscanner.QRScannerActivity"></activity>
     </application>
 
 </manifest>
