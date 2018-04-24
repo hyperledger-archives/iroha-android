@@ -1,0 +1,50 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.github.dcendents.android-maven'
+
+ext {
+    bintrayRepo = 'maven' // your repo name
+    bintrayName = 'iroha-android-bindings' // has to be same as your library module name
+    publishedGroupId = 'jp.co.soramitsu.iroha.android' // your module package name
+    libraryName = 'bindings'
+    artifact = 'iroha-android-bindings' // has to be same as your library module name
+    libraryDescription = 'A set of methods used to manipulate Iroha'
+    siteUrl = 'https://github.com/hyperledger/iroha-android'
+    gitUrl = 'https://github.com/hyperledger/iroha-android/bindings.git'
+    libraryVersion = '1.1'
+    developerId = 'bulatmukhutdinov'
+    developerName = 'Bulat Mukhutdinov'
+    developerEmail = 'bulat.m@soramitsu.co.jp'
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
+android {
+    compileSdkVersion 27
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 27
+        versionCode 1
+        versionName "1.1"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+}
+
+
+apply from: 'install.gradle'
+apply from: 'bintray.gradle'

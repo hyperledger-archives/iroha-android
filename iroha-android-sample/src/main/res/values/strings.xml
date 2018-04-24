@@ -1,64 +1,28 @@
-<!--
-  ~ Copyright Soramitsu Co., Ltd. 2016 All Rights Reserved.
-  ~ http://soramitsu.co.jp
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~          http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
-
 <resources>
-    <string name="app_name">IrohaAndroid</string>
-
-    <string name="register">Register</string>
-    <string name="validation_message_required">%1$s is required.</string>
-    <string name="name">Name</string>
-    <string name="error">Error!</string>
-    <string name="during_registration">Registration…</string>
-    <string name="message_account_register_successful">Account registered!</string>
-    <string name="placeholder_account_name">username:</string>
-    <string name="transaction_history">Transaction</string>
-    <string name="send">Send</string>
-    <string name="receive">Receive</string>
-    <string name="during_fetch_account_info">Fetching account…</string>
-    <string name="error_message_retry_again">Please retry again.</string>
-    <string name="error_message_check_network_state">Please check your network state.</string>
-    <string name="load_receiver_qr">Reading QR</string>
-    <string name="sending">Sending…</string>
-    <string name="error_message_illegal_qr">Illegal QR!</string>
-    <string name="error_message_request_amount_is_incorrect">Incorrect amount!</string>
-    <string name="error_message_cannot_send_to_myself">Cannot send asset to myself</string>
-    <string name="successful_title_sent">Sent</string>
-    <string name="hint_receiver_amount">amount</string>
-    <string name="error_message_cannot_generate_qr">Cannot generate QR!</string>
-    <string name="message_send_asset_successful">You sent %2$s IRH to %1$s</string>
-    <string name="error_message_large_number_of_digits">Large number of digits!</string>
-    <string name="unknown_receiver">Unknown</string>
-    <string name="error_message_account_duplicate">Account already exist!</string>
-    <string name="error_message_user_not_found">Account not found!</string>
-    <string name="has_asset_amount">"%1$s IRH"</string>
-    <string name="home">HOME</string>
-    <string name="unregister">Unregister</string>
-    <string name="wallet">Wallet</string>
-    <string name="to">to</string>
-    <string name="error_receiver_not_found">Please input (or read QR code) receiver.</string>
-    <string name="transaction_history_not_found">Transaction history not found.</string>
-    <string name="open_source_license">Open Source License</string>
-    <string name="library_description">IrohaAndroid is client library for using iroha for Android.</string>
-    <string name="message_copy_to_clipboard">Copy to clipboard!</string>
-    <string name="successful">Successful</string>
-    <string name="message_account_deleted">Account deleted</string>
-    <string name="warning">Warning!</string>
-    <string name="connection">Connection…</string>
-    <string name="message_delete_account">Are you sure you want to delete your account info?</string>
-    <string name="account_delete">Account Delete</string>
-    <string name="during_delete">Deleting…</string>
+    <string name="app_name">Iroha-Android</string>
+    <string name="to">To</string>
+    <string name="amount">Amount</string>
+    <string name="or">OR</string>
+    <string name="qr_hint">Send via QR code</string>
+    <string name="send">send</string>
+    <string name="registration_title">I R O H A</string>
+    <string name="registration_subtitle">Blockchain technologies for business</string>
+    <string name="username_hint">Username (only small latin letters)</string>
+    <string name="button_register">Register</string>
+    <string name="error_dialog_title">Failure</string>
+    <string name="username_empty_error_dialog_message">Username can\'t be empty</string>
+    <string name="username_already_exists_error_dialog_message">Username already exists</string>
+    <string name="username_doesnt_exists">No such user</string>
+    <string name="fields_cant_be_empty">Fields can not be emoty</string>
+    <string name="please_wait">Please, wait…</string>
+    <string name="general_error">Problem with connection to server</string>
+    <string name="logout">Logout</string>
+    <string name="logout_description">Are you sure? Account will be lost</string>
+    <string name="account_details">Account details</string>
+    <string name="account_details_error">Failed to set account details</string>
+    <string name="not_enough_balance_error">Not enough amount on balance</string>
+    <string name="bio">Any details such as age, profession.</string>
+    <string name="transaction_successful">Transaction successfull.</string>
+    <string name="qr_decode_successful">QR decode successfull.</string>
+    <string name="info">Info</string>
 </resources>

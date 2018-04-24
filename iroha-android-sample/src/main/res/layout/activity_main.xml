@@ -19,64 +19,122 @@
 
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
-
-    <android.support.v4.widget.DrawerLayout
-        android:id="@+id/drawer_layout"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swiperefresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".main.MainActivity">
 
-        <android.support.design.widget.CoordinatorLayout
+        <android.support.v7.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:context=".presentation.view.activity.MainActivity">
+            android:layout_height="wrap_content"
+            app:cardElevation="4dp"
+            card_view:cardBackgroundColor="@android:color/white">
 
-            <RelativeLayout
+            <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <android.support.design.widget.AppBarLayout
-                    android:id="@+id/toolbar_container"
-                    android:layout_width="match_parent"
+                <ImageView
+                    android:id="@+id/logo"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:src="@drawable/ic_logo"
+                    android:transitionName="profile"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="ContentDescription" />
+
+                <ImageView
+                    android:id="@+id/logout"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:theme="@style/AppTheme.AppBarOverlay">
+                    android:padding="16dp"
+                    android:src="@drawable/ic_logout"
+                    app:layout_constraintBottom_toBottomOf="@id/logo"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/logo"
+                    tools:ignore="ContentDescription" />
 
-                    <android.support.v7.widget.Toolbar
-                        android:id="@+id/toolbar"
-                        android:layout_width="match_parent"
-                        android:layout_height="?attr/actionBarSize"
-                        android:background="?attr/colorPrimary"
-                        app:popupTheme="@style/AppTheme.PopupOverlay" />
+                <TextView
+                    android:id="@+id/username"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginStart="16dp"
+                    android:textColor="@color/text"
+                    android:textSize="16sp"
+                    app:layout_constraintEnd_toStartOf="@id/logout"
+                    app:layout_constraintStart_toEndOf="@id/logo"
+                    app:layout_constraintTop_toTopOf="@id/logo"
+                    tools:text="@tools:sample/full_names" />
 
-                </android.support.design.widget.AppBarLayout>
+                <TextView
+                    android:id="@+id/bio"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginStart="16dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:text="@string/bio"
+                    android:textColor="@color/hint"
+                    android:textSize="13sp"
+                    app:layout_constraintBottom_toBottomOf="@id/logo"
+                    app:layout_constraintEnd_toStartOf="@id/logout"
+                    app:layout_constraintStart_toEndOf="@id/logo"
+                    app:layout_constraintTop_toBottomOf="@id/username" />
 
-                <android.support.design.widget.BottomNavigationView
-                    android:id="@+id/bottom_navigation"
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:layout_alignParentBottom="true"
-                    android:background="@color/grey200"
-                    app:menu="@menu/bottom_navigation_menu" />
+                <ImageView
+                    android:id="@+id/background"
+                    android:layout_width="0dp"
+                    android:layout_height="120dp"
+                    android:layout_marginTop="16dp"
+                    android:alpha="0.3"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/background"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/logo"
+                    tools:ignore="ContentDescription" />
 
-                <FrameLayout
-                    android:id="@+id/container"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_above="@id/bottom_navigation"
-                    android:layout_below="@id/toolbar_container"
-                    android:focusableInTouchMode="true"
-                    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-                    tools:context=".presentation.view.activity.MainActivity"
-                    tools:showIn="@layout/activity_main" />
-            </RelativeLayout>
-        </android.support.design.widget.CoordinatorLayout>
+                <TextView
+                    android:id="@+id/balance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/text"
+                    android:textSize="25sp"
+                    app:layout_constraintBottom_toBottomOf="@id/background"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/background"
+                    tools:text="168 IRH" />
 
-        <android.support.design.widget.NavigationView
-            android:id="@+id/navigation"
-            android:layout_width="300dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            app:headerLayout="@layout/drawer_header"
-            app:menu="@menu/navigation_menu" />
-    </android.support.v4.widget.DrawerLayout>
+                <android.support.design.widget.TabLayout
+                    android:id="@+id/tabs"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/background"
+                    app:tabGravity="fill"
+                    app:tabIndicatorColor="@color/iroha"
+                    app:tabMode="fixed" />
+            </android.support.constraint.ConstraintLayout>
+        </android.support.v7.widget.CardView>
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+    </android.support.v4.widget.SwipeRefreshLayout>
 </layout>
