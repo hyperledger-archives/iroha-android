@@ -1,0 +1,14 @@
+syntax = "proto3";
+package iroha.ordering.proto;
+
+import "iroha/protocol/block.proto";
+import "iroha/protocol/proposal.proto";
+import "empty.proto";
+
+service OrderingGateTransportGrpc {
+    rpc onProposal (protocol.Proposal) returns (google.protobuf.Empty);
+}
+
+service OrderingServiceTransportGrpc {
+    rpc onTransaction (iroha.protocol.Transaction) returns (google.protobuf.Empty);
+}
