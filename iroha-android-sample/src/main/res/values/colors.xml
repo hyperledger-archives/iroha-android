@@ -1,37 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#DB0622</color>
-    <color name="colorPrimaryDark">#DE2B3C</color>
-    <color name="colorAccent">#FF5252</color>
+    <color name="colorPrimary">#fdfdfd</color>
+    <color name="colorPrimaryDark">#757575</color>
+    <color name="colorAccent">#263238</color>
+    <color name="iroha">#D13937</color>
 
-    <!-- Text & Icon -->
-    <color name="text_icons">#B6B6B6</color>
-    <color name="primary_text">#212121</color>
-    <color name="secondary_text">#727272</color>
-    <color name="divider_color">#B6B6B6</color>
-    <color name="link_color">#1111CC</color>
-
-    <!-- Greyscales -->
-    <color name="grey200">#EEEEEE</color>
-    <color name="grey300">#E0E0E0</color>
-    <color name="grey400">#BDBDBD</color>
-    <color name="grey600">#757575</color>
-    <color name="black">#212121</color>
-    <color name="white">#FAFAFA</color>
-    <color name="grey">#AAFFFFFF</color>
-
-    <!-- Others -->
-    <color name="red600">#E53935</color>
-    <color name="pink600">#D81B60</color>
-    <color name="purple600">#8E24AA</color>
-    <color name="blue600">#1E88E5</color>
-    <color name="cyan600">#00ACC1</color>
-    <color name="green600">#43A047</color>
-    <color name="yellow600">#FDD835</color>
-    <color name="orange600">#FB8C00</color>
-    <color name="brown600">#6D4C41</color>
-    <color name="light_green600">#7CB342</color>
-
-    <color name="receiver">#FDD835</color>
-    <color name="sender">#5CB85C</color>
+    <color name="text">#000000</color>
+    <color name="hint">#BDBDBD</color>
+    <color name="positiveAmount">#078B75</color>
 </resources>
