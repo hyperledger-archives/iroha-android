@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 
 import com.jakewharton.rxbinding2.view.RxView;
 import com.jakewharton.rxbinding2.widget.RxTextView;
+import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -119,6 +121,19 @@ public class MainActivity extends AppCompatActivity implements MainView {
         adapter.addFragment(new ReceiveFragment(), "RECEIVE");
         adapter.addFragment(new HistoryFragment(), "HISTORY");
         binding.content.setAdapter(adapter);
+
+        binding.content.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
+
+            @Override
+            public void onPageSelected(int position) {
+                binding.swiperefresh.setEnabled(!(adapter.getItem(position) instanceof HistoryFragment));
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {}
+        });
     }
 
     @Override
@@ -154,7 +169,6 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
     @Override
     public void showError(Throwable throwable) {
-        throwable.printStackTrace();
         AlertDialog alertDialog = new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.error_dialog_title))
                 .setMessage(throwable.getLocalizedMessage())

@@ -17,8 +17,9 @@ import javax.inject.Inject;
 import jp.co.soramitsu.iroha.android.sample.R;
 import jp.co.soramitsu.iroha.android.sample.SampleApplication;
 import jp.co.soramitsu.iroha.android.sample.databinding.FragmentHistoryBinding;
+import jp.co.soramitsu.iroha.android.sample.main.MainActivity;
 
-public class HistoryFragment extends Fragment {
+public class HistoryFragment extends Fragment implements HistoryView {
     private FragmentHistoryBinding binding;
 
     @Inject
@@ -35,6 +36,7 @@ public class HistoryFragment extends Fragment {
 
         presenter.setFragment(this);
         presenter.onCreateView();
+        presenter.getTransactions();
 
         TransactionsViewModel transactionsViewModel = ViewModelProviders.of(this).get(TransactionsViewModel.class);
         transactionsViewModel.getTransactions().observe(this, transactions -> {
@@ -46,7 +48,7 @@ public class HistoryFragment extends Fragment {
         });
 
         configureRecycler();
-        binding.refresh.setOnRefreshListener(() -> binding.refresh.setRefreshing(false));
+        binding.refresh.setOnRefreshListener(() -> presenter.getTransactions());
         return binding.getRoot();
     }
 
@@ -58,8 +60,24 @@ public class HistoryFragment extends Fragment {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        presenter.setFragment(this);
+    }
+
+    @Override
     public void onStop() {
         super.onStop();
         presenter.onStop();
+    }
+
+    @Override
+    public void finishRefresh() {
+        binding.refresh.setRefreshing(false);
+    }
+
+    @Override
+    public void didError(Throwable error) {
+        ((MainActivity) getActivity()).showError(error);
     }
 }

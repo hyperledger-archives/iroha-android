@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jp.co.soramitsu.iroha.android.sample.R;
+import jp.co.soramitsu.iroha.android.sample.SampleApplication;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -47,7 +48,13 @@ public class TransactionsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             TransactionVM transaction = (TransactionVM) transactions.get(position);
             TransactionItem transactionItem = (TransactionItem) holder;
             transactionItem.username.setText(transaction.username);
-            transactionItem.amount.setText(transaction.prettyAmount);
+            if (transaction.prettyAmount.contains("-")) {
+                transactionItem.amount.setText(transaction.prettyAmount);
+                transactionItem.amount.setTextColor(SampleApplication.instance.getResources().getColor(R.color.text));
+            } else {
+                transactionItem.amount.setText("+ " + transaction.prettyAmount);
+                transactionItem.amount.setTextColor(SampleApplication.instance.getResources().getColor(R.color.positiveAmount));
+            }
             transactionItem.date.setText(transaction.prettyDate);
         } else if (holder instanceof TransactionHeaderItem) {
             TransactionHeaderItem headerItem = (TransactionHeaderItem) holder;

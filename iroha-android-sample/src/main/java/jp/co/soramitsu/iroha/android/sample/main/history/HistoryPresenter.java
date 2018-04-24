@@ -3,22 +3,19 @@ package jp.co.soramitsu.iroha.android.sample.main.history;
 import android.arch.lifecycle.ViewModelProviders;
 import android.text.format.DateUtils;
 
-import com.orhanobut.logger.Logger;
-
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
-import jp.co.soramitsu.iroha.android.sample.interactor.GetTransactionsInteractor;
+import jp.co.soramitsu.iroha.android.sample.interactor.GetAccountTransactionsInteractor;
 import lombok.Setter;
 
 public class HistoryPresenter {
@@ -26,34 +23,32 @@ public class HistoryPresenter {
     @Setter
     private HistoryFragment fragment;
 
-    private final GetTransactionsInteractor getTransactionsInteractor;
+    private final GetAccountTransactionsInteractor getAccountTransactionsInteractor;
 
     private TransactionsViewModel transactionsViewModel;
 
     @Inject
-    public HistoryPresenter(GetTransactionsInteractor getTransactionsInteractor) {
-        this.getTransactionsInteractor = getTransactionsInteractor;
+    public HistoryPresenter(GetAccountTransactionsInteractor getAccountTransactionsInteractor) {
+        this.getAccountTransactionsInteractor = getAccountTransactionsInteractor;
     }
 
     void onCreateView() {
         transactionsViewModel = ViewModelProviders.of(fragment).get(TransactionsViewModel.class);
+    }
 
-        new Timer().scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                getTransactionsInteractor.execute(transactions -> {
-                            if (transactions.isEmpty()) {
-                                transactionsViewModel.getTransactions().postValue(new ArrayList<>());
-                            }
-                            transactionsViewModel.getTransactions().postValue(transformTransactions(transactions));
-                        },
-                        throwable -> Logger.e(throwable.getMessage()));
-            }
-
-        }, 0, TimeUnit.MINUTES.toMillis(1));
+    void getTransactions() {
+        getAccountTransactionsInteractor.execute(
+                transactions -> {
+                    transactionsViewModel.getTransactions().postValue(transformTransactions(transactions));
+                    fragment.finishRefresh();
+                },
+                throwable -> fragment.didError(throwable));
     }
 
     private List transformTransactions(List<Transaction> transactions) {
+        if (transactions.isEmpty()) {
+            return Collections.emptyList();
+        }
         List listItems = new ArrayList();
 
         Calendar c = Calendar.getInstance();
@@ -86,7 +81,7 @@ public class HistoryPresenter {
                 listItems.add(currentPrettyDate);
             }
 
-            BigDecimal amount = new BigDecimal(transaction.amount).movePointLeft(2);
+            BigDecimal amount = new BigDecimal(transaction.amount);
             String prettyAmount = amount.toString();
 
             String prettyDate;
@@ -102,8 +97,9 @@ public class HistoryPresenter {
                 prettyDate = hoursDateFormat.format(transaction.date);
             }
 
-            TransactionVM vm = new TransactionVM(transaction.id, prettyDate,
-                    transaction.username, prettyAmount, transaction.amount > 0);
+
+            TransactionVM vm = new TransactionVM(transaction.id, prettyDate, transaction.username, prettyAmount);
+
             listItems.add(vm);
         }
         return listItems;
@@ -121,6 +117,6 @@ public class HistoryPresenter {
 
     void onStop() {
         fragment = null;
-        getTransactionsInteractor.unsubscribe();
+        getAccountTransactionsInteractor.unsubscribe();
     }
 }
