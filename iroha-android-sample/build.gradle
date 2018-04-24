@@ -1,0 +1,117 @@
+apply plugin: 'com.android.application'
+apply plugin: 'com.google.protobuf'
+
+android {
+    compileSdkVersion 27
+    defaultConfig {
+        applicationId "jp.co.soramitsu.iroha.android.sample"
+        minSdkVersion 21
+        targetSdkVersion 27
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    lintOptions {
+        abortOnError false
+    }
+    dataBinding.enabled = true
+    buildTypes {
+        release {
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            resValue "string", "iroha_url", "199.247.30.27"
+            resValue "integer", "iroha_port", "50051"
+        }
+        debug {
+            resValue "string", "iroha_url", "199.247.30.27"
+            resValue "integer", "iroha_port", "50051"
+        }
+    }
+    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
+    }
+    defaultConfig {
+        multiDexEnabled true
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project(':iroha-android-bindings')
+
+    implementation "com.android.support:appcompat-v7:$androidSupportLibraryVersion"
+    implementation "com.android.support:support-v4:$androidSupportLibraryVersion"
+    implementation "com.android.support:design:$androidSupportLibraryVersion"
+    implementation "com.android.support:cardview-v7:$androidSupportLibraryVersion"
+
+    implementation "android.arch.lifecycle:extensions:$archLifecycleVersion"
+    annotationProcessor "android.arch.lifecycle:compiler:$archLifecycleVersion"
+
+    implementation "android.arch.paging:runtime:1.0.0-beta1"
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+
+    // Dagger 2
+    implementation "com.google.dagger:dagger-android:$daggerVersion"
+    implementation "com.google.dagger:dagger-android-support:$daggerVersion"
+    annotationProcessor "com.google.dagger:dagger-android-processor:$daggerVersion"
+    annotationProcessor "com.google.dagger:dagger-compiler:$daggerVersion"
+    // Protobuf
+    implementation 'com.google.protobuf:protobuf-lite:3.0.1'
+    implementation 'io.grpc:grpc-core:1.8.0'
+    implementation 'io.grpc:grpc-stub:1.8.0'
+    implementation 'io.grpc:grpc-okhttp:1.8.0'
+    implementation('io.grpc:grpc-protobuf-lite:1.8.0') {
+        // Otherwise Android compile will complain "Multiple dex files define ..."
+        exclude module: "protobuf-lite"
+    }
+    implementation 'javax.annotation:javax.annotation-api:1.3.1'
+
+    // Rx
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
+    implementation 'io.reactivex.rxjava2:rxjava:2.1.10'
+    implementation 'com.jakewharton.rxbinding2:rxbinding:2.1.1'
+
+    // Zxing
+    implementation 'com.journeyapps:zxing-android-embedded:3.5.0'
+
+    // QrScanner
+    implementation 'com.github.blikoon:QRCodeScanner:0.1.2'
+
+    // Dexter - permissions manager
+
+    implementation 'com.karumi:dexter:4.2.0'
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok:1.16.20'
+    compileOnly 'javax.annotation:javax.annotation-api:1.3.1'
+    annotationProcessor 'org.projectlombok:lombok:1.16.20'
+
+    implementation "com.orhanobut:logger:2.1.1"
+    implementation 'com.google.code.gson:gson:2.8.2'
+
+}
+protobuf {
+    protoc {
+        artifact = 'com.google.protobuf:protoc:3.5.1-1'
+    }
+    plugins {
+        javalite {
+            artifact = "com.google.protobuf:protoc-gen-javalite:3.0.0"
+        }
+        grpc {
+            artifact = 'io.grpc:protoc-gen-grpc-java:1.10.0'
+        }
+    }
+    generateProtoTasks {
+        all().each { task ->
+            task.plugins {
+                javalite {}
+                grpc {
+                    // Options added to --grpc_out
+                    option 'lite'
+                    option 'generate_equals=true'
+                }
+            }
+        }
+    }
+}
