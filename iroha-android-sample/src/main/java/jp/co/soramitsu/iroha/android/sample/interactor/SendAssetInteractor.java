@@ -2,7 +2,6 @@ package jp.co.soramitsu.iroha.android.sample.interactor;
 
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.orhanobut.logger.Logger;
 
 import java.math.BigInteger;
 import java.util.concurrent.TimeUnit;
@@ -24,12 +23,11 @@ import jp.co.soramitsu.iroha.android.UnsignedTx;
 import jp.co.soramitsu.iroha.android.sample.PreferencesUtil;
 import jp.co.soramitsu.iroha.android.sample.injection.ApplicationModule;
 
+import static jp.co.soramitsu.iroha.android.sample.Constants.ASSET_ID;
 import static jp.co.soramitsu.iroha.android.sample.Constants.CONNECTION_TIMEOUT_SECONDS;
-import static jp.co.soramitsu.iroha.android.sample.Constants.CREATOR;
 import static jp.co.soramitsu.iroha.android.sample.Constants.DOMAIN_ID;
 import static jp.co.soramitsu.iroha.android.sample.Constants.PRIV_KEY;
 import static jp.co.soramitsu.iroha.android.sample.Constants.PUB_KEY;
-import static jp.co.soramitsu.iroha.android.sample.Constants.TX_COUNTER;
 
 public class SendAssetInteractor extends CompletableInteractor<String[]> {
 
@@ -60,7 +58,8 @@ public class SendAssetInteractor extends CompletableInteractor<String[]> {
             //Sending asset
             UnsignedTx sendAssetTx = txBuilder.creatorAccountId(username + "@" + DOMAIN_ID)
                     .createdTime(BigInteger.valueOf(currentTime))
-                    .transferAsset(username + "@" + DOMAIN_ID, data[0] + "@" + DOMAIN_ID, "irh#" + DOMAIN_ID, "initial" , data[1])
+                    .transferAsset(username + "@" + DOMAIN_ID,
+                            data[0] + "@" + DOMAIN_ID, ASSET_ID, "initial", data[1])
                     .build();
 
             ByteVector txblob = protoTxHelper.signAndAddSignature(sendAssetTx, userKeys).blob();

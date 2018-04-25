@@ -7,6 +7,7 @@ public interface Constants {
     long TX_COUNTER = 1;
     long QUERY_COUNTER = 1;
     String DOMAIN_ID = "test";
+    String ASSET_ID = "irh#" + DOMAIN_ID;
     int CONNECTION_TIMEOUT_SECONDS = 20;
     int MAX_ACCOUNT_DETAILS_SIZE = 32;
     String ACCOUNT_DETAILS = "account_details";
