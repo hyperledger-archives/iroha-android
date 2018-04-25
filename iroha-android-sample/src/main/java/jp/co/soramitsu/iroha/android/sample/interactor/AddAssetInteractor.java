@@ -23,6 +23,7 @@ import jp.co.soramitsu.iroha.android.UnsignedTx;
 import jp.co.soramitsu.iroha.android.sample.PreferencesUtil;
 import jp.co.soramitsu.iroha.android.sample.injection.ApplicationModule;
 
+import static jp.co.soramitsu.iroha.android.sample.Constants.ASSET_ID;
 import static jp.co.soramitsu.iroha.android.sample.Constants.CONNECTION_TIMEOUT_SECONDS;
 import static jp.co.soramitsu.iroha.android.sample.Constants.CREATOR;
 import static jp.co.soramitsu.iroha.android.sample.Constants.DOMAIN_ID;
@@ -58,8 +59,8 @@ public class AddAssetInteractor extends CompletableInteractor<String> {
             //Adding asset
             UnsignedTx addAssetTx = txBuilder.creatorAccountId(CREATOR)
                     .createdTime(BigInteger.valueOf(currentTime))
-                    .addAssetQuantity(CREATOR, "irh#" + DOMAIN_ID, "100")
-                    .transferAsset(CREATOR, username + "@" + DOMAIN_ID, "irh#" + DOMAIN_ID, "initial" ,"100")
+                    .addAssetQuantity(CREATOR, ASSET_ID, "100")
+                    .transferAsset(CREATOR, username + "@" + DOMAIN_ID, ASSET_ID, "initial", "100")
                     .build();
 
             ByteVector txblob = protoTxHelper.signAndAddSignature(addAssetTx, adminKeys).blob();

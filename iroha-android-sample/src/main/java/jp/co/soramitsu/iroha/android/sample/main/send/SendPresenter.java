@@ -2,15 +2,13 @@ package jp.co.soramitsu.iroha.android.sample.main.send;
 
 import android.content.Intent;
 
-import com.blikoon.qrcodescanner.QrCodeActivity;
-
 import javax.inject.Inject;
 
 import jp.co.soramitsu.iroha.android.sample.R;
 import jp.co.soramitsu.iroha.android.sample.SampleApplication;
 import jp.co.soramitsu.iroha.android.sample.interactor.GetAccountInteractor;
 import jp.co.soramitsu.iroha.android.sample.interactor.SendAssetInteractor;
-import jp.co.soramitsu.iroha.android.sample.main.MainActivity;
+import jp.co.soramitsu.iroha.android.sample.qrscanner.QRScannerActivity;
 import lombok.Setter;
 
 public class SendPresenter {
@@ -58,7 +56,7 @@ public class SendPresenter {
     }
 
     public void doScanQr() {
-        Intent i = new Intent(fragment.getActivity(), QrCodeActivity.class);
+        Intent i = new Intent(fragment.getActivity(), QRScannerActivity.class);
         fragment.startActivityForResult(i, REQUEST_CODE_QR_SCAN);
     }
 
