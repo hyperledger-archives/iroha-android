@@ -18,7 +18,7 @@
 general:
   branches:
     only:
-      - master
+        - bug_fix
   artifacts:
     - "app/build/outputs/apk/app-release-unsigned.apk"
 machine:
