@@ -1,7 +1,6 @@
 package jp.co.soramitsu.iroha.android.sample.main.send;
 
 import android.content.Intent;
-
 import javax.inject.Inject;
 
 import jp.co.soramitsu.iroha.android.sample.R;
