@@ -44,12 +44,8 @@ dependencies:
 build:
   override:
     - ./gradlew assembleDebug
-    - ls build/
-    - ls build/outputs
-    - ls build/outputs/apk
-    - ls build/outputs/apk/debug
   post:
-    - if [ -d iroha-android/build/test-results ]; then cp -r iroha-android/build/test-results/* $CIRCLE_TEST_REPORTS; fi
+    - ls build/outputs/apk.debug
 general:
   artifacts:
     - "build/outputs/apk/debug/iroha-android-sample-debug.apk"
