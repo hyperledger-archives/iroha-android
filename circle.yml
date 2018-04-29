@@ -45,7 +45,7 @@ build:
   override:
     - ./gradlew assembleDebug
   post:
-    - ls build/outputs/apk.debug
+    - ls build/outputs/apk/debug
 general:
   artifacts:
     - "build/outputs/apk/debug/iroha-android-sample-debug.apk"
