@@ -53,6 +53,9 @@ public class MainActivity extends AppCompatActivity implements MainView {
         createProgressDialog();
         configureRefreshLayout();
 
+        ArrayList a;
+        a.add(1);
+
         RxView.clicks(binding.logout)
                 .subscribe(v -> {
                     AlertDialog alertDialog = new AlertDialog.Builder(this)
