@@ -17,7 +17,6 @@ import android.widget.TextView;
 
 import com.jakewharton.rxbinding2.view.RxView;
 import com.jakewharton.rxbinding2.widget.RxTextView;
-import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,9 +51,6 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
         createProgressDialog();
         configureRefreshLayout();
-
-        ArrayList a;
-        a.add(1);
 
         RxView.clicks(binding.logout)
                 .subscribe(v -> {

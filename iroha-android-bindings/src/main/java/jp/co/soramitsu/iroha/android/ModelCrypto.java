@@ -8,8 +8,6 @@
 
 package jp.co.soramitsu.iroha.android;
 
-import java.util.ArrayList;
-
 public class ModelCrypto {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;
@@ -17,8 +15,6 @@ public class ModelCrypto {
   protected ModelCrypto(long cPtr, boolean cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = cPtr;
-    ArrayList arrayList;
-    arrayList.add()
   }
 
   protected static long getCPtr(ModelCrypto obj) {
