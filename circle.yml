@@ -35,6 +35,7 @@ dependencies:
   cache_directories:
     - android-ndk-r11c
   pre:
+    - touch iroha-android/local.properties
     - if [[ ! -e android-ndk-r11c ]]; then wget http://dl.google.com/android/repository/android-ndk-r11c-linux-x86_64.zip && unzip android-ndk-r11c-linux-x86_64.zip; fi
     - ( sleep 5 && while [ 1 ]; do sleep 1; echo y; done ) | android update sdk --no-ui --all --filter "tools,platform-tools,android-25,extra-google-m2repository,extra-android-m2repository,extra-android-support"
     - echo y | android update sdk --no-ui --all --filter "build-tools-25.0.2"
