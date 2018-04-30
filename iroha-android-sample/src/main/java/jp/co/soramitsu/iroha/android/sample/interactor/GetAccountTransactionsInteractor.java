@@ -79,17 +79,18 @@ public class GetAccountTransactionsInteractor extends SingleInteractor<List<Tran
 
                 Long amount = Long.parseLong(getIntBalance(transaction.getPayload().getCommands(0).getTransferAsset().getAmount()));
 
-                String sender = transaction.getPayload().getCreatorAccountId();
+                String sender = transaction.getPayload().getCommands(0).getTransferAsset().getSrcAccountId();
                 String receiver = transaction.getPayload().getCommands(0).getTransferAsset().getDestAccountId();
                 String currentAccount = username + "@" + DOMAIN_ID;
+                String user = sender;
 
                 if (sender.equals(currentAccount)) {
                     amount = -amount;
+                    user = receiver;
                 }
 
-                String user = sender;
-                if (sender.equals(currentAccount)) {
-                    user = receiver;
+                if (receiver.equals(currentAccount)) {
+                    user = sender;
                 }
 
                 transactions.add(new Transaction(0, date, user.split("@")[0], amount));
