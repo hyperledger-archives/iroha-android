@@ -32,21 +32,25 @@ public class SendPresenter {
     void sendTransaction(String username, String amount) {
         String[] data = {username, amount};
         if (!username.isEmpty() && !amount.isEmpty()) {
-            if (!isEnoughBalance(Long.parseLong(amount))) {
-                fragment.didSendError(new Throwable(fragment.getString(R.string.not_enough_balance_error)));
-            } else {
-                getAccountInteractor.execute(username,
-                        account -> {
-                            if (account.getAccountId().isEmpty()) {
-                                fragment.didSendError(new Throwable(SampleApplication.instance.getString(R.string.username_doesnt_exists)));
-                            } else {
-                                sendAssetInteractor.execute(data,
-                                        () -> fragment.didSendSuccess(),
-                                        error -> fragment.didSendError(error)
-                                );
-                            }
-                        }, throwable -> fragment.didSendError(throwable));
+            if (SampleApplication.instance.account != null) {
+                if (!isEnoughBalance(Long.parseLong(amount))) {
+                    fragment.didSendError(new Throwable(fragment.getString(R.string.not_enough_balance_error)));
+                } else {
+                    getAccountInteractor.execute(username,
+                            account -> {
+                                if (account.getAccountId().isEmpty()) {
+                                    fragment.didSendError(new Throwable(SampleApplication.instance.getString(R.string.username_doesnt_exists)));
+                                } else {
+                                    sendAssetInteractor.execute(data,
+                                            () -> fragment.didSendSuccess(),
+                                            error -> fragment.didSendError(error)
+                                    );
+                                }
+                            }, throwable -> fragment.didSendError(throwable));
 
+                }
+            } else {
+                fragment.didSendError(new Throwable(SampleApplication.instance.getString(R.string.server_is_not_reachable)));
             }
         } else {
             fragment.didSendError(new Throwable(SampleApplication.instance.getString(R.string.fields_cant_be_empty)));
