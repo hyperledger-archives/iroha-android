@@ -34,11 +34,12 @@
         android:roundIcon="@drawable/ic_logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity
             android:name=".main.MainActivity"
             android:screenOrientation="portrait">
-
         </activity>
+
         <activity
             android:name=".registration.RegistrationActivity"
             android:screenOrientation="portrait">
@@ -48,6 +49,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".qrscanner.QRScannerActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>
