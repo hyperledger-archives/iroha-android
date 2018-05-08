@@ -40,16 +40,22 @@ public class RegistrationPresenter {
                     createAccountInteractor.execute(username,
                             () -> addAssetInteractor.execute(username,
                                     () -> view.didRegistrationSuccess(),
-                                    error -> view.didRegistrationError(error)
+                                    error -> didRegistrationError(error)
                             ),
-                            error -> view.didRegistrationError(error));
+                            error -> didRegistrationError(error));
                 } else {
-                    view.didRegistrationError(new Throwable(SampleApplication.instance.getString(R.string.username_already_exists_error_dialog_message)));
+                    didRegistrationError(new Throwable(SampleApplication.instance.getString(R.string.username_already_exists_error_dialog_message)));
                 }
-            }, e -> view.didRegistrationError(e));
+            }, e -> didRegistrationError(e));
         } else {
-            view.didRegistrationError(new Throwable(SampleApplication.instance.getString(R.string.username_empty_error_dialog_message)));
+            didRegistrationError(new Throwable(SampleApplication.instance.getString(R.string.username_empty_error_dialog_message)));
         }
+    }
+
+    private void didRegistrationError(Throwable throwable) {
+        preferencesUtil.saveUsername("");
+        preferencesUtil.saveKeys(null);
+        view.didRegistrationError(throwable);
     }
 
     boolean isRegistered() {
