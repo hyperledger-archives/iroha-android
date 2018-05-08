@@ -1,7 +1,5 @@
 package jp.co.soramitsu.iroha.android.sample.registration;
 
-import com.orhanobut.logger.Logger;
-
 import javax.inject.Inject;
 
 import jp.co.soramitsu.iroha.android.sample.PreferencesUtil;
@@ -53,8 +51,7 @@ public class RegistrationPresenter {
     }
 
     private void didRegistrationError(Throwable throwable) {
-        preferencesUtil.saveUsername("");
-        preferencesUtil.saveKeys(null);
+        preferencesUtil.clear();
         view.didRegistrationError(throwable);
     }
 

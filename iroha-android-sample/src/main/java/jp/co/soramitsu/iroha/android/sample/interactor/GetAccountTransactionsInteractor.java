@@ -26,7 +26,7 @@ import jp.co.soramitsu.iroha.android.sample.PreferencesUtil;
 import jp.co.soramitsu.iroha.android.sample.injection.ApplicationModule;
 import jp.co.soramitsu.iroha.android.sample.main.history.Transaction;
 
-import static jp.co.soramitsu.iroha.android.sample.Constants.ASSET_ID;
+import static iroha.protocol.Commands.Command.CommandCase.TRANSFER_ASSET;
 import static jp.co.soramitsu.iroha.android.sample.Constants.DOMAIN_ID;
 import static jp.co.soramitsu.iroha.android.sample.Constants.QUERY_COUNTER;
 
@@ -57,7 +57,7 @@ public class GetAccountTransactionsInteractor extends SingleInteractor<List<Tran
             UnsignedQuery accountBalanceQuery = modelQueryBuilder.creatorAccountId(username + "@" + DOMAIN_ID)
                     .queryCounter(BigInteger.valueOf(QUERY_COUNTER))
                     .createdTime(BigInteger.valueOf(currentTime))
-                    .getAccountTransactions(username + "@" + DOMAIN_ID)
+                    .getAccountAssetTransactions(username + "@" + DOMAIN_ID, "irh#" + DOMAIN_ID)
                     .build();
             ByteVector queryBlob = protoQueryHelper.signAndAddSignature(accountBalanceQuery, userKeys).blob();
             byte bquery[] = toByteArray(queryBlob);
@@ -75,26 +75,28 @@ public class GetAccountTransactionsInteractor extends SingleInteractor<List<Tran
             List<Transaction> transactions = new ArrayList<>();
 
             for (BlockOuterClass.Transaction transaction : queryResponse.getTransactionsResponse().getTransactionsList()) {
-                Date date = new Date();
-                date.setTime(transaction.getPayload().getCreatedTime());
+                if (transaction.getPayload().getCommands(0).getCommandCase() == TRANSFER_ASSET) {
+                    Date date = new Date();
+                    date.setTime(transaction.getPayload().getCreatedTime());
 
-                Long amount = Long.parseLong(getIntBalance(transaction.getPayload().getCommands(0).getTransferAsset().getAmount()));
+                    Long amount = Long.parseLong(getIntBalance(transaction.getPayload().getCommands(0).getTransferAsset().getAmount()));
 
-                String sender = transaction.getPayload().getCommands(0).getTransferAsset().getSrcAccountId();
-                String receiver = transaction.getPayload().getCommands(0).getTransferAsset().getDestAccountId();
-                String currentAccount = username + "@" + DOMAIN_ID;
-                String user = sender;
+                    String sender = transaction.getPayload().getCommands(0).getTransferAsset().getSrcAccountId();
+                    String receiver = transaction.getPayload().getCommands(0).getTransferAsset().getDestAccountId();
+                    String currentAccount = username + "@" + DOMAIN_ID;
+                    String user = sender;
 
-                if (sender.equals(currentAccount)) {
-                    amount = -amount;
-                    user = receiver;
+                    if (sender.equals(currentAccount)) {
+                        amount = -amount;
+                        user = receiver;
+                    }
+
+                    if (receiver.equals(currentAccount)) {
+                        user = sender;
+                    }
+
+                    transactions.add(new Transaction(0, date, user.split("@")[0], amount));
                 }
-
-                if (receiver.equals(currentAccount)) {
-                    user = sender;
-                }
-
-                transactions.add(new Transaction(0, date, user.split("@")[0], amount));
             }
             emitter.onSuccess(transactions);
         });
