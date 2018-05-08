@@ -39,6 +39,7 @@ public class HistoryPresenter {
     void getTransactions() {
         getAccountTransactionsInteractor.execute(
                 transactions -> {
+                    Collections.sort(transactions, (o1, o2) -> o2.date.compareTo(o1.date));
                     transactionsViewModel.getTransactions().postValue(transformTransactions(transactions));
                     fragment.finishRefresh();
                 },
