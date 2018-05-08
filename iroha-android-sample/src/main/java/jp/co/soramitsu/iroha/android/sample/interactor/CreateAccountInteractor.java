@@ -2,7 +2,6 @@ package jp.co.soramitsu.iroha.android.sample.interactor;
 
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.orhanobut.logger.Logger;
 
 import java.math.BigInteger;
 import java.util.concurrent.TimeUnit;
@@ -20,7 +19,6 @@ import jp.co.soramitsu.iroha.android.Keypair;
 import jp.co.soramitsu.iroha.android.ModelCrypto;
 import jp.co.soramitsu.iroha.android.ModelProtoTransaction;
 import jp.co.soramitsu.iroha.android.ModelTransactionBuilder;
-import jp.co.soramitsu.iroha.android.StringVector;
 import jp.co.soramitsu.iroha.android.UnsignedTx;
 import jp.co.soramitsu.iroha.android.sample.PreferencesUtil;
 import jp.co.soramitsu.iroha.android.sample.injection.ApplicationModule;
@@ -30,7 +28,6 @@ import static jp.co.soramitsu.iroha.android.sample.Constants.CREATOR;
 import static jp.co.soramitsu.iroha.android.sample.Constants.DOMAIN_ID;
 import static jp.co.soramitsu.iroha.android.sample.Constants.PRIV_KEY;
 import static jp.co.soramitsu.iroha.android.sample.Constants.PUB_KEY;
-import static jp.co.soramitsu.iroha.android.sample.Constants.TX_COUNTER;
 
 public class CreateAccountInteractor extends CompletableInteractor<String> {
 
