@@ -91,7 +91,7 @@ public class HistoryPresenter {
                 if (diffInMinutes == 0) {
                     prettyDate = "just now";
                 } else {
-                    prettyDate = diffInMinutes + "minutes ago";
+                    prettyDate = diffInMinutes + " minutes ago";
                 }
             } else {
                 prettyDate = hoursDateFormat.format(transaction.date);

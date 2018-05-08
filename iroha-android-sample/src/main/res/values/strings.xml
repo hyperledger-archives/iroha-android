@@ -23,7 +23,7 @@
     <string name="account_details_error">Failed to set account details</string>
     <string name="not_enough_balance_error">Not enough amount on balance</string>
     <string name="bio">Any details such as age, profession.</string>
-    <string name="transaction_successful">Transaction successfull.</string>
-    <string name="qr_decode_successful">QR decode successfull.</string>
+    <string name="transaction_successful">Transaction successful.</string>
+    <string name="qr_decode_successful">QR decode successful.</string>
     <string name="info">Info</string>
 </resources>
