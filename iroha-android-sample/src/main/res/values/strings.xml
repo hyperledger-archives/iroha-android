@@ -7,7 +7,7 @@
     <string name="send">send</string>
     <string name="registration_title">I R O H A</string>
     <string name="registration_subtitle">Blockchain technologies for business</string>
-    <string name="username_hint">Username (only small latin letters)</string>
+    <string name="username_hint">Username (use small latin letters and digits)</string>
     <string name="button_register">Register</string>
     <string name="error_dialog_title">Failure</string>
     <string name="username_empty_error_dialog_message">Username can\'t be empty</string>

@@ -12,10 +12,10 @@ import com.jakewharton.rxbinding2.view.RxView;
 
 import javax.inject.Inject;
 
-import jp.co.soramitsu.iroha.android.sample.main.MainActivity;
 import jp.co.soramitsu.iroha.android.sample.R;
 import jp.co.soramitsu.iroha.android.sample.SampleApplication;
 import jp.co.soramitsu.iroha.android.sample.databinding.ActivityRegistrationBinding;
+import jp.co.soramitsu.iroha.android.sample.main.MainActivity;
 
 public class RegistrationActivity extends AppCompatActivity implements RegistrationView {
 

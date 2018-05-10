@@ -1,5 +1,7 @@
 package jp.co.soramitsu.iroha.android.sample.registration;
 
+import android.support.annotation.VisibleForTesting;
+
 import javax.inject.Inject;
 
 import jp.co.soramitsu.iroha.android.sample.PreferencesUtil;
@@ -12,13 +14,16 @@ import lombok.Setter;
 
 public class RegistrationPresenter {
 
-    private final PreferencesUtil preferencesUtil;
     @Setter
     private RegistrationView view;
+    private final PreferencesUtil preferencesUtil;
 
     private final CreateAccountInteractor createAccountInteractor;
     private final GetAccountInteractor getAccountInteractor;
     private final AddAssetInteractor addAssetInteractor;
+
+    @VisibleForTesting
+    public boolean isRequestFinished;
 
     @Inject
     public RegistrationPresenter(CreateAccountInteractor createAccountInteractor,
@@ -32,25 +37,32 @@ public class RegistrationPresenter {
     }
 
     void createAccount(String username) {
+        isRequestFinished = false;
+
         if (!username.isEmpty()) {
             getAccountInteractor.execute(username, account -> {
                 if (account.getAccountId().isEmpty()) {
                     createAccountInteractor.execute(username,
                             () -> addAssetInteractor.execute(username,
-                                    () -> view.didRegistrationSuccess(),
-                                    error -> didRegistrationError(error)
+                                    () -> {
+                                        isRequestFinished = true;
+                                        view.didRegistrationSuccess();
+                                    },
+                                    this::didRegistrationError
                             ),
-                            error -> didRegistrationError(error));
+                            this::didRegistrationError);
                 } else {
-                    didRegistrationError(new Throwable(SampleApplication.instance.getString(R.string.username_already_exists_error_dialog_message)));
+                    didRegistrationError(new Throwable(SampleApplication.instance
+                            .getString(R.string.username_already_exists_error_dialog_message)));
                 }
-            }, e -> didRegistrationError(e));
+            }, this::didRegistrationError);
         } else {
             didRegistrationError(new Throwable(SampleApplication.instance.getString(R.string.username_empty_error_dialog_message)));
         }
     }
 
     private void didRegistrationError(Throwable throwable) {
+        isRequestFinished = true;
         preferencesUtil.clear();
         view.didRegistrationError(throwable);
     }
