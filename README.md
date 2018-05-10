@@ -16,7 +16,7 @@ There are two ways to get Iroha library for Android:
 
 1.  Grab via Gradle (see details in the section [Importing the Library from jcenter](#importing-the-library-from-jcenter))
 
-        implementation 'jp.co.soramitsu.iroha.android:iroha-android-bindings:1.1'
+        implementation 'jp.co.soramitsu.iroha.android:iroha-android-bindings:1.0'
 
 2.  Compile the library on your own.
 
