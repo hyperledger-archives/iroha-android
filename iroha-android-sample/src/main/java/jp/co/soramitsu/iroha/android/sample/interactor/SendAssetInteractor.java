@@ -60,6 +60,7 @@ public class SendAssetInteractor extends CompletableInteractor<String[]> {
             //Sending asset
             UnsignedTx sendAssetTx = txBuilder.creatorAccountId(username + "@" + DOMAIN_ID)
                     .createdTime(BigInteger.valueOf(currentTime))
+                    .txCounter(BigInteger.valueOf(TX_COUNTER))
                     .transferAsset(username + "@" + DOMAIN_ID, data[0] + "@" + DOMAIN_ID, "irh#" + DOMAIN_ID, "initial" , data[1])
                     .build();
 
