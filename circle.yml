@@ -1,0 +1,51 @@
+#
+# Copyright Soramitsu Co., Ltd. 2016 All Rights Reserved.
+# http://soramitsu.co.jp
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#          http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+general:
+  branches:
+    only:
+        - bug_fix
+  artifacts:
+    - "app/build/outputs/apk/app-release-unsigned.apk"
+machine:
+  java:
+    version: oraclejdk8
+  environment:
+    ANDROID_HOME: /usr/local/android-sdk-linux
+    ANDROID_NDK: $HOME/iroha-android/android-ndk-r11c
+    ANDROID_NDK_HOME: $ANDROID_NDK
+    PATH: $PATH:$ANDROID_NDK
+    JAVA_OPTS: "-Xms512m -Xmx1024m"
+    GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
+dependencies:
+  cache_directories:
+    - android-ndk-r11c
+  pre:
+    - touch local.properties
+    - if [[ ! -e android-ndk-r11c ]]; then wget http://dl.google.com/android/repository/android-ndk-r11c-linux-x86_64.zip && unzip android-ndk-r11c-linux-x86_64.zip; fi
+    - ( sleep 5 && while [ 1 ]; do sleep 1; echo y; done ) | android update sdk --no-ui --all --filter "tools,platform-tools,android-25,extra-google-m2repository,extra-android-m2repository,extra-android-support"
+    - echo y | android update sdk --no-ui --all --filter "build-tools-25.0.2"
+    - cp -rf licenses $ANDROID_HOME/.
+    - ls $ANDROID_HOME/.
+build:
+  override:
+    - ./gradlew assembleDebug
+  post:
+    - ls build/outputs/apk/debug
+general:
+  artifacts:
+    - "build/outputs/apk/debug/iroha-android-sample-debug.apk"
