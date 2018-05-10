@@ -28,6 +28,7 @@ import static jp.co.soramitsu.iroha.android.sample.Constants.CREATOR;
 import static jp.co.soramitsu.iroha.android.sample.Constants.DOMAIN_ID;
 import static jp.co.soramitsu.iroha.android.sample.Constants.PRIV_KEY;
 import static jp.co.soramitsu.iroha.android.sample.Constants.PUB_KEY;
+import static jp.co.soramitsu.iroha.android.sample.Constants.TX_COUNTER;
 
 public class AddAssetInteractor extends CompletableInteractor<String> {
 
@@ -58,6 +59,7 @@ public class AddAssetInteractor extends CompletableInteractor<String> {
             //Adding asset
             UnsignedTx addAssetTx = txBuilder.creatorAccountId(CREATOR)
                     .createdTime(BigInteger.valueOf(currentTime))
+                    .txCounter(BigInteger.valueOf(TX_COUNTER))
                     .addAssetQuantity(CREATOR, "irh#" + DOMAIN_ID, "100")
                     .transferAsset(CREATOR, username + "@" + DOMAIN_ID, "irh#" + DOMAIN_ID, "initial" ,"100")
                     .build();

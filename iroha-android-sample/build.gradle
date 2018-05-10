@@ -34,8 +34,7 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation project(':iroha-android-bindings')
+    implementation 'jp.co.soramitsu.iroha.android:iroha-android-bindings:1.0'
 
     implementation "com.android.support:appcompat-v7:$androidSupportLibraryVersion"
     implementation "com.android.support:support-v4:$androidSupportLibraryVersion"
