@@ -33,15 +33,16 @@ public class GetAccountInteractor extends SingleInteractor<Responses.Account, St
 
     private final ModelQueryBuilder modelQueryBuilder = new ModelQueryBuilder();
     private final ModelProtoQuery protoQueryHelper = new ModelProtoQuery();
-    @Inject
-    ModelCrypto crypto;
-    @Inject
-    ManagedChannel channel;
+    private final ModelCrypto crypto;
+    private final ManagedChannel channel;
 
     @Inject
     GetAccountInteractor(@Named(ApplicationModule.JOB) Scheduler jobScheduler,
-                         @Named(ApplicationModule.UI) Scheduler uiScheduler) {
+                         @Named(ApplicationModule.UI) Scheduler uiScheduler,
+                         ModelCrypto crypto, ManagedChannel channel) {
         super(jobScheduler, uiScheduler);
+        this.crypto = crypto;
+        this.channel = channel;
     }
 
     @Override
@@ -73,6 +74,7 @@ public class GetAccountInteractor extends SingleInteractor<Responses.Account, St
             QueryServiceGrpc.QueryServiceBlockingStub queryStub = QueryServiceGrpc.newBlockingStub(channel)
                     .withDeadlineAfter(CONNECTION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
             Responses.QueryResponse queryResponse = queryStub.find(protoQuery);
+
             emitter.onSuccess(queryResponse.getAccountResponse().getAccount());
         });
     }

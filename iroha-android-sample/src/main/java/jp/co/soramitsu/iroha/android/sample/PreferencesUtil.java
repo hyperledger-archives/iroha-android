@@ -22,11 +22,11 @@ public class PreferencesUtil {
     @Getter
     private final SharedPreferences preferences;
 
-    @Inject
-    ModelCrypto modelCrypto;
+    private final ModelCrypto modelCrypto;
 
     @Inject
-    public PreferencesUtil() {
+    public PreferencesUtil(ModelCrypto modelCrypto) {
+        this.modelCrypto = modelCrypto;
         preferences = SampleApplication.instance.getSharedPreferences(SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
     }
 

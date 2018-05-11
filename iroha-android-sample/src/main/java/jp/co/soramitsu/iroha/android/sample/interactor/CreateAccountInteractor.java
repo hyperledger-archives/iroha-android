@@ -32,8 +32,7 @@ import static jp.co.soramitsu.iroha.android.sample.Constants.PUB_KEY;
 public class CreateAccountInteractor extends CompletableInteractor<String> {
 
     private final ManagedChannel channel;
-    @Inject
-    ModelCrypto crypto;
+    private final ModelCrypto crypto;
     private final ModelTransactionBuilder txBuilder = new ModelTransactionBuilder();
     private final ModelProtoTransaction protoTxHelper = new ModelProtoTransaction();
     private final PreferencesUtil preferenceUtils;
@@ -41,9 +40,11 @@ public class CreateAccountInteractor extends CompletableInteractor<String> {
     @Inject
     CreateAccountInteractor(@Named(ApplicationModule.JOB) Scheduler jobScheduler,
                             @Named(ApplicationModule.UI) Scheduler uiScheduler,
-                            ManagedChannel managedChannel, PreferencesUtil preferencesUtil) {
+                            ManagedChannel managedChannel, ModelCrypto crypto,
+                            PreferencesUtil preferencesUtil) {
         super(jobScheduler, uiScheduler);
         this.channel = managedChannel;
+        this.crypto = crypto;
         this.preferenceUtils = preferencesUtil;
     }
 

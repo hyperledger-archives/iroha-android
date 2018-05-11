@@ -45,7 +45,6 @@ public class GenerateQRInteractor extends SingleInteractor<Bitmap, String> {
 
     private final PreferencesUtil preferenceUtils;
 
-
     @Inject
     GenerateQRInteractor(@Named(ApplicationModule.JOB) Scheduler jobScheduler,
                          @Named(ApplicationModule.UI) Scheduler uiScheduler,

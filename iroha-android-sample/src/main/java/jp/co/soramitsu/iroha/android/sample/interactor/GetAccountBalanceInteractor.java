@@ -30,16 +30,15 @@ public class GetAccountBalanceInteractor extends SingleInteractor<String, Void> 
     private final ModelQueryBuilder modelQueryBuilder = new ModelQueryBuilder();
     private final ModelProtoQuery protoQueryHelper = new ModelProtoQuery();
     private final PreferencesUtil preferenceUtils;
-
-    @Inject
-    ManagedChannel channel;
+    private final ManagedChannel channel;
 
     @Inject
     GetAccountBalanceInteractor(@Named(ApplicationModule.JOB) Scheduler jobScheduler,
                                 @Named(ApplicationModule.UI) Scheduler uiScheduler,
-                                PreferencesUtil preferenceUtils) {
+                                PreferencesUtil preferenceUtils, ManagedChannel channel) {
         super(jobScheduler, uiScheduler);
         this.preferenceUtils = preferenceUtils;
+        this.channel = channel;
     }
 
     @Override

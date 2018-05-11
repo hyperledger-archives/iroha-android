@@ -89,6 +89,10 @@ dependencies {
 
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test:rules:1.0.2'
+
+    androidTestImplementation 'org.mockito:mockito-core:2.18.3'
+    androidTestImplementation 'org.mockito:mockito-android:2.18.3'
+    androidTestImplementation 'com.github.fabioCollini.daggermock:daggermock:0.8.4'
 }
 
 protobuf {

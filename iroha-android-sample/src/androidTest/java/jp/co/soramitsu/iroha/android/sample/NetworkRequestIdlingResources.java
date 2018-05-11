@@ -4,13 +4,13 @@ import android.support.test.espresso.IdlingResource;
 
 import jp.co.soramitsu.iroha.android.sample.registration.RegistrationPresenter;
 
-public class EspressoIdlingResources implements IdlingResource {
+public class NetworkRequestIdlingResources implements IdlingResource {
 
     private final RegistrationPresenter presenter;
     private ResourceCallback resourceCallback;
 
 
-    public EspressoIdlingResources(RegistrationPresenter presenter) {
+    public NetworkRequestIdlingResources(RegistrationPresenter presenter) {
         this.presenter = presenter;
     }
 
