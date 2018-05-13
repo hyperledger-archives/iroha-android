@@ -10,6 +10,8 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.jakewharton.rxbinding2.view.RxView;
 
+import java.net.ConnectException;
+
 import javax.inject.Inject;
 
 import jp.co.soramitsu.iroha.android.sample.R;
@@ -64,9 +66,15 @@ public class RegistrationActivity extends AppCompatActivity implements Registrat
         dismissProgressDialog();
         AlertDialog alertDialog = new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.error_dialog_title))
-                .setMessage(error.getMessage() == null ? getString(R.string.general_error) : error.getMessage())
+                .setMessage(error.getCause() instanceof ConnectException ?
+                        getString(R.string.general_error) :
+                        error.getLocalizedMessage())
                 .setCancelable(true)
-                .setPositiveButton(android.R.string.ok, null)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    if (error.getCause() instanceof ConnectException) {
+                        finish();
+                    }
+                })
                 .create();
         alertDialog.show();
     }
