@@ -33,6 +33,7 @@
         android:icon="@drawable/ic_logo"
         android:label="@string/app_name"
         android:roundIcon="@drawable/ic_logo"
+        android:sharedUserId="com.example.testproject.uid"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">

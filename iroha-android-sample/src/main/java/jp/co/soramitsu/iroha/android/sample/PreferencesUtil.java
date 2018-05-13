@@ -2,6 +2,7 @@ package jp.co.soramitsu.iroha.android.sample;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.VisibleForTesting;
 
 import javax.inject.Inject;
 
@@ -11,19 +12,21 @@ import lombok.Getter;
 
 public class PreferencesUtil {
 
-    private static final String SHARED_PREFERENCES_FILE = "shared_preferences_file";
-    private static final String SAVED_USERNAME = "saved_username";
+    @VisibleForTesting
+    public static final String SHARED_PREFERENCES_FILE = "shared_preferences_file";
+    @VisibleForTesting
+    public static final String SAVED_USERNAME = "saved_username";
     private static final String SAVED_PRIVATE_KEY = "saved_private_key";
     private static final String SAVED_PUBLIC_KEY = "saved_public_key";
 
     @Getter
     private final SharedPreferences preferences;
 
-    @Inject
-    ModelCrypto modelCrypto;
+    private final ModelCrypto modelCrypto;
 
     @Inject
-    public PreferencesUtil() {
+    public PreferencesUtil(ModelCrypto modelCrypto) {
+        this.modelCrypto = modelCrypto;
         preferences = SampleApplication.instance.getSharedPreferences(SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
     }
 
