@@ -1,6 +1,7 @@
 package jp.co.soramitsu.iroha.android.sample.main;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -17,12 +18,15 @@ import android.widget.TextView;
 
 import com.jakewharton.rxbinding2.view.RxView;
 import com.jakewharton.rxbinding2.widget.RxTextView;
+import com.orhanobut.logger.Logger;
 
+import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
+import io.grpc.StatusRuntimeException;
 import jp.co.soramitsu.iroha.android.sample.Constants;
 import jp.co.soramitsu.iroha.android.sample.R;
 import jp.co.soramitsu.iroha.android.sample.SampleApplication;
@@ -170,9 +174,17 @@ public class MainActivity extends AppCompatActivity implements MainView {
     public void showError(Throwable throwable) {
         AlertDialog alertDialog = new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.error_dialog_title))
-                .setMessage(throwable.getLocalizedMessage())
+                .setMessage(
+                        throwable.getCause() instanceof ConnectException ?
+                                getString(R.string.general_error) :
+                                throwable.getLocalizedMessage()
+                )
                 .setCancelable(true)
-                .setPositiveButton(android.R.string.ok, null)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    if (throwable.getCause() instanceof ConnectException) {
+                        finish();
+                    }
+                })
                 .create();
         alertDialog.show();
     }

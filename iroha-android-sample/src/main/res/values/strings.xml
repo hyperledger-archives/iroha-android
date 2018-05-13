@@ -13,7 +13,8 @@
     <string name="username_empty_error_dialog_message">Username can\'t be empty</string>
     <string name="username_already_exists_error_dialog_message">Username already exists</string>
     <string name="username_doesnt_exists">No such user</string>
-    <string name="fields_cant_be_empty">Fields can not be emoty</string>
+    <string name="fields_cant_be_empty">Fields can not be empty</string>
+    <string name="server_is_not_reachable">Server is not reachable</string>
     <string name="please_wait">Please, wait…</string>
     <string name="general_error">Problem with connection to server</string>
     <string name="logout">Logout</string>
@@ -22,7 +23,7 @@
     <string name="account_details_error">Failed to set account details</string>
     <string name="not_enough_balance_error">Not enough amount on balance</string>
     <string name="bio">Any details such as age, profession.</string>
-    <string name="transaction_successful">Transaction successfull.</string>
-    <string name="qr_decode_successful">QR decode successfull.</string>
+    <string name="transaction_successful">Transaction successful.</string>
+    <string name="qr_decode_successful">QR decode successful.</string>
     <string name="info">Info</string>
 </resources>
