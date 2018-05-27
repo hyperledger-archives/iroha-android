@@ -1,7 +1,6 @@
 package jp.co.soramitsu.iroha.android.sample.main;
 
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -18,7 +17,6 @@ import android.widget.TextView;
 
 import com.jakewharton.rxbinding2.view.RxView;
 import com.jakewharton.rxbinding2.widget.RxTextView;
-import com.orhanobut.logger.Logger;
 
 import java.net.ConnectException;
 import java.util.ArrayList;
@@ -26,7 +24,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import io.grpc.StatusRuntimeException;
 import jp.co.soramitsu.iroha.android.sample.Constants;
 import jp.co.soramitsu.iroha.android.sample.R;
 import jp.co.soramitsu.iroha.android.sample.SampleApplication;
@@ -127,7 +124,8 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
         binding.content.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
 
             @Override
             public void onPageSelected(int position) {
@@ -135,7 +133,8 @@ public class MainActivity extends AppCompatActivity implements MainView {
             }
 
             @Override
-            public void onPageScrollStateChanged(int state) {}
+            public void onPageScrollStateChanged(int state) {
+            }
         });
     }
 
@@ -195,6 +194,12 @@ public class MainActivity extends AppCompatActivity implements MainView {
     }
 
     @Override
+    public void onStop() {
+        super.onStop();
+        presenter.onStop();
+    }
+
+    @Override
     public void refreshData(boolean animate) {
         binding.swiperefresh.setRefreshing(animate);
         presenter.updateData(animate);
@@ -234,4 +239,5 @@ public class MainActivity extends AppCompatActivity implements MainView {
             return titles.get(position);
         }
     }
+
 }

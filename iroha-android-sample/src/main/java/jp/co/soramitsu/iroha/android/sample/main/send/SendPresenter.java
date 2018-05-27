@@ -1,6 +1,7 @@
 package jp.co.soramitsu.iroha.android.sample.main.send;
 
 import android.content.Intent;
+
 import javax.inject.Inject;
 
 import jp.co.soramitsu.iroha.android.sample.R;
@@ -66,9 +67,14 @@ public class SendPresenter {
         return SampleApplication.instance.account.getBalance() >= amount;
     }
 
-    public void doScanQr() {
+    void doScanQr() {
         Intent i = new Intent(fragment.getActivity(), QRScannerActivity.class);
         fragment.startActivityForResult(i, REQUEST_CODE_QR_SCAN);
     }
 
+    void onStop() {
+        fragment = null;
+        sendAssetInteractor.unsubscribe();
+        getAccountInteractor.unsubscribe();
+    }
 }

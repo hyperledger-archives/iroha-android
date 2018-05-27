@@ -49,4 +49,10 @@ public class ReceiveFragment extends Fragment implements ReceiveView {
     public void didError(Throwable error) {
         ((MainActivity) getActivity()).showError(error);
     }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        presenter.onStop();
+    }
 }

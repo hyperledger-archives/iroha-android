@@ -71,4 +71,10 @@ public class RegistrationPresenter {
         return !preferencesUtil.retrieveUsername().isEmpty();
     }
 
+    void onStop() {
+        view = null;
+        createAccountInteractor.unsubscribe();
+        getAccountInteractor.unsubscribe();
+        addAssetInteractor.unsubscribe();
+    }
 }

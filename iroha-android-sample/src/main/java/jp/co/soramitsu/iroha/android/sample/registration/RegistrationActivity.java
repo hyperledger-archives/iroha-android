@@ -86,6 +86,12 @@ public class RegistrationActivity extends AppCompatActivity implements Registrat
     }
 
     @Override
+    public void onStop() {
+        super.onStop();
+        registrationPresenter.onStop();
+    }
+
+    @Override
     public void showProgressDialog() {
         dialog.show();
     }

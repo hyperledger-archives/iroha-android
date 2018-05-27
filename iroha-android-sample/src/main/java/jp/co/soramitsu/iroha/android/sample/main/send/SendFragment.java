@@ -75,6 +75,12 @@ public class SendFragment extends Fragment implements SendView {
     }
 
     @Override
+    public void onStop() {
+        super.onStop();
+        presenter.onStop();
+    }
+
+    @Override
     public void didSendSuccess() {
         ((MainActivity) getActivity()).refreshData(false);
         binding.amount.setText("");
