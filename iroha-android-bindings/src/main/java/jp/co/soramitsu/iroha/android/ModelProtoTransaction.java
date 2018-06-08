@@ -35,12 +35,16 @@ public class ModelProtoTransaction {
     }
   }
 
-  public Blob signAndAddSignature(UnsignedTx us, Keypair keypair) {
-    return new Blob(irohaJNI.ModelProtoTransaction_signAndAddSignature(swigCPtr, this, UnsignedTx.getCPtr(us), us, Keypair.getCPtr(keypair), keypair), true);
+  public ModelProtoTransaction(UnsignedTx us) {
+    this(irohaJNI.new_ModelProtoTransaction(UnsignedTx.getCPtr(us), us), true);
   }
 
-  public ModelProtoTransaction() {
-    this(irohaJNI.new_ModelProtoTransaction(), true);
+  public ModelProtoTransaction signAndAddSignature(Keypair keypair) {
+    return new ModelProtoTransaction(irohaJNI.ModelProtoTransaction_signAndAddSignature(swigCPtr, this, Keypair.getCPtr(keypair), keypair), true);
+  }
+
+  public Blob finish() {
+    return new Blob(irohaJNI.ModelProtoTransaction_finish(swigCPtr, this), true);
   }
 
 }

@@ -44,7 +44,7 @@ public class Transaction {
   }
 
   public SWIGTYPE_p_shared_model__proto__Transaction__CommandsType commands() {
-    return new SWIGTYPE_p_shared_model__proto__Transaction__CommandsType(irohaJNI.Transaction_commands(swigCPtr, this), false);
+    return new SWIGTYPE_p_shared_model__proto__Transaction__CommandsType(irohaJNI.Transaction_commands(swigCPtr, this), true);
   }
 
   public Blob blob() {
@@ -55,20 +55,20 @@ public class Transaction {
     return new Blob(irohaJNI.Transaction_payload(swigCPtr, this), false);
   }
 
-  public SWIGTYPE_p_shared_model__interface__SignatureSetType signatures() {
-    return new SWIGTYPE_p_shared_model__interface__SignatureSetType(irohaJNI.Transaction_signatures(swigCPtr, this), false);
+  public SWIGTYPE_p_boost__any_rangeT_shared_model__interface__Signature_const_R_boost__forward_traversal_tag_t signatures() {
+    return new SWIGTYPE_p_boost__any_rangeT_shared_model__interface__Signature_const_R_boost__forward_traversal_tag_t(irohaJNI.Transaction_signatures(swigCPtr, this), true);
   }
 
   public boolean addSignature(Signed signed_blob, PublicKey public_key) {
     return irohaJNI.Transaction_addSignature(swigCPtr, this, Signed.getCPtr(signed_blob), signed_blob, PublicKey.getCPtr(public_key), public_key);
   }
 
-  public boolean clearSignatures() {
-    return irohaJNI.Transaction_clearSignatures(swigCPtr, this);
-  }
-
   public java.math.BigInteger createdTime() {
     return irohaJNI.Transaction_createdTime(swigCPtr, this);
+  }
+
+  public SWIGTYPE_p_shared_model__proto__Transaction__QuorumType quorum() {
+    return new SWIGTYPE_p_shared_model__proto__Transaction__QuorumType(irohaJNI.Transaction_quorum(swigCPtr, this), true);
   }
 
 }

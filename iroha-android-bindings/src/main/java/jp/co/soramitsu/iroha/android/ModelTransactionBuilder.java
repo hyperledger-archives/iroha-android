@@ -47,6 +47,10 @@ public class ModelTransactionBuilder {
     return new ModelTransactionBuilder(irohaJNI.ModelTransactionBuilder_createdTime(swigCPtr, this, created_time), true);
   }
 
+  public ModelTransactionBuilder quorum(long quorum) {
+    return new ModelTransactionBuilder(irohaJNI.ModelTransactionBuilder_quorum(swigCPtr, this, quorum), true);
+  }
+
   public ModelTransactionBuilder addAssetQuantity(String account_id, String asset_id, String amount) {
     return new ModelTransactionBuilder(irohaJNI.ModelTransactionBuilder_addAssetQuantity(swigCPtr, this, account_id, asset_id, amount), true);
   }

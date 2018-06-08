@@ -34,9 +34,9 @@ import static jp.co.soramitsu.iroha.android.sample.Constants.QUERY_COUNTER;
 public class GetAccountTransactionsInteractor extends SingleInteractor<List<Transaction>, Void> {
 
     private final ModelQueryBuilder modelQueryBuilder = new ModelQueryBuilder();
-    private final ModelProtoQuery protoQueryHelper = new ModelProtoQuery();
     private final PreferencesUtil preferenceUtils;
     private final ManagedChannel channel;
+    private ModelProtoQuery protoQueryHelper;
 
     @Inject
     GetAccountTransactionsInteractor(@Named(ApplicationModule.JOB) Scheduler jobScheduler,
@@ -59,7 +59,9 @@ public class GetAccountTransactionsInteractor extends SingleInteractor<List<Tran
                     .createdTime(BigInteger.valueOf(currentTime))
                     .getAccountAssetTransactions(username + "@" + DOMAIN_ID, ASSET_ID)
                     .build();
-            ByteVector queryBlob = protoQueryHelper.signAndAddSignature(accountBalanceQuery, userKeys).blob();
+
+            protoQueryHelper = new ModelProtoQuery(accountBalanceQuery);
+            ByteVector queryBlob = protoQueryHelper.signAndAddSignature(userKeys).finish().blob();
             byte bquery[] = toByteArray(queryBlob);
 
             Queries.Query protoQuery = null;

@@ -34,8 +34,9 @@ public class CreateAccountInteractor extends CompletableInteractor<String> {
     private final ManagedChannel channel;
     private final ModelCrypto crypto;
     private final ModelTransactionBuilder txBuilder = new ModelTransactionBuilder();
-    private final ModelProtoTransaction protoTxHelper = new ModelProtoTransaction();
     private final PreferencesUtil preferenceUtils;
+
+    private ModelProtoTransaction protoTxHelper;
 
     @Inject
     CreateAccountInteractor(@Named(ApplicationModule.JOB) Scheduler jobScheduler,
@@ -62,7 +63,8 @@ public class CreateAccountInteractor extends CompletableInteractor<String> {
                     .build();
 
             // sign transaction and get its binary representation (Blob)
-            ByteVector txblob = protoTxHelper.signAndAddSignature(createAccount, adminKeys).blob();
+            protoTxHelper = new ModelProtoTransaction(createAccount);
+            ByteVector txblob = protoTxHelper.signAndAddSignature(adminKeys).finish().blob();
             // Convert ByteVector to byte array
             byte bs[] = toByteArray(txblob);
 

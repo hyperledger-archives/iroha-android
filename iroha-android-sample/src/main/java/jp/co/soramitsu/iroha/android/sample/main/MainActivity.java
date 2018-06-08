@@ -181,7 +181,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
                 .setCancelable(true)
                 .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                     if (throwable.getCause() instanceof ConnectException) {
-                        finish();
+                      //  finish();
                     }
                 })
                 .create();

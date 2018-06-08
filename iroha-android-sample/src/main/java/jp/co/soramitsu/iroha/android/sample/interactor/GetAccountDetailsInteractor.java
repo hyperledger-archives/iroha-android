@@ -31,9 +31,9 @@ import static jp.co.soramitsu.iroha.android.sample.Constants.QUERY_COUNTER;
 public class GetAccountDetailsInteractor extends SingleInteractor<String, Void> {
 
     private final ModelQueryBuilder modelQueryBuilder = new ModelQueryBuilder();
-    private final ModelProtoQuery protoQueryHelper = new ModelProtoQuery();
     private final PreferencesUtil preferenceUtils;
     private final ManagedChannel channel;
+    private ModelProtoQuery protoQueryHelper;
 
     @Inject
     GetAccountDetailsInteractor(@Named(ApplicationModule.JOB) Scheduler jobScheduler,
@@ -56,7 +56,9 @@ public class GetAccountDetailsInteractor extends SingleInteractor<String, Void> 
                     .createdTime(BigInteger.valueOf(currentTime))
                     .getAccountDetail(username + "@" + DOMAIN_ID)
                     .build();
-            ByteVector queryBlob = protoQueryHelper.signAndAddSignature(accountDetails, userKeys).blob();
+
+            protoQueryHelper = new ModelProtoQuery(accountDetails);
+            ByteVector queryBlob = protoQueryHelper.signAndAddSignature(userKeys).finish().blob();
             byte bquery[] = toByteArray(queryBlob);
 
             Queries.Query protoQuery = null;

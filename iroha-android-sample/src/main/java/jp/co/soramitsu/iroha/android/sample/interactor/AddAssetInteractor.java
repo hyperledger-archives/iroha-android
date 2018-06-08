@@ -34,9 +34,9 @@ public class AddAssetInteractor extends CompletableInteractor<String> {
 
     private final ManagedChannel channel;
     private final ModelTransactionBuilder txBuilder = new ModelTransactionBuilder();
-    private final ModelProtoTransaction protoTxHelper = new ModelProtoTransaction();
     private final PreferencesUtil preferenceUtils;
     private final ModelCrypto crypto;
+    private ModelProtoTransaction protoTxHelper;
 
     @Inject
     AddAssetInteractor(@Named(ApplicationModule.JOB) Scheduler jobScheduler,
@@ -62,7 +62,8 @@ public class AddAssetInteractor extends CompletableInteractor<String> {
                     .transferAsset(CREATOR, username + "@" + DOMAIN_ID, ASSET_ID, "initial", "100")
                     .build();
 
-            ByteVector txblob = protoTxHelper.signAndAddSignature(addAssetTx, adminKeys).blob();
+            protoTxHelper = new ModelProtoTransaction(addAssetTx);
+            ByteVector txblob = protoTxHelper.signAndAddSignature(adminKeys).finish().blob();
             byte[] bsq = toByteArray(txblob);
             BlockOuterClass.Transaction protoTx = null;
 

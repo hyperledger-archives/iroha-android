@@ -35,12 +35,16 @@ public class ModelProtoQuery {
     }
   }
 
-  public Blob signAndAddSignature(UnsignedQuery us, Keypair keypair) {
-    return new Blob(irohaJNI.ModelProtoQuery_signAndAddSignature(swigCPtr, this, UnsignedQuery.getCPtr(us), us, Keypair.getCPtr(keypair), keypair), true);
+  public ModelProtoQuery(UnsignedQuery us) {
+    this(irohaJNI.new_ModelProtoQuery(UnsignedQuery.getCPtr(us), us), true);
   }
 
-  public ModelProtoQuery() {
-    this(irohaJNI.new_ModelProtoQuery(), true);
+  public ModelProtoQuery signAndAddSignature(Keypair keypair) {
+    return new ModelProtoQuery(irohaJNI.ModelProtoQuery_signAndAddSignature(swigCPtr, this, Keypair.getCPtr(keypair), keypair), true);
+  }
+
+  public Blob finish() {
+    return new Blob(irohaJNI.ModelProtoQuery_finish(swigCPtr, this), true);
   }
 
 }

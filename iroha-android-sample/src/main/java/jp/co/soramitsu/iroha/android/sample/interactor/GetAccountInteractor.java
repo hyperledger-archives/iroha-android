@@ -32,9 +32,9 @@ import static jp.co.soramitsu.iroha.android.sample.Constants.QUERY_COUNTER;
 public class GetAccountInteractor extends SingleInteractor<Responses.Account, String> {
 
     private final ModelQueryBuilder modelQueryBuilder = new ModelQueryBuilder();
-    private final ModelProtoQuery protoQueryHelper = new ModelProtoQuery();
     private final ModelCrypto crypto;
     private final ManagedChannel channel;
+    private ModelProtoQuery protoQueryHelper;
 
     @Inject
     GetAccountInteractor(@Named(ApplicationModule.JOB) Scheduler jobScheduler,
@@ -61,7 +61,8 @@ public class GetAccountInteractor extends SingleInteractor<Responses.Account, St
 
 
             // sign transaction and get its binary representation (Blob)
-            ByteVector queryBlob = protoQueryHelper.signAndAddSignature(query, adminKeys).blob();
+            protoQueryHelper = new ModelProtoQuery(query);
+            ByteVector queryBlob = protoQueryHelper.signAndAddSignature(adminKeys).finish().blob();
             byte bquery[] = toByteArray(queryBlob);
 
             Queries.Query protoQuery = null;

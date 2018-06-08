@@ -4,7 +4,6 @@ package jp.co.soramitsu.iroha.android.sample.interactor;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import java.math.BigInteger;
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -31,8 +30,8 @@ public class SendAssetInteractor extends CompletableInteractor<String[]> {
 
     private final ManagedChannel channel;
     private final ModelTransactionBuilder txBuilder = new ModelTransactionBuilder();
-    private final ModelProtoTransaction protoTxHelper = new ModelProtoTransaction();
     private final PreferencesUtil preferenceUtils;
+    private ModelProtoTransaction protoTxHelper;
 
     @Inject
     SendAssetInteractor(@Named(ApplicationModule.JOB) Scheduler jobScheduler,
@@ -56,7 +55,8 @@ public class SendAssetInteractor extends CompletableInteractor<String[]> {
                             data[0] + "@" + DOMAIN_ID, ASSET_ID, "initial", data[1])
                     .build();
 
-            ByteVector txblob = protoTxHelper.signAndAddSignature(sendAssetTx, userKeys).blob();
+            protoTxHelper = new ModelProtoTransaction(sendAssetTx);
+            ByteVector txblob = protoTxHelper.signAndAddSignature(userKeys).finish().blob();
             byte[] bsq = toByteArray(txblob);
             BlockOuterClass.Transaction protoTx = null;
 

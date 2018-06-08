@@ -59,16 +59,12 @@ public class Query {
     return new Blob(irohaJNI.Query_payload(swigCPtr, this), false);
   }
 
-  public SWIGTYPE_p_shared_model__interface__SignatureSetType signatures() {
-    return new SWIGTYPE_p_shared_model__interface__SignatureSetType(irohaJNI.Query_signatures(swigCPtr, this), false);
+  public SWIGTYPE_p_boost__any_rangeT_shared_model__interface__Signature_const_R_boost__forward_traversal_tag_t signatures() {
+    return new SWIGTYPE_p_boost__any_rangeT_shared_model__interface__Signature_const_R_boost__forward_traversal_tag_t(irohaJNI.Query_signatures(swigCPtr, this), true);
   }
 
   public boolean addSignature(Signed signed_blob, PublicKey public_key) {
     return irohaJNI.Query_addSignature(swigCPtr, this, Signed.getCPtr(signed_blob), signed_blob, PublicKey.getCPtr(public_key), public_key);
-  }
-
-  public boolean clearSignatures() {
-    return irohaJNI.Query_clearSignatures(swigCPtr, this);
   }
 
   public java.math.BigInteger createdTime() {

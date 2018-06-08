@@ -67,8 +67,8 @@ public class ModelQueryBuilder {
     return new ModelQueryBuilder(irohaJNI.ModelQueryBuilder_getAccountAssetTransactions(swigCPtr, this, account_id, asset_id), true);
   }
 
-  public ModelQueryBuilder getAccountAssets(String account_id, String asset_id) {
-    return new ModelQueryBuilder(irohaJNI.ModelQueryBuilder_getAccountAssets(swigCPtr, this, account_id, asset_id), true);
+  public ModelQueryBuilder getAccountAssets(String account_id) {
+    return new ModelQueryBuilder(irohaJNI.ModelQueryBuilder_getAccountAssets(swigCPtr, this, account_id), true);
   }
 
   public ModelQueryBuilder getRoles() {

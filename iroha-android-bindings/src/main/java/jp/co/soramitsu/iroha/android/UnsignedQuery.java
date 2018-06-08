@@ -39,8 +39,12 @@ public class UnsignedQuery {
     this(irohaJNI.new_UnsignedQuery__SWIG_0(Query.getCPtr(o), o), true);
   }
 
-  public Query signAndAddSignature(Keypair keypair) {
-    return new Query(irohaJNI.UnsignedQuery_signAndAddSignature(swigCPtr, this, Keypair.getCPtr(keypair), keypair), true);
+  public UnsignedQuery signAndAddSignature(Keypair keypair) {
+    return new UnsignedQuery(irohaJNI.UnsignedQuery_signAndAddSignature(swigCPtr, this, Keypair.getCPtr(keypair), keypair), false);
+  }
+
+  public Query finish() {
+    return new Query(irohaJNI.UnsignedQuery_finish(swigCPtr, this), true);
   }
 
   public Hash hash() {
