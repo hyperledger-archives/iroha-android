@@ -10,6 +10,11 @@ message Asset {
     uint32 precision = 3;
 }
 
+message Domain {
+    string domain_id = 1;
+    string default_role = 2;
+}
+
 message Account {
     string account_id = 1;
     string domain_id = 2;
@@ -25,7 +30,7 @@ message AccountAsset {
 
 // *** Responses *** //
 message AccountAssetResponse {
-    AccountAsset account_asset = 1;
+    repeated AccountAsset account_assets = 1;
 }
 
 message AccountDetailResponse {
@@ -62,6 +67,7 @@ message ErrorResponse {
         NO_ROLES = 8; // when there are no roles defined in the system
     }
     Reason reason = 1;
+    string message = 2;
 }
 
 message SignatoriesResponse {
@@ -71,7 +77,6 @@ message SignatoriesResponse {
 message TransactionsResponse {
     repeated Transaction transactions = 1;
 }
-
 
 message QueryResponse {
     oneof response {
@@ -85,5 +90,20 @@ message QueryResponse {
         RolesResponse roles_response = 8;
         RolePermissionsResponse role_permissions_response = 9;
     }
-    bytes query_hash = 10;
+    string query_hash = 10;
+}
+
+message BlockResponse {
+    Block block = 1;
+}
+
+message BlockErrorResponse {
+    string message = 1;
+}
+
+message BlockQueryResponse {
+    oneof response {
+        BlockResponse block_response = 1;
+        BlockErrorResponse error_response = 2;
+    }
 }

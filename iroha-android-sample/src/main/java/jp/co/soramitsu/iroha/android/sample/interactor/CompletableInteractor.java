@@ -14,9 +14,9 @@ public abstract class CompletableInteractor<ParameterType> extends Interactor {
     protected abstract Completable build(ParameterType parameter);
 
     public void execute(ParameterType parameter, Action onSuccess, Consumer<Throwable> onError) {
-        build(parameter)
+        subscriptions.add(build(parameter)
                 .subscribeOn(jobScheduler)
                 .observeOn(uiScheduler)
-                .subscribe(onSuccess, onError);
+                .subscribe(onSuccess, onError));
     }
 }

@@ -30,8 +30,8 @@ public class SetAccountDetailsInteractor extends CompletableInteractor<String> {
 
     private final ManagedChannel channel;
     private final ModelTransactionBuilder txBuilder = new ModelTransactionBuilder();
-    private final ModelProtoTransaction protoTxHelper = new ModelProtoTransaction();
     private final PreferencesUtil preferenceUtils;
+    private ModelProtoTransaction protoTxHelper;
 
     @Inject
     SetAccountDetailsInteractor(@Named(ApplicationModule.JOB) Scheduler jobScheduler,
@@ -55,7 +55,8 @@ public class SetAccountDetailsInteractor extends CompletableInteractor<String> {
                     .setAccountDetail(username + "@" + DOMAIN_ID, ACCOUNT_DETAILS, details)
                     .build();
 
-            ByteVector txblob = protoTxHelper.signAndAddSignature(setDetailsTransaction, userKeys).blob();
+            protoTxHelper = new ModelProtoTransaction(setDetailsTransaction);
+            ByteVector txblob = protoTxHelper.signAndAddSignature(userKeys).finish().blob();
             byte[] bs = toByteArray(txblob);
             BlockOuterClass.Transaction protoTx = null;
 

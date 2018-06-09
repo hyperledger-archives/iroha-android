@@ -2,7 +2,6 @@ package jp.co.soramitsu.iroha.android.sample.interactor;
 
 
 import com.google.protobuf.ByteString;
-import com.orhanobut.logger.Logger;
 
 import java.util.Iterator;
 
@@ -16,7 +15,7 @@ import jp.co.soramitsu.iroha.android.UnsignedTx;
 
 class Interactor {
 
-    private final CompositeDisposable subscriptions = new CompositeDisposable();
+    final CompositeDisposable subscriptions = new CompositeDisposable();
     final Scheduler jobScheduler;
     final Scheduler uiScheduler;
 

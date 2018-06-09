@@ -83,4 +83,12 @@ public class MainPresenter {
             view.hideProgress();
         });
     }
+
+    void onStop() {
+        view = null;
+        setAccountDetails.unsubscribe();
+        getAccountDetails.unsubscribe();
+        getAccountInteractor.unsubscribe();
+        getAccountBalanceInteractor.unsubscribe();
+    }
 }

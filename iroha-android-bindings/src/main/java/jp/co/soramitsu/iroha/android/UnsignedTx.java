@@ -39,8 +39,12 @@ public class UnsignedTx {
     this(irohaJNI.new_UnsignedTx__SWIG_0(Transaction.getCPtr(o), o), true);
   }
 
-  public Transaction signAndAddSignature(Keypair keypair) {
-    return new Transaction(irohaJNI.UnsignedTx_signAndAddSignature(swigCPtr, this, Keypair.getCPtr(keypair), keypair), true);
+  public UnsignedTx signAndAddSignature(Keypair keypair) {
+    return new UnsignedTx(irohaJNI.UnsignedTx_signAndAddSignature(swigCPtr, this, Keypair.getCPtr(keypair), keypair), false);
+  }
+
+  public Transaction finish() {
+    return new Transaction(irohaJNI.UnsignedTx_finish(swigCPtr, this), true);
   }
 
   public Hash hash() {

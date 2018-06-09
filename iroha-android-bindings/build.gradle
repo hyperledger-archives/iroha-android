@@ -11,7 +11,7 @@ ext {
     libraryDescription = 'A set of methods used to manipulate Iroha'
     siteUrl = 'https://github.com/hyperledger/iroha-android'
     gitUrl = 'https://github.com/hyperledger/iroha-android/bindings.git'
-    libraryVersion = '1.1'
+    libraryVersion = '1.2'
     developerId = 'bulatmukhutdinov'
     developerName = 'Bulat Mukhutdinov'
     developerEmail = 'bulat.m@soramitsu.co.jp'
@@ -26,8 +26,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 27
-        versionCode 1
-        versionName "1.1"
+        versionCode 3
+        versionName "1.3"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 

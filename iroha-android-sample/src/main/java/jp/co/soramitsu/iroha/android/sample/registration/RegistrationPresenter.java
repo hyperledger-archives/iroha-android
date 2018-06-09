@@ -1,6 +1,6 @@
 package jp.co.soramitsu.iroha.android.sample.registration;
 
-import com.orhanobut.logger.Logger;
+import android.support.annotation.VisibleForTesting;
 
 import javax.inject.Inject;
 
@@ -14,13 +14,16 @@ import lombok.Setter;
 
 public class RegistrationPresenter {
 
-    private final PreferencesUtil preferencesUtil;
     @Setter
     private RegistrationView view;
+    private final PreferencesUtil preferencesUtil;
 
     private final CreateAccountInteractor createAccountInteractor;
     private final GetAccountInteractor getAccountInteractor;
     private final AddAssetInteractor addAssetInteractor;
+
+    @VisibleForTesting
+    public boolean isRequestFinished;
 
     @Inject
     public RegistrationPresenter(CreateAccountInteractor createAccountInteractor,
@@ -34,26 +37,44 @@ public class RegistrationPresenter {
     }
 
     void createAccount(String username) {
+        isRequestFinished = false;
+
         if (!username.isEmpty()) {
             getAccountInteractor.execute(username, account -> {
                 if (account.getAccountId().isEmpty()) {
                     createAccountInteractor.execute(username,
                             () -> addAssetInteractor.execute(username,
-                                    () -> view.didRegistrationSuccess(),
-                                    error -> view.didRegistrationError(error)
+                                    () -> {
+                                        isRequestFinished = true;
+                                        view.didRegistrationSuccess();
+                                    },
+                                    this::didRegistrationError
                             ),
-                            error -> view.didRegistrationError(error));
+                            this::didRegistrationError);
                 } else {
-                    view.didRegistrationError(new Throwable(SampleApplication.instance.getString(R.string.username_already_exists_error_dialog_message)));
+                    didRegistrationError(new Throwable(SampleApplication.instance
+                            .getString(R.string.username_already_exists_error_dialog_message)));
                 }
-            }, e -> view.didRegistrationError(e));
+            }, this::didRegistrationError);
         } else {
-            view.didRegistrationError(new Throwable(SampleApplication.instance.getString(R.string.username_empty_error_dialog_message)));
+            didRegistrationError(new Throwable(SampleApplication.instance.getString(R.string.username_empty_error_dialog_message)));
         }
+    }
+
+    private void didRegistrationError(Throwable throwable) {
+        isRequestFinished = true;
+        preferencesUtil.clear();
+        view.didRegistrationError(throwable);
     }
 
     boolean isRegistered() {
         return !preferencesUtil.retrieveUsername().isEmpty();
     }
 
+    void onStop() {
+        view = null;
+        createAccountInteractor.unsubscribe();
+        getAccountInteractor.unsubscribe();
+        addAssetInteractor.unsubscribe();
+    }
 }

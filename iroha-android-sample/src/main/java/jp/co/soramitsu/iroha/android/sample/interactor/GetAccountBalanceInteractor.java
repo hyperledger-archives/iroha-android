@@ -27,18 +27,17 @@ import static jp.co.soramitsu.iroha.android.sample.Constants.QUERY_COUNTER;
 public class GetAccountBalanceInteractor extends SingleInteractor<String, Void> {
 
     private final ModelQueryBuilder modelQueryBuilder = new ModelQueryBuilder();
-    private final ModelProtoQuery protoQueryHelper = new ModelProtoQuery();
     private final PreferencesUtil preferenceUtils;
-
-    @Inject
-    ManagedChannel channel;
+    private final ManagedChannel channel;
+    private ModelProtoQuery protoQueryHelper;
 
     @Inject
     GetAccountBalanceInteractor(@Named(ApplicationModule.JOB) Scheduler jobScheduler,
                                 @Named(ApplicationModule.UI) Scheduler uiScheduler,
-                                PreferencesUtil preferenceUtils) {
+                                PreferencesUtil preferenceUtils, ManagedChannel channel) {
         super(jobScheduler, uiScheduler);
         this.preferenceUtils = preferenceUtils;
+        this.channel = channel;
     }
 
     @Override
@@ -51,9 +50,11 @@ public class GetAccountBalanceInteractor extends SingleInteractor<String, Void> 
             UnsignedQuery accountBalanceQuery = modelQueryBuilder.creatorAccountId(username + "@" + DOMAIN_ID)
                     .queryCounter(BigInteger.valueOf(QUERY_COUNTER))
                     .createdTime(BigInteger.valueOf(currentTime))
-                    .getAccountAssets(username + "@" + DOMAIN_ID, "irh#" + DOMAIN_ID)
+                    .getAccountAssets(username + "@" + DOMAIN_ID)
                     .build();
-            ByteVector queryBlob = protoQueryHelper.signAndAddSignature(accountBalanceQuery, userKeys).blob();
+
+            protoQueryHelper = new ModelProtoQuery(accountBalanceQuery);
+            ByteVector queryBlob = protoQueryHelper.signAndAddSignature(userKeys).finish().blob();
             byte bquery[] = toByteArray(queryBlob);
 
             Queries.Query protoQuery = null;
@@ -66,8 +67,7 @@ public class GetAccountBalanceInteractor extends SingleInteractor<String, Void> 
             QueryServiceGrpc.QueryServiceBlockingStub queryStub = QueryServiceGrpc.newBlockingStub(channel);
             Responses.QueryResponse queryResponse = queryStub.find(protoQuery);
 
-
-            emitter.onSuccess(getIntBalance(queryResponse.getAccountAssetsResponse().getAccountAsset().getBalance()));
+            emitter.onSuccess(getIntBalance(queryResponse.getAccountAssetsResponse().getAccountAssets(0).getBalance()));
         });
     }
 }

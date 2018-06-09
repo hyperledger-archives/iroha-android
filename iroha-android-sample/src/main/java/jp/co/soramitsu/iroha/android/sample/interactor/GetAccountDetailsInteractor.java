@@ -31,18 +31,17 @@ import static jp.co.soramitsu.iroha.android.sample.Constants.QUERY_COUNTER;
 public class GetAccountDetailsInteractor extends SingleInteractor<String, Void> {
 
     private final ModelQueryBuilder modelQueryBuilder = new ModelQueryBuilder();
-    private final ModelProtoQuery protoQueryHelper = new ModelProtoQuery();
     private final PreferencesUtil preferenceUtils;
-
-    @Inject
-    ManagedChannel channel;
+    private final ManagedChannel channel;
+    private ModelProtoQuery protoQueryHelper;
 
     @Inject
     GetAccountDetailsInteractor(@Named(ApplicationModule.JOB) Scheduler jobScheduler,
                                 @Named(ApplicationModule.UI) Scheduler uiScheduler,
-                                PreferencesUtil preferenceUtils) {
+                                PreferencesUtil preferenceUtils, ManagedChannel channel) {
         super(jobScheduler, uiScheduler);
         this.preferenceUtils = preferenceUtils;
+        this.channel = channel;
     }
 
     @Override
@@ -57,7 +56,9 @@ public class GetAccountDetailsInteractor extends SingleInteractor<String, Void> 
                     .createdTime(BigInteger.valueOf(currentTime))
                     .getAccountDetail(username + "@" + DOMAIN_ID)
                     .build();
-            ByteVector queryBlob = protoQueryHelper.signAndAddSignature(accountDetails, userKeys).blob();
+
+            protoQueryHelper = new ModelProtoQuery(accountDetails);
+            ByteVector queryBlob = protoQueryHelper.signAndAddSignature(userKeys).finish().blob();
             byte bquery[] = toByteArray(queryBlob);
 
             Queries.Query protoQuery = null;
@@ -70,7 +71,8 @@ public class GetAccountDetailsInteractor extends SingleInteractor<String, Void> 
             QueryServiceGrpc.QueryServiceBlockingStub queryStub = QueryServiceGrpc.newBlockingStub(channel);
             Responses.QueryResponse queryResponse = queryStub.find(protoQuery);
 
-            JsonElement jsonElement = new Gson().fromJson(queryResponse.getAccountDetailResponse().getDetail(), JsonObject.class).get(username + "@" + DOMAIN_ID);;
+            JsonElement jsonElement = new Gson().fromJson(queryResponse.getAccountDetailResponse().getDetail(), JsonObject.class).get(username + "@" + DOMAIN_ID);
+            ;
             String detail = jsonElement != null ? jsonElement.getAsJsonObject().get(Constants.ACCOUNT_DETAILS).getAsString() : "";
 
             emitter.onSuccess(detail);

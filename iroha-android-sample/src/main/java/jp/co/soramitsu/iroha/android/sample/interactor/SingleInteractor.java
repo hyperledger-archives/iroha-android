@@ -13,10 +13,10 @@ public abstract class SingleInteractor<ResultType, ParameterType> extends Intera
     protected abstract Single<ResultType> build(ParameterType parameter);
 
     public void execute(ParameterType parameter, Consumer<ResultType> onSuccess, Consumer<Throwable> onError) {
-        build(parameter)
+        subscriptions.add(build(parameter)
                 .subscribeOn(jobScheduler)
                 .observeOn(uiScheduler)
-                .subscribe(onSuccess, onError);
+                .subscribe(onSuccess, onError));
     }
 
     public void execute(Consumer<ResultType> onSuccess, Consumer<Throwable> onError) {

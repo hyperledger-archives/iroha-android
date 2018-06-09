@@ -29,4 +29,9 @@ public class ReceivePresenter {
             Logger.e(throwable.getMessage());
         });
     }
+
+    void onStop() {
+        fragment = null;
+        generateQRInteractor.unsubscribe();
+    }
 }

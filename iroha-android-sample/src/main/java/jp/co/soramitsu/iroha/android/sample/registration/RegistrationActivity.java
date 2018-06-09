@@ -10,12 +10,14 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.jakewharton.rxbinding2.view.RxView;
 
+import java.net.ConnectException;
+
 import javax.inject.Inject;
 
-import jp.co.soramitsu.iroha.android.sample.main.MainActivity;
 import jp.co.soramitsu.iroha.android.sample.R;
 import jp.co.soramitsu.iroha.android.sample.SampleApplication;
 import jp.co.soramitsu.iroha.android.sample.databinding.ActivityRegistrationBinding;
+import jp.co.soramitsu.iroha.android.sample.main.MainActivity;
 
 public class RegistrationActivity extends AppCompatActivity implements RegistrationView {
 
@@ -64,9 +66,15 @@ public class RegistrationActivity extends AppCompatActivity implements Registrat
         dismissProgressDialog();
         AlertDialog alertDialog = new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.error_dialog_title))
-                .setMessage(error.getMessage() == null ? getString(R.string.general_error) : error.getMessage())
+                .setMessage(error.getCause() instanceof ConnectException ?
+                        getString(R.string.general_error) :
+                        error.getLocalizedMessage())
                 .setCancelable(true)
-                .setPositiveButton(android.R.string.ok, null)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    if (error.getCause() instanceof ConnectException) {
+                        finish();
+                    }
+                })
                 .create();
         alertDialog.show();
     }
@@ -75,6 +83,12 @@ public class RegistrationActivity extends AppCompatActivity implements Registrat
         dialog = new ProgressDialog(this);
         dialog.setCancelable(false);
         dialog.setMessage(getString(R.string.please_wait));
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        registrationPresenter.onStop();
     }
 
     @Override

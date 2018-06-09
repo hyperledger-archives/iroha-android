@@ -39,6 +39,7 @@ public class HistoryPresenter {
     void getTransactions() {
         getAccountTransactionsInteractor.execute(
                 transactions -> {
+                    Collections.sort(transactions, (o1, o2) -> o2.date.compareTo(o1.date));
                     transactionsViewModel.getTransactions().postValue(transformTransactions(transactions));
                     fragment.finishRefresh();
                 },
@@ -91,7 +92,7 @@ public class HistoryPresenter {
                 if (diffInMinutes == 0) {
                     prettyDate = "just now";
                 } else {
-                    prettyDate = diffInMinutes + "minutes ago";
+                    prettyDate = diffInMinutes + " minutes ago";
                 }
             } else {
                 prettyDate = hoursDateFormat.format(transaction.date);

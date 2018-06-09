@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.jakewharton.rxbinding2.widget.RxTextView;
 
+import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -123,7 +124,8 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
         binding.content.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
 
             @Override
             public void onPageSelected(int position) {
@@ -131,7 +133,8 @@ public class MainActivity extends AppCompatActivity implements MainView {
             }
 
             @Override
-            public void onPageScrollStateChanged(int state) {}
+            public void onPageScrollStateChanged(int state) {
+            }
         });
     }
 
@@ -170,9 +173,17 @@ public class MainActivity extends AppCompatActivity implements MainView {
     public void showError(Throwable throwable) {
         AlertDialog alertDialog = new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.error_dialog_title))
-                .setMessage(throwable.getLocalizedMessage())
+                .setMessage(
+                        throwable.getCause() instanceof ConnectException ?
+                                getString(R.string.general_error) :
+                                throwable.getLocalizedMessage()
+                )
                 .setCancelable(true)
-                .setPositiveButton(android.R.string.ok, null)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    if (throwable.getCause() instanceof ConnectException) {
+                      //  finish();
+                    }
+                })
                 .create();
         alertDialog.show();
     }
@@ -180,6 +191,12 @@ public class MainActivity extends AppCompatActivity implements MainView {
     @Override
     public void hideRefresh() {
         binding.swiperefresh.setRefreshing(false);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        presenter.onStop();
     }
 
     @Override
@@ -222,4 +239,5 @@ public class MainActivity extends AppCompatActivity implements MainView {
             return titles.get(position);
         }
     }
+
 }

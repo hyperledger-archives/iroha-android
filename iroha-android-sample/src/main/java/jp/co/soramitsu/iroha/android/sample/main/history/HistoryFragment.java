@@ -78,6 +78,7 @@ public class HistoryFragment extends Fragment implements HistoryView {
 
     @Override
     public void didError(Throwable error) {
+        binding.refresh.setRefreshing(false);
         ((MainActivity) getActivity()).showError(error);
     }
 }

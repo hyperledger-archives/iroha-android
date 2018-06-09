@@ -7,7 +7,7 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.1'
+        classpath 'com.android.tools.build:gradle:3.1.2'
         classpath "com.google.protobuf:protobuf-gradle-plugin:0.8.4"
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
@@ -23,8 +23,8 @@ allprojects {
 }
 
 ext {
-    androidSupportLibraryVersion = "27.1.0"
-    daggerVersion = "2.15"
+    androidSupportLibraryVersion = "27.1.1"
+    daggerVersion = "2.16"
     archLifecycleVersion = "1.1.1"
 }
 

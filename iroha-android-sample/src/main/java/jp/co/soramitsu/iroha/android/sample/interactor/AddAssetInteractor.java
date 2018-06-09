@@ -23,6 +23,7 @@ import jp.co.soramitsu.iroha.android.UnsignedTx;
 import jp.co.soramitsu.iroha.android.sample.PreferencesUtil;
 import jp.co.soramitsu.iroha.android.sample.injection.ApplicationModule;
 
+import static jp.co.soramitsu.iroha.android.sample.Constants.ASSET_ID;
 import static jp.co.soramitsu.iroha.android.sample.Constants.CONNECTION_TIMEOUT_SECONDS;
 import static jp.co.soramitsu.iroha.android.sample.Constants.CREATOR;
 import static jp.co.soramitsu.iroha.android.sample.Constants.DOMAIN_ID;
@@ -34,9 +35,9 @@ public class AddAssetInteractor extends CompletableInteractor<String> {
 
     private final ManagedChannel channel;
     private final ModelTransactionBuilder txBuilder = new ModelTransactionBuilder();
-    private final ModelProtoTransaction protoTxHelper = new ModelProtoTransaction();
     private final PreferencesUtil preferenceUtils;
     private final ModelCrypto crypto;
+    private ModelProtoTransaction protoTxHelper;
 
     @Inject
     AddAssetInteractor(@Named(ApplicationModule.JOB) Scheduler jobScheduler,
@@ -52,19 +53,18 @@ public class AddAssetInteractor extends CompletableInteractor<String> {
     protected Completable build(String details) {
         return Completable.create(emitter -> {
             long currentTime = System.currentTimeMillis();
-            Keypair userKeys = preferenceUtils.retrieveKeys();
             Keypair adminKeys = crypto.convertFromExisting(PUB_KEY, PRIV_KEY);
             String username = preferenceUtils.retrieveUsername();
 
             //Adding asset
             UnsignedTx addAssetTx = txBuilder.creatorAccountId(CREATOR)
                     .createdTime(BigInteger.valueOf(currentTime))
-                    .txCounter(BigInteger.valueOf(TX_COUNTER))
-                    .addAssetQuantity(CREATOR, "irh#" + DOMAIN_ID, "100")
-                    .transferAsset(CREATOR, username + "@" + DOMAIN_ID, "irh#" + DOMAIN_ID, "initial" ,"100")
+                    .addAssetQuantity(CREATOR, ASSET_ID, "100")
+                    .transferAsset(CREATOR, username + "@" + DOMAIN_ID, ASSET_ID, "initial", "100")
                     .build();
 
-            ByteVector txblob = protoTxHelper.signAndAddSignature(addAssetTx, adminKeys).blob();
+            protoTxHelper = new ModelProtoTransaction(addAssetTx);
+            ByteVector txblob = protoTxHelper.signAndAddSignature(adminKeys).finish().blob();
             byte[] bsq = toByteArray(txblob);
             BlockOuterClass.Transaction protoTx = null;
 

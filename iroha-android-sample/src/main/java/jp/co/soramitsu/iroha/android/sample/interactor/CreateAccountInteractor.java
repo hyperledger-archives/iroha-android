@@ -2,7 +2,6 @@ package jp.co.soramitsu.iroha.android.sample.interactor;
 
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.orhanobut.logger.Logger;
 
 import java.math.BigInteger;
 import java.util.concurrent.TimeUnit;
@@ -20,7 +19,6 @@ import jp.co.soramitsu.iroha.android.Keypair;
 import jp.co.soramitsu.iroha.android.ModelCrypto;
 import jp.co.soramitsu.iroha.android.ModelProtoTransaction;
 import jp.co.soramitsu.iroha.android.ModelTransactionBuilder;
-import jp.co.soramitsu.iroha.android.StringVector;
 import jp.co.soramitsu.iroha.android.UnsignedTx;
 import jp.co.soramitsu.iroha.android.sample.PreferencesUtil;
 import jp.co.soramitsu.iroha.android.sample.injection.ApplicationModule;
@@ -30,23 +28,24 @@ import static jp.co.soramitsu.iroha.android.sample.Constants.CREATOR;
 import static jp.co.soramitsu.iroha.android.sample.Constants.DOMAIN_ID;
 import static jp.co.soramitsu.iroha.android.sample.Constants.PRIV_KEY;
 import static jp.co.soramitsu.iroha.android.sample.Constants.PUB_KEY;
-import static jp.co.soramitsu.iroha.android.sample.Constants.TX_COUNTER;
 
 public class CreateAccountInteractor extends CompletableInteractor<String> {
 
     private final ManagedChannel channel;
-    @Inject
-    ModelCrypto crypto;
+    private final ModelCrypto crypto;
     private final ModelTransactionBuilder txBuilder = new ModelTransactionBuilder();
-    private final ModelProtoTransaction protoTxHelper = new ModelProtoTransaction();
     private final PreferencesUtil preferenceUtils;
+
+    private ModelProtoTransaction protoTxHelper;
 
     @Inject
     CreateAccountInteractor(@Named(ApplicationModule.JOB) Scheduler jobScheduler,
                             @Named(ApplicationModule.UI) Scheduler uiScheduler,
-                            ManagedChannel managedChannel, PreferencesUtil preferencesUtil) {
+                            ManagedChannel managedChannel, ModelCrypto crypto,
+                            PreferencesUtil preferencesUtil) {
         super(jobScheduler, uiScheduler);
         this.channel = managedChannel;
+        this.crypto = crypto;
         this.preferenceUtils = preferencesUtil;
     }
 
@@ -65,7 +64,8 @@ public class CreateAccountInteractor extends CompletableInteractor<String> {
                     .build();
 
             // sign transaction and get its binary representation (Blob)
-            ByteVector txblob = protoTxHelper.signAndAddSignature(createAccount, adminKeys).blob();
+            protoTxHelper = new ModelProtoTransaction(createAccount);
+            ByteVector txblob = protoTxHelper.signAndAddSignature(adminKeys).finish().blob();
             // Convert ByteVector to byte array
             byte bs[] = toByteArray(txblob);
 
