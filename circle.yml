@@ -43,7 +43,7 @@ dependencies:
     - ls $ANDROID_HOME/.
 build:
   override:
-    - ./gradlew assembleDebug
+    - ./gradlew clean test connectedAndroidTest build install
   post:
     - ls build/outputs/apk/debug
 general:
