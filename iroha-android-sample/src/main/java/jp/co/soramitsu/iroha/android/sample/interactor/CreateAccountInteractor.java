@@ -59,7 +59,6 @@ public class CreateAccountInteractor extends CompletableInteractor<String> {
             // Create account
             UnsignedTx createAccount = txBuilder.creatorAccountId(CREATOR)
                     .createdTime(BigInteger.valueOf(currentTime))
-                    .txCounter(BigInteger.valueOf(TX_COUNTER))
                     .createAccount(username, DOMAIN_ID, userKeys.publicKey())
                     .build();
 

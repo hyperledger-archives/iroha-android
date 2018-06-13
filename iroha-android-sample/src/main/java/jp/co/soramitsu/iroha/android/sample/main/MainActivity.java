@@ -1,5 +1,6 @@
 package jp.co.soramitsu.iroha.android.sample.main;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
@@ -19,8 +20,6 @@ import com.jakewharton.rxbinding2.view.RxView;
 import com.jakewharton.rxbinding2.widget.RxTextView;
 
 import java.net.ConnectException;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -74,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
         RxView.clicks(binding.bio)
                 .subscribe(v -> {
                     LayoutInflater inflater = LayoutInflater.from(this);
-                    final View view = inflater.inflate(R.layout.dialog_account_details, null);
+                    @SuppressLint("InflateParams") final View view = inflater.inflate(R.layout.dialog_account_details, null);
                     final EditText details = view.findViewById(R.id.details);
                     final TextView symbolsLeft = view.findViewById(R.id.symbols_left);
 
@@ -112,14 +111,11 @@ public class MainActivity extends AppCompatActivity implements MainView {
     }
 
     private void configureRefreshLayout() {
-        binding.swiperefresh.setOnRefreshListener(() -> presenter.updateData(true));
+//        binding.swiperefresh.setOnRefreshListener(() -> presenter.updateData(true));
     }
 
     private void setupViewPager() {
         Adapter adapter = new Adapter(getSupportFragmentManager());
-        adapter.addFragment(new SendFragment(), "SEND");
-        adapter.addFragment(new ReceiveFragment(), "RECEIVE");
-        adapter.addFragment(new HistoryFragment(), "HISTORY");
         binding.content.setAdapter(adapter);
 
         binding.content.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -129,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
             @Override
             public void onPageSelected(int position) {
-                binding.swiperefresh.setEnabled(!(adapter.getItem(position) instanceof HistoryFragment));
+//                binding.swiperefresh.setEnabled(!(adapter.getItem(position) instanceof HistoryFragment));
             }
 
             @Override
@@ -181,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
                 .setCancelable(true)
                 .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                     if (throwable.getCause() instanceof ConnectException) {
-                      //  finish();
+                        //  finish();
                     }
                 })
                 .create();
@@ -190,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
     @Override
     public void hideRefresh() {
-        binding.swiperefresh.setRefreshing(false);
+//        binding.swiperefresh.setRefreshing(false);
     }
 
     @Override
@@ -201,7 +197,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
     @Override
     public void refreshData(boolean animate) {
-        binding.swiperefresh.setRefreshing(animate);
+//        binding.swiperefresh.setRefreshing(animate);
         presenter.updateData(animate);
     }
 
@@ -212,8 +208,6 @@ public class MainActivity extends AppCompatActivity implements MainView {
     }
 
     public static class Adapter extends FragmentPagerAdapter {
-        private final List<Fragment> fragments = new ArrayList<>();
-        private final List<String> titles = new ArrayList<>();
 
         Adapter(FragmentManager manager) {
             super(manager);
@@ -221,23 +215,29 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
         @Override
         public Fragment getItem(int position) {
-            return fragments.get(position);
+            if (position == 0) {
+                return new SendFragment();
+            } else if (position == 1) {
+                return new ReceiveFragment();
+            } else {
+                return new HistoryFragment();
+            }
         }
 
         @Override
         public int getCount() {
-            return fragments.size();
-        }
-
-        void addFragment(Fragment fragment, String title) {
-            fragments.add(fragment);
-            titles.add(title);
+            return 3;
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return titles.get(position);
+            if (position == 0) {
+                return "SEND";
+            } else if (position == 1) {
+                return "RECEIVE";
+            } else {
+                return "HISTORY";
+            }
         }
     }
-
 }

@@ -25,7 +25,8 @@ public class TransactionDiffChecker extends DiffUtil.Callback {
 
     @Override
     public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-        if (oldTransactions.get(oldItemPosition) instanceof TransactionVM) {
+        if (oldTransactions.get(oldItemPosition) instanceof TransactionVM
+                && newTransactions.get(newItemPosition) instanceof TransactionVM ) {
             TransactionVM oldItem = (TransactionVM) oldTransactions.get(oldItemPosition);
             TransactionVM newItem = (TransactionVM) newTransactions.get(newItemPosition);
             return oldItem.id == newItem.id;
