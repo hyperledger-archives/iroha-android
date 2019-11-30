@@ -1,31 +1,122 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
+
+    ext.versions = [
+            kotlin            : '1.3.11',
+            support           : '1.0.0',
+            constraint        : '1.1.3',
+            dagger            : '2.17',
+            javaxInject       : '1',
+            archComponents    : '2.0.0',
+            rxJava2           : '2.2.7',
+            rxBinding         : '2.1.1',
+            rxPermissions     : '0.10.2',
+            rxAndroid         : '2.1.0',
+            iroha             : '5.1.2',
+            birt              : '2.9.0',
+            zXing             : '3.3.3',
+            zXingEmbedded     : '3.5.0@aar',
+            rxPermissions     : '0.10.2',
+    ]
+
+    ext {
+        compileVersion = 28
+        minVersion = 21
+        targetVersion = 28
+
+        androidDeps = [
+                appCompat : "androidx.appcompat:appcompat:$versions.support",
+                v4        : "androidx.legacy:legacy-support-v4:$versions.support",
+                constraint: "androidx.constraintlayout:constraintlayout:$versions.constraint",
+                material  : "com.google.android.material:material:$versions.support",
+                ktx       : "androidx.core:core-ktx:$versions.support"
+        ]
+
+        kotlinDeps = [
+                kotlin: "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$versions.kotlin"
+        ]
+
+        daggerDeps = [
+                dagger: "com.google.dagger:dagger:$versions.dagger"
+        ]
+
+        daggerKapt = [
+                dagger: "com.google.dagger:dagger-compiler:$versions.dagger"
+        ]
+
+        javaXInject = [
+                inject : "javax.inject:javax.inject:$versions.javaxInject"
+        ]
+
+        lifecycleDeps = [
+                lifecycleExt: "androidx.lifecycle:lifecycle-extensions:$versions.archComponents",
+        ]
+
+        lifecycleKapt = [
+                compiler: "androidx.lifecycle:lifecycle-compiler:$versions.archComponents"
+        ]
+
+        rxDeps = [
+                rxJava2: "io.reactivex.rxjava2:rxjava:$versions.rxJava2"
+        ]
+
+        rxAndroidDeps = [
+                rxAndroid: "io.reactivex.rxjava2:rxandroid:$versions.rxAndroid"
+        ]
+
+        rxBindingDeps = [
+                rxBinding   : "com.jakewharton.rxbinding2:rxbinding:$versions.rxBinding",
+                v4          : "com.jakewharton.rxbinding2:rxbinding-support-v4:$versions.rxBinding",
+                appCompat   : "com.jakewharton.rxbinding2:rxbinding-appcompat-v7:$versions.rxBinding",
+                design      : "com.jakewharton.rxbinding2:rxbinding-design:$versions.rxBinding",
+                recyclerView: "com.jakewharton.rxbinding2:rxbinding-recyclerview-v7:$versions.rxBinding"
+        ]
+
+        rxAndroidDeps = [
+                rxAndroid: "io.reactivex.rxjava2:rxandroid:$versions.rxAndroid"
+        ]
+
+        irohaDeps = [
+                iroha: "com.github.hyperledger.iroha-java:client:$versions.iroha"
+        ]
+
+        birtDeps = [
+                birt: "org.eclipse.birt.runtime.3_7_1:org.apache.xerces:$versions.birt"
+        ]
+
+        zXingDeps = [
+                core    : "com.google.zxing:core:$versions.zXing",
+                embedded: "com.journeyapps:zxing-android-embedded:$versions.zXingEmbedded"
+        ]
+
+        rxPermissionsDeps = [
+                rxPermissions: "com.github.tbruyelle:rxpermissions:$versions.rxPermissions"
+        ]
+    }
+
+    ext.kotlin_version = '1.3.50'
     repositories {
-        jcenter()
-        mavenCentral()
         google()
+        jcenter()
+        
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.2'
-        classpath "com.google.protobuf:protobuf-gradle-plugin:0.8.4"
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
+        classpath 'com.android.tools.build:gradle:3.5.1'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
     }
 }
 
 allprojects {
     repositories {
-        jcenter()
         google()
-        maven { url 'https://jitpack.io' }
+        jcenter()
+        maven {
+            url "https://jitpack.io"
+        }
     }
-}
-
-ext {
-    androidSupportLibraryVersion = "27.1.1"
-    daggerVersion = "2.16"
-    archLifecycleVersion = "1.1.1"
 }
 
 task clean(type: Delete) {

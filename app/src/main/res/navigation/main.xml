@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/main"
+    app:startDestination="@id/signupActivity">
+
+    <activity
+        android:id="@+id/signupActivity"
+        android:name="jp.co.soramitsu.irohaandroid.presentation.signup.SignupActivity"
+        android:label="SignupActivity"
+        android:layout="@layout/activity_signup"/>
+</navigation>
