@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="x1_2">4dp</dimen>
+    <dimen name="x1">8dp</dimen>
+    <dimen name="x2">16dp</dimen>
+    <dimen name="x2_5">20dp</dimen>
+    <dimen name="x3">24dp</dimen>
+    <dimen name="x4">32dp</dimen>
+    <dimen name="x5">40dp</dimen>
+    <dimen name="x6">48dp</dimen>
+    <dimen name="x7">56dp</dimen>
+    <dimen name="x8">64dp</dimen>
+    <dimen name="x9">72dp</dimen>
+    <dimen name="x10">80dp</dimen>
+    <dimen name="x11">88dp</dimen>
+</resources>

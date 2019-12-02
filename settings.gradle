@@ -1,1 +1,2 @@
-include ':iroha-android-bindings', ':iroha-android-sample'
+include ':app'
+rootProject.name='Iroha Android'
