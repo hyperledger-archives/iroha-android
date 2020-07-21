@@ -1,3 +1,5 @@
+> This repository is not maintained anymore. To create awesome Android apps on Iroha, please use [Java library](https://github.com/hyperledger/iroha-java). It is compatable with Android and is carefully maintained.
+
 Iroha Android bindings
 =====================
 
